@@ -1,8 +1,10 @@
-package com.example.btl_mobileapp;
+package com.example.btl_mobileapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import com.example.btl_mobileapp.R;
 import com.google.android.material.button.MaterialButton;
 
 public class SettingActivity extends BaseActivity {

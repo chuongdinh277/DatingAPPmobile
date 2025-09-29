@@ -1,4 +1,4 @@
-package com.example.btl_mobileapp;
+package com.example.btl_mobileapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.widget.ImageButton;
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.FrameLayout;
+
+import com.example.btl_mobileapp.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 

@@ -13,7 +13,7 @@
         android:theme="@style/Theme.BTL_mobileAPP">
 
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".activities.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,18 +21,18 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginByPhoneActivity" />
-        <activity android:name=".LoginByEmailActivity" />
-        <activity android:name=".HomeMainActivity" />
-        <activity android:name=".PlanActivity" />
-        <activity android:name=".BaseActivity" />
-        <activity android:name=".SettingActivity" />
-        <activity android:name=".MessengerActivity" />
-        <activity android:name=".NotificationActivity" />
-        <activity android:name=".SettingProfileActivity" />
-        <activity android:name=".SettingPrivacyActivity" />
-        <activity android:name=".SettingAboutActivity" />
-        <activity android:name=".SettingNotificationActivity" />
+        <activity android:name=".activities.LoginByPhoneActivity" />
+        <activity android:name=".activities.LoginByEmailActivity" />
+        <activity android:name=".activities.HomeMainActivity" />
+        <activity android:name=".activities.PlanActivity" />
+        <activity android:name=".activities.BaseActivity" />
+        <activity android:name=".activities.SettingActivity" />
+        <activity android:name=".activities.MessengerActivity" />
+        <activity android:name=".activities.NotificationActivity" />
+        <activity android:name=".activities.SettingProfileActivity" />
+        <activity android:name=".activities.SettingPrivacyActivity" />
+        <activity android:name=".activities.SettingAboutActivity" />
+        <activity android:name=".activities.SettingNotificationActivity" />
 
     </application>
 

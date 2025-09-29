@@ -1,4 +1,4 @@
-package com.example.btl_mobileapp; // đổi thành package app của bạn
+package com.example.btl_mobileapp.activities; // đổi thành package app của bạn
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.btl_mobileapp.R;
 
 
 public class WelcomeActivity extends AppCompatActivity {

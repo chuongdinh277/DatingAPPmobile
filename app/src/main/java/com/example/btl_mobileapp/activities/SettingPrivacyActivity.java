@@ -1,7 +1,8 @@
-package com.example.btl_mobileapp;
+package com.example.btl_mobileapp.activities;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.btl_mobileapp.R;
 
 public class SettingPrivacyActivity extends BaseActivity {
 

@@ -1,4 +1,4 @@
-package com.example.btl_mobileapp;
+package com.example.btl_mobileapp.activities;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

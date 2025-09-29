@@ -1,4 +1,4 @@
-package com.example.btl_mobileapp;
+package com.example.btl_mobileapp.activities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +7,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.btl_mobileapp.R;
+
 import java.util.Calendar;
 
 public class PlanActivity extends BaseActivity {

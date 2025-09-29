@@ -1,6 +1,8 @@
-package com.example.btl_mobileapp;
+package com.example.btl_mobileapp.activities;
 
 import android.os.Bundle;
+
+import com.example.btl_mobileapp.R;
 
 
 public class SettingNotificationActivity extends BaseActivity {

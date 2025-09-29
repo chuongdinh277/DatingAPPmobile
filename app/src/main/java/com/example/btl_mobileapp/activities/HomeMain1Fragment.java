@@ -1,4 +1,4 @@
-package com.example.btl_mobileapp;
+package com.example.btl_mobileapp.activities;
 
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -6,16 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class HomeMain2Fragment extends Fragment {
+import com.example.btl_mobileapp.R;
 
-    public HomeMain2Fragment() {
-        // Required empty public constructor
-    }
+public class HomeMain1Fragment extends Fragment {
+    public HomeMain1Fragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.homemain2, container, false);
+        // Nạp layout homemain1.xml
+        return inflater.inflate(R.layout.homemain1, container, false);
     }
 }

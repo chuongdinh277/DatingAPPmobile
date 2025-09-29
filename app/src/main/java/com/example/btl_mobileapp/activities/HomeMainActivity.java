@@ -1,8 +1,11 @@
-package com.example.btl_mobileapp;
+package com.example.btl_mobileapp.activities;
 
 import android.os.Bundle;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.fragment.app.Fragment;
+
+import com.example.btl_mobileapp.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
