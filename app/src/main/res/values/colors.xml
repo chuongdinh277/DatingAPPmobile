@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_app">#FDD9E6</color>
+    <color name="pill_pink">#F9B7D0</color>
+    <color name="pill_maroon">#990033</color>
+    <color name="underline_dark">#3F0303</color>
+    <color name="underline_light">#FFFFFF</color>
+    <color name="signup_red">#C21807</color>
+    <color name="black">#FF000000</color>
+    <color name="title_shadow">#8B3A7A</color>
+    <color name="pink">#F38ABF</color>
+    <color name="blue">#0069FF</color>
+    <color name="white">#FFFFFF</color>
+
+</resources>

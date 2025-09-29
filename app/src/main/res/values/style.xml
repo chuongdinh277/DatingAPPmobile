@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomPasswordInput" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">#9B004E</item>
+        <item name="hintTextColor">#FFFFFFFF</item>
+        <item name="android:textColorHint">#FFFFFFFF</item>
+        <item name="boxStrokeColor">#FFFFFFFF</item>
+    </style>
+
+</resources>

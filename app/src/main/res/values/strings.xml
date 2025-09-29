@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">BTL_mobileAPP</string>
+    <string name="camera_button">Camera button</string>
+    <string name="about">About</string>
+    <string name="logout">Logout</string>
+    <string name="privacy">Privacy</string>
+    <string name="notification">Notification</string>
+    <string name="profile">Profile</string>
+    <string name="first_name">First Name :</string>
+    <string name="last_name">Last Name :</string>
+    <string name="username">Username :</string>
+    <string name="gmail">Gmail :</string>
+    <string name="phone">Phone Number :</string>
+    <string name="upload">Upload</string>
+    <string name="edit">Edit</string>
+    <string name="hint_message">Nhắn tin</string>
+    <string name="send">Gửi</string>
+</resources>

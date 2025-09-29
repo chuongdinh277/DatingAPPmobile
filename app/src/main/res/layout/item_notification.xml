@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@android:color/transparent"
+    android:padding = "10dp">
+
+    <ImageView
+        android:id ="@+id/iv_user_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/circle_shape"
+        android:scaleType="centerInside"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp">
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_inforNoti"
+            android:textColor="#B03E3E"
+            android:textSize="14sp"
+            android:text="Hau Hau đã chập nhận lời mới kết thành cặp đôi của bạn"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_timeNoti"
+            android:textStyle="bold"
+            android:textSize="10sp"
+            android:text="1 ngaỳ trước"
+            android:textColor="@color/black"/>
+
+    </LinearLayout>
+
+
+
+
+</LinearLayout>
