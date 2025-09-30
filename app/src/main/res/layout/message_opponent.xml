@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="3dp"
+    android:background="@android:color/transparent">
+
+    <ImageView
+        android:id="@+id/iv_opponent_image"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:background="@drawable/circle_shape"
+        android:scaleType="centerInside" />
+
+    <TextView
+        android:id="@+id/tv_messageYourself"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rectangle_shape_15"
+        android:backgroundTint="#7E7575"
+        android:layout_marginLeft="5dp"
+        android:text="Chào bạn , bạn ăn thóc luộc chưa"
+        android:textColor="#121212"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="5dp"
+        android:maxWidth="180dp"
+        android:ellipsize="none"
+        android:scrollHorizontally="false"
+        android:singleLine="false"/>
+
+
+</LinearLayout>
+

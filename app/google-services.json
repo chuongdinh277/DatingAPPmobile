@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "501013051271",
+    "firebase_url": "https://couples-app-b83be-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "couples-app-b83be",
+    "storage_bucket": "couples-app-b83be.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:501013051271:android:c8f3b0a380cdc2dfa90522",
+        "android_client_info": {
+          "package_name": "com.example.couple_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7h8KUV0503ZzdjbZmEM8gFQ79Ay6MVtA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

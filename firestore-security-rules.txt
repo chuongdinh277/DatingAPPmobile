@@ -1,0 +1,39 @@
+# Firebase Security Rules for Cloud Firestore
+# These rules should be added to your Firestore Security Rules in the Firebase Console
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    # Users collection - users can only read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    # Couples collection - only coupled users can access their couple data
+    match /couples/{coupleId} {
+      allow read, write: if request.auth != null &&
+        (resource.data.user1Id == request.auth.uid ||
+         resource.data.user2Id == request.auth.uid);
+
+      # Allow creation if the user is one of the couple members
+      allow create: if request.auth != null &&
+        (request.resource.data.user1Id == request.auth.uid ||
+         request.resource.data.user2Id == request.auth.uid);
+    }
+
+    # AI Suggestions collection - only coupled users can access their suggestions
+    match /ai_suggestions/{suggestionId} {
+      allow read, write: if request.auth != null &&
+        exists(/databases/$(database)/documents/couples/$(resource.data.coupleId)) &&
+        (get(/databases/$(database)/documents/couples/$(resource.data.coupleId)).data.user1Id == request.auth.uid ||
+         get(/databases/$(database)/documents/couples/$(resource.data.coupleId)).data.user2Id == request.auth.uid);
+
+      # Allow creation for coupled users
+      allow create: if request.auth != null &&
+        exists(/databases/$(database)/documents/couples/$(request.resource.data.coupleId)) &&
+        (get(/databases/$(database)/documents/couples/$(request.resource.data.coupleId)).data.user1Id == request.auth.uid ||
+         get(/databases/$(database)/documents/couples/$(request.resource.data.coupleId)).data.user2Id == request.auth.uid);
+    }
+  }
+}

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Couple App</string>
+    <!-- Add Google Sign-In Web Client ID - Replace with your actual Web Client ID from Firebase Console -->
+    <string name="default_web_client_id">501013051271-mus50dnnjjdld03pdq9vng4qjfm0usae.apps.googleusercontent.com</string>
+    <string name="camera_button">Camera button</string>
+    <string name="about">About</string>
+    <string name="logout">Logout</string>
+    <string name="privacy">Privacy</string>
+    <string name="notification">Notification</string>
+    <string name="profile">Profile</string>
+    <string name="first_name">First Name :</string>
+    <string name="last_name">Last Name :</string>
+    <string name="username">Username :</string>
+    <string name="gmail">Gmail :</string>
+    <string name="phone">Phone Number :</string>
+    <string name="upload">Upload</string>
+    <string name="edit">Edit</string>
+    <string name="hint_message">Nhắn tin</string>
+    <string name="send">Gửi</string>
+</resources>

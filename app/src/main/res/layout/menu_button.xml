@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FCC9E0"> <!-- Màu nền màn hình chính -->
+
+    <!-- Chỗ để load layout con -->
+    <FrameLayout
+        android:id="@+id/baseContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Container bọc thanh bottom bar để căn giữa + tạo khoảng cách đáy -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="12dp">
+
+        <!-- Bottom Bar thực sự -->
+        <LinearLayout
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="69dp"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/rounded_toolbar"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:elevation="8dp"
+            android:clipToOutline="true"
+            android:paddingHorizontal="8dp">
+
+            <ImageButton
+                android:id="@+id/btnPlan"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="Task"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_task" />
+
+            <ImageButton
+                android:id="@+id/btnMessage"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="Mess"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_chat" />
+
+            <ImageButton
+                android:id="@+id/btnHome"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="Home"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_home" />
+
+            <ImageButton
+                android:id="@+id/btnGame"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="Game"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_game" />
+
+            <ImageButton
+                android:id="@+id/btnSettings"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="Setting"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_settings" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

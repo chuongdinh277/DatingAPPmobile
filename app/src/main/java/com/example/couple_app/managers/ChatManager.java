@@ -1,0 +1,285 @@
+package com.example.couple_app.managers;
+
+import android.util.Log;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.example.couple_app.models.ChatMessage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+public class ChatManager {
+    private static final String TAG = "ChatManager";
+    private DatabaseReference database;
+    private static ChatManager instance;
+
+    // Database paths
+    private static final String CHATS_PATH = "chats";
+
+    private ChatManager() {
+        database = FirebaseDatabase.getInstance().getReference();
+    }
+
+    public static synchronized ChatManager getInstance() {
+        if (instance == null) {
+            instance = new ChatManager();
+        }
+        return instance;
+    }
+
+    public interface ChatCallback {
+        void onMessagesReceived(List<ChatMessage> messages);
+        void onMessageSent();
+        void onError(String error);
+    }
+
+    public interface MessageListener {
+        void onNewMessage(ChatMessage message);
+        void onError(String error);
+    }
+
+    // Send a message
+    public void sendMessage(String coupleId, String senderId, String messageText, ChatCallback callback) {
+        if (coupleId == null || senderId == null || messageText == null || messageText.trim().isEmpty()) {
+            callback.onError("Invalid message data");
+            return;
+        }
+
+        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+        DatabaseReference newMessageRef = chatRef.push();
+
+        ChatMessage message = new ChatMessage(senderId, messageText.trim());
+
+        newMessageRef.setValue(message)
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Message sent successfully");
+                callback.onMessageSent();
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "Error sending message", e);
+                callback.onError("Failed to send message: " + e.getMessage());
+            });
+    }
+
+    // Listen for new messages in real-time
+    public ValueEventListener listenForMessages(String coupleId, MessageListener listener) {
+        if (coupleId == null) {
+            listener.onError("Invalid couple ID");
+            return null;
+        }
+
+        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+
+        ValueEventListener messageListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                    ChatMessage message = messageSnapshot.getValue(ChatMessage.class);
+                    if (message != null) {
+                        message.setMessageId(messageSnapshot.getKey());
+                        listener.onNewMessage(message);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.w(TAG, "Message listener cancelled", error.toException());
+                listener.onError("Failed to listen for messages: " + error.getMessage());
+            }
+        };
+
+        chatRef.addValueEventListener(messageListener);
+        return messageListener;
+    }
+
+    // Stream new messages using ChildEventListener (preferred to avoid duplicates)
+    public ChildEventListener listenForNewMessagesStream(String coupleId, MessageListener listener) {
+        if (coupleId == null) {
+            listener.onError("Invalid couple ID");
+            return null;
+        }
+        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+        ChildEventListener childListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
+                ChatMessage msg = snapshot.getValue(ChatMessage.class);
+                if (msg != null) {
+                    msg.setMessageId(snapshot.getKey());
+                    listener.onNewMessage(msg);
+                }
+            }
+            @Override public void onChildChanged(DataSnapshot snapshot, String previousChildName) {}
+            @Override public void onChildRemoved(DataSnapshot snapshot) {}
+            @Override public void onChildMoved(DataSnapshot snapshot, String previousChildName) {}
+            @Override public void onCancelled(DatabaseError error) {
+                Log.w(TAG, "Child listener cancelled", error.toException());
+                listener.onError("Failed to listen for messages: " + error.getMessage());
+            }
+        };
+        chatRef.addChildEventListener(childListener);
+        return childListener;
+    }
+
+    // Stream new messages using ChildEventListener (preferred to avoid duplicates)
+    public ChildEventListener listenForNewMessagesStream(String coupleId, long startAfterTimestamp, MessageListener listener) {
+        if (coupleId == null) {
+            listener.onError("Invalid couple ID");
+            return null;
+        }
+        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+        Query query = chatRef.orderByChild("timestamp").startAt(startAfterTimestamp + 1);
+        ChildEventListener childListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
+                ChatMessage msg = snapshot.getValue(ChatMessage.class);
+                if (msg != null) {
+                    msg.setMessageId(snapshot.getKey());
+                    listener.onNewMessage(msg);
+                }
+            }
+            @Override public void onChildChanged(DataSnapshot snapshot, String previousChildName) {}
+            @Override public void onChildRemoved(DataSnapshot snapshot) {}
+            @Override public void onChildMoved(DataSnapshot snapshot, String previousChildName) {}
+            @Override public void onCancelled(DatabaseError error) {
+                Log.w(TAG, "Child listener cancelled", error.toException());
+                listener.onError("Failed to listen for messages: " + error.getMessage());
+            }
+        };
+        query.addChildEventListener(childListener);
+        return childListener;
+    }
+
+    // Get chat history (last N messages) sorted by timestamp ascending
+    public void getChatHistory(String coupleId, int limit, ChatCallback callback) {
+        if (coupleId == null) {
+            callback.onError("Invalid couple ID");
+            return;
+        }
+
+        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+        Query query = chatRef.orderByChild("timestamp").limitToLast(limit);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<ChatMessage> messages = new ArrayList<>();
+                for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                    ChatMessage message = messageSnapshot.getValue(ChatMessage.class);
+                    if (message != null) {
+                        message.setMessageId(messageSnapshot.getKey());
+                        messages.add(message);
+                    }
+                }
+                // Sort by timestamp ascending to ensure correct order
+                Collections.sort(messages, new Comparator<ChatMessage>() {
+                    @Override
+                    public int compare(ChatMessage a, ChatMessage b) {
+                        long ta = coerceToMillis(a != null ? a.getTimestamp() : null);
+                        long tb = coerceToMillis(b != null ? b.getTimestamp() : null);
+                        return Long.compare(ta, tb);
+                    }
+                });
+                callback.onMessagesReceived(messages);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.w(TAG, "Error getting chat history", error.toException());
+                callback.onError("Failed to get chat history: " + error.getMessage());
+            }
+        });
+    }
+
+    private static long coerceToMillis(Object ts) {
+        if (ts == null) return 0L;
+        if (ts instanceof Long) return (Long) ts;
+        if (ts instanceof Double) return ((Double) ts).longValue();
+        return 0L; // Unknown placeholder
+    }
+
+    // Remove message listener
+    public void removeMessageListener(String coupleId, ValueEventListener listener) {
+        if (coupleId != null && listener != null) {
+            DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+            chatRef.removeEventListener(listener);
+        }
+    }
+
+    public void removeChildMessageListener(String coupleId, ChildEventListener listener) {
+        if (coupleId != null && listener != null) {
+            DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+            chatRef.removeEventListener(listener);
+        }
+    }
+
+    // Delete a message (only sender can delete)
+    public void deleteMessage(String coupleId, String messageId, String currentUserId, ChatCallback callback) {
+        if (coupleId == null || messageId == null || currentUserId == null) {
+            callback.onError("Invalid parameters");
+            return;
+        }
+
+        DatabaseReference messageRef = database.child(CHATS_PATH).child(coupleId).child(messageId);
+
+        // First check if current user is the sender
+        messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ChatMessage message = dataSnapshot.getValue(ChatMessage.class);
+                if (message == null) {
+                    callback.onError("Message not found");
+                    return;
+                }
+
+                if (!message.getSenderId().equals(currentUserId)) {
+                    callback.onError("You can only delete your own messages");
+                    return;
+                }
+
+                // Delete the message
+                messageRef.removeValue()
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "Message deleted successfully");
+                        callback.onMessageSent(); // Reuse callback for success
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w(TAG, "Error deleting message", e);
+                        callback.onError("Failed to delete message: " + e.getMessage());
+                    });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.w(TAG, "Error checking message ownership", error.toException());
+                callback.onError("Failed to verify message ownership: " + error.getMessage());
+            }
+        });
+    }
+
+    // Clear all chat history for a couple (both users must agree - implement UI confirmation)
+    public void clearChatHistory(String coupleId, ChatCallback callback) {
+        if (coupleId == null) {
+            callback.onError("Invalid couple ID");
+            return;
+        }
+
+        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+
+        chatRef.removeValue()
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Chat history cleared successfully");
+                callback.onMessageSent(); // Reuse callback for success
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "Error clearing chat history", e);
+                callback.onError("Failed to clear chat history: " + e.getMessage());
+            });
+    }
+}
