@@ -115,6 +115,25 @@ public class DatabaseManager {
             });
     }
 
+    // Update user email in Firestore (for Google account linking)
+    public void updateUserEmail(String userId, String email, AuthManager.AuthActionCallback callback) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("email", email);
+        updates.put("updatedAt", Timestamp.now());
+
+        db.collection(USERS_COLLECTION)
+            .document(userId)
+            .update(updates)
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "User email updated successfully to: " + email);
+                callback.onSuccess();
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "Error updating user email", e);
+                callback.onError("Failed to update email: " + e.getMessage());
+            });
+    }
+
     // Generate and save PIN for user
     public void generateAndSavePinForUser(String userId, DatabaseCallback<String> callback) {
         generateAndSavePinRecursive(userId, callback, 5); // Thêm một giới hạn số lần thử, ví dụ 5 lần
@@ -542,6 +561,35 @@ public class DatabaseManager {
                     } else {
                         Log.w(TAG, "Error checking phone number existence", task.getException());
                         callback.onError("Failed to check phone number: " + task.getException().getMessage());
+                    }
+                });
+    }
+
+    // Check if email exists in database and return user info if exists
+    public void checkEmailExists(String email, DatabaseCallback<User> callback) {
+        db.collection(USERS_COLLECTION)
+                .whereEqualTo("email", email)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        if (!task.getResult().isEmpty()) {
+                            // Email exists, return the user
+                            QueryDocumentSnapshot doc = (QueryDocumentSnapshot) task.getResult().getDocuments().get(0);
+                            try {
+                                User existingUser = doc.toObject(User.class);
+                                existingUser.setUserId(doc.getId()); // Set the document ID as user ID
+                                callback.onSuccess(existingUser);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error parsing existing user with email", e);
+                                callback.onError("Error parsing user data: " + e.getMessage());
+                            }
+                        } else {
+                            // Email doesn't exist
+                            callback.onSuccess(null);
+                        }
+                    } else {
+                        Log.w(TAG, "Error checking email existence", task.getException());
+                        callback.onError("Failed to check email: " + task.getException().getMessage());
                     }
                 });
     }

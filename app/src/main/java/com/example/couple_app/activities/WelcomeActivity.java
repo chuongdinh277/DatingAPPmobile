@@ -197,6 +197,41 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+
+        // First, get the Google account info to check email
+        GoogleSignInAccount lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(this);
+        if (lastSignedInAccount != null && lastSignedInAccount.getEmail() != null) {
+            String googleEmail = lastSignedInAccount.getEmail();
+
+            // Check if this email exists in Firestore database
+            com.example.couple_app.managers.DatabaseManager.getInstance().checkEmailExists(
+                googleEmail,
+                new com.example.couple_app.managers.DatabaseManager.DatabaseCallback<com.example.couple_app.models.User>() {
+                    @Override
+                    public void onSuccess(com.example.couple_app.models.User existingUser) {
+                        if (existingUser != null) {
+                            // Email exists in database, proceed with Firebase Auth
+                            proceedWithGoogleLogin(credential);
+                        } else {
+                            // Email not found in database
+                            showAccountNotFoundDialog(googleEmail);
+                        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(WelcomeActivity.this,
+                            "Lỗi kiểm tra tài khoản: " + error, Toast.LENGTH_LONG).show();
+                    }
+                }
+            );
+        } else {
+            // Fallback: proceed with Firebase Auth if can't get email
+            proceedWithGoogleLogin(credential);
+        }
+    }
+
+    private void proceedWithGoogleLogin(AuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -212,7 +247,7 @@ public class WelcomeActivity extends AppCompatActivity {
                                     user.getUid()
                             );
 
-                            Toast.makeText(this, "Google sign in successful!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Đăng nhập Google thành công!", Toast.LENGTH_SHORT).show();
                             navigateToHome(user);
                         }
                     } else {
@@ -221,6 +256,26 @@ public class WelcomeActivity extends AppCompatActivity {
                         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void showAccountNotFoundDialog(String email) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Tài khoản chưa tồn tại")
+                .setMessage("Email " + email + " chưa được đăng ký trong hệ thống.\n\n" +
+                           "Bạn cần tạo tài khoản trước khi đăng nhập bằng Google.")
+                .setPositiveButton("Đăng ký ngay", (dialog, which) -> {
+                    // Navigate to sign up screen
+                    Intent intent = new Intent(WelcomeActivity.this, SignUpActivity.class);
+                    intent.putExtra("google_email", email); // Pass Google email to pre-fill
+                    startActivity(intent);
+                })
+                .setNegativeButton("Đóng", (dialog, which) -> {
+                    // Sign out from Google to clear selection
+                    mGoogleSignInClient.signOut();
+                })
+                .setCancelable(false)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
     }
 
     @Override

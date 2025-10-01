@@ -6,7 +6,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.EmailAuthProvider; 
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.UserInfo;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -400,54 +401,71 @@ public class AuthManager {
         });
     }
 
-    // Check if current user account has both password and Google providers linked
-    public boolean isAccountFullyLinked() {
+    // Link Phone number to existing Google account
+    public void linkPhoneAccount(PhoneAuthCredential phoneCredential, AuthActionCallback callback) {
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
-            return false;
+        if (user != null) {
+            user.linkWithCredential(phoneCredential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Phone number linked successfully");
+                        callback.onSuccess();
+                    } else {
+                        String errorMessage = task.getException() != null ?
+                            task.getException().getMessage() : "Failed to link phone number";
+                        Log.w(TAG, "Failed to link phone number", task.getException());
+                        callback.onError(errorMessage);
+                    }
+                });
+        } else {
+            callback.onError("No user signed in to link phone number");
         }
+    }
 
-        boolean hasPasswordProvider = false;
-        boolean hasGoogleProvider = false;
+    // Check if user has multiple providers linked
+    public boolean hasMultipleProviders() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            List<? extends UserInfo> providers = user.getProviderData();
+            // Filter out firebase provider (it's always there)
+            return providers.stream()
+                .filter(provider -> !provider.getProviderId().equals("firebase"))
+                .count() > 1;
+        }
+        return false;
+    }
 
-        for (UserInfo userInfo : user.getProviderData()) {
-            if (EmailAuthProvider.PROVIDER_ID.equals(userInfo.getProviderId())) {
-                hasPasswordProvider = true;
+    // Get list of linked providers
+    public List<String> getLinkedProviders() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        List<String> providers = new ArrayList<>();
+        if (user != null) {
+            for (UserInfo userInfo : user.getProviderData()) {
+                if (!userInfo.getProviderId().equals("firebase")) {
+                    providers.add(userInfo.getProviderId());
+                }
             }
-            if (GoogleAuthProvider.PROVIDER_ID.equals(userInfo.getProviderId())) {
-                hasGoogleProvider = true;
-            }
         }
-        return hasPasswordProvider && hasGoogleProvider;
+        return providers;
     }
 
-    public static class AccountLinkingStatus {
-        public final boolean hasPassword;
-        public final boolean hasGoogle;
-        public final String message;
-
-        public AccountLinkingStatus(boolean hasPassword, boolean hasGoogle, String message) {
-            this.hasPassword = hasPassword;
-            this.hasGoogle = hasGoogle;
-            this.message = message;
+    // Unlink phone number
+    public void unlinkPhoneAccount(AuthActionCallback callback) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            user.unlink("phone")
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Phone number unlinked successfully");
+                        callback.onSuccess();
+                    } else {
+                        String errorMessage = task.getException() != null ?
+                            task.getException().getMessage() : "Failed to unlink phone number";
+                        callback.onError(errorMessage);
+                    }
+                });
+        } else {
+            callback.onError("No user signed in");
         }
-
-        public boolean needsLinking() {
-            return hasPassword && !hasGoogle;
-        }
-
-        public boolean isAlreadyLinked() {
-            return hasPassword && hasGoogle;
-        }
-    }
-
-    private String storedGoogleIdToken = null;
-
-    public void setStoredGoogleIdToken(String idToken) {
-        this.storedGoogleIdToken = idToken;
-    }
-
-    public String getStoredGoogleIdToken() {
-        return this.storedGoogleIdToken;
     }
 }

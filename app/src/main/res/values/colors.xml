@@ -58,4 +58,10 @@
     <color name="underline_dark">#3F0303</color>
     <color name="underline_light">#FFFFFF</color>
     <color name="signup_red">#C21807</color>
+
+    <!-- Account Linking colors -->
+    <color name="google_blue">#4285F4</color>
+    <color name="phone_green">#34A853</color>
+    <color name="error_red">#EA4335</color>
+    <color name="warning_yellow">#FFF3CD</color>
 </resources>

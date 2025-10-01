@@ -100,7 +100,7 @@
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="320dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="100dp"
+            android:layout_marginBottom="20dp"
             android:gravity="start|center_vertical"
             android:insetTop="0dp"
             android:insetBottom="0dp"
@@ -119,6 +119,29 @@
             app:iconTint="@null" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/bt_link_google"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="100dp"
+            android:gravity="start|center_vertical"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minHeight="48dp"
+            android:padding="8dp"
+            android:text="Liên kết Google"
+            android:textAllCaps="false"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            app:backgroundTint="@color/pink"
+            app:cornerRadius="30dp"
+            app:icon="@drawable/ic_google"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:iconSize="24dp"
+            app:iconTint="@null" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/bt_logout"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="220dp"
@@ -127,7 +150,7 @@
             android:insetBottom="0dp"
             android:minHeight="48dp"
             android:padding="8dp"
-            android:text="@string/logout"
+            android:text="Đăng xuất"
             android:textAllCaps="false"
             android:textColor="@android:color/black"
             android:textSize="20sp"
