@@ -219,12 +219,18 @@ public class PairingActivity extends AppCompatActivity {
     }
 
     private void logout() {
+        // Clear login state from SharedPreferences
+        com.example.couple_app.utils.LoginPreferences.clearLoginState(this);
+
+        // Sign out from Firebase
         authManager.signOut();
+
+        // Navigate to login screen
         navigateToLogin();
     }
 
     private void navigateToLogin() {
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, WelcomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

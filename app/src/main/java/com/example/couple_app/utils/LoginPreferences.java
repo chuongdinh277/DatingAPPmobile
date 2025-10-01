@@ -4,75 +4,106 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class LoginPreferences {
-    private static final String PREF_NAME = "CoupleAppLoginPrefs";
+    private static final String PREF_NAME = "LoginPrefs";
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
-    private static final String KEY_USER_ID = "userId";
-    private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_EMAIL = "userEmail";
+    private static final String KEY_USER_NAME = "userName";
+    private static final String KEY_USER_ID = "userId";
     private static final String KEY_USER_PHONE = "userPhone";
-    private static final String KEY_LOGIN_TYPE = "loginType"; // "phone", "google"
+    private static final String KEY_LOGIN_TYPE = "loginType";
 
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
     private Context context;
 
+    // Constructor for instance usage
     public LoginPreferences(Context context) {
         this.context = context;
-        sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
     }
 
-    // Save login state
-    public void saveLoginState(String userId, String userName, String email, String phone, String loginType) {
+    // Instance methods (used by LoginActivity)
+    public void saveLoginState(String userId, String name, String email, String phone, String loginType) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putString(KEY_USER_ID, userId);
-        editor.putString(KEY_USER_NAME, userName);
+        editor.putString(KEY_USER_NAME, name);
         editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_PHONE, phone);
         editor.putString(KEY_LOGIN_TYPE, loginType);
         editor.apply();
     }
 
-    // Check if user is logged in
     public boolean isLoggedIn() {
-        return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false);
-    }
-
-    // Get saved user data
-    public String getUserId() {
-        return sharedPreferences.getString(KEY_USER_ID, null);
-    }
-
-    public String getUserName() {
-        return sharedPreferences.getString(KEY_USER_NAME, null);
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getBoolean(KEY_IS_LOGGED_IN, false);
     }
 
     public String getUserEmail() {
-        return sharedPreferences.getString(KEY_USER_EMAIL, null);
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_USER_EMAIL, "");
+    }
+
+    public String getUserName() {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_USER_NAME, "");
+    }
+
+    public String getUserId() {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_USER_ID, "");
     }
 
     public String getUserPhone() {
-        return sharedPreferences.getString(KEY_USER_PHONE, null);
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_USER_PHONE, "");
     }
 
     public String getLoginType() {
-        return sharedPreferences.getString(KEY_LOGIN_TYPE, null);
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_LOGIN_TYPE, "email");
     }
 
-    // Clear login state (logout)
     public void clearLoginState() {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
         editor.clear();
         editor.apply();
     }
 
-    // Check if auto-login is enabled
-    public boolean isAutoLoginEnabled() {
-        return sharedPreferences.getBoolean("autoLogin", true);
+    // Static methods (for backward compatibility with other activities)
+    public static void saveLoginState(Context context, boolean isLoggedIn, String email, String name, String userId) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(KEY_IS_LOGGED_IN, isLoggedIn);
+        editor.putString(KEY_USER_EMAIL, email);
+        editor.putString(KEY_USER_NAME, name);
+        editor.putString(KEY_USER_ID, userId);
+        editor.apply();
     }
 
-    // Set auto-login preference
-    public void setAutoLoginEnabled(boolean enabled) {
-        editor.putBoolean("autoLogin", enabled);
+    public static boolean isLoggedIn(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getBoolean(KEY_IS_LOGGED_IN, false);
+    }
+
+    public static String getUserEmail(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_USER_EMAIL, "");
+    }
+
+    public static String getUserName(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_USER_NAME, "");
+    }
+
+    public static String getUserId(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_USER_ID, "");
+    }
+
+    public static void clearLoginState(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
         editor.apply();
     }
 }

@@ -11,8 +11,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.couple_app.R;
+import com.example.couple_app.utils.LoginPreferences;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
@@ -34,6 +36,9 @@ public class LoginByPhoneActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
+        // Check if user is already logged in
+        checkLoginState();
 
         // Initialize views
         ImageButton btnBack = findViewById(R.id.welcomeBack);
@@ -68,7 +73,28 @@ public class LoginByPhoneActivity extends AppCompatActivity {
                 phoneNumber = "+84" + phoneNumber; // Vietnam country code
             }
 
-            sendVerificationCode(phoneNumber);
+            // Check if phone number exists in database before sending verification code
+            final String finalPhoneNumber = phoneNumber;
+            com.example.couple_app.managers.DatabaseManager databaseManager =
+                com.example.couple_app.managers.DatabaseManager.getInstance();
+
+            databaseManager.checkPhoneNumberExists(finalPhoneNumber, new com.example.couple_app.managers.DatabaseManager.DatabaseCallback<Boolean>() {
+                @Override
+                public void onSuccess(Boolean exists) {
+                    if (exists) {
+                        // Phone number exists in database, proceed with verification
+                        sendVerificationCode(finalPhoneNumber);
+                    } else {
+                        // Phone number not found in database
+                        Toast.makeText(LoginByPhoneActivity.this, "Phone number not registered. Please sign up first.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(LoginByPhoneActivity.this, "Error checking phone number: " + error, Toast.LENGTH_LONG).show();
+                }
+            });
         });
 
         // Verify code
@@ -81,15 +107,75 @@ public class LoginByPhoneActivity extends AppCompatActivity {
             verifyCode(code);
         });
 
-        // Login after verification
+        // Remove the direct navigation to PairingActivity - will be handled in signInWithPhoneAuthCredential
         btnLogin.setOnClickListener(view -> {
-            Intent intent = new Intent(LoginByPhoneActivity.this, PairingActivity.class);
-            startActivity(intent);
-            finish();
+            FirebaseUser user = mAuth.getCurrentUser();
+            if (user != null) {
+                handleSuccessfulLogin(user);
+            }
         });
 
         // Initialize phone auth callbacks
         initializePhoneAuthCallbacks();
+    }
+
+    private void checkLoginState() {
+        // Check SharedPreferences first
+        if (LoginPreferences.isLoggedIn(this)) {
+            // Also check Firebase Auth state
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if (currentUser != null) {
+                // User is still authenticated, check pairing status
+                checkPairingStatus(currentUser);
+            } else {
+                // Firebase session expired, clear saved login state
+                LoginPreferences.clearLoginState(this);
+            }
+        }
+    }
+
+    private void handleSuccessfulLogin(FirebaseUser user) {
+        // Save login state to SharedPreferences
+        LoginPreferences.saveLoginState(
+            this,
+            true,
+            user.getEmail() != null ? user.getEmail() : "",
+            user.getDisplayName() != null ? user.getDisplayName() : "",
+            user.getUid()
+        );
+
+        Toast.makeText(this, "Phone login successful!", Toast.LENGTH_SHORT).show();
+
+        // Check pairing status before navigation
+        checkPairingStatus(user);
+    }
+
+    private void checkPairingStatus(FirebaseUser user) {
+        // Check if user is already paired before going to HomeMainActivity
+        com.example.couple_app.managers.DatabaseManager databaseManager =
+            com.example.couple_app.managers.DatabaseManager.getInstance();
+
+        databaseManager.getCoupleByUserId(user.getUid(), new com.example.couple_app.managers.DatabaseManager.DatabaseCallback<com.example.couple_app.models.Couple>() {
+            @Override
+            public void onSuccess(com.example.couple_app.models.Couple couple) {
+                // User is already paired, go to HomeMainActivity
+                Intent intent = new Intent(LoginByPhoneActivity.this, HomeMainActivity.class);
+                intent.putExtra("user_name", user.getDisplayName() != null ? user.getDisplayName() : LoginPreferences.getUserName(LoginByPhoneActivity.this));
+                intent.putExtra("user_email", user.getEmail());
+                intent.putExtra("user_id", user.getUid());
+                intent.putExtra("coupleId", couple.getCoupleId());
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onError(String error) {
+                // User is not paired yet, go to PairingActivity
+                Intent intent = new Intent(LoginByPhoneActivity.this, PairingActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void initializePhoneAuthCallbacks() {
@@ -102,8 +188,7 @@ public class LoginByPhoneActivity extends AppCompatActivity {
 
             @Override
             public void onVerificationFailed(FirebaseException e) {
-                Toast.makeText(LoginByPhoneActivity.this, "Verification failed: " + e.getMessage(),
-                    Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginByPhoneActivity.this, "Verification failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -140,13 +225,13 @@ public class LoginByPhoneActivity extends AppCompatActivity {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Sign in success
-                        Toast.makeText(this, "Phone verification successful!", Toast.LENGTH_SHORT).show();
-                        btnLogin.setVisibility(View.VISIBLE);
-                        btnVerifyCode.setEnabled(false);
+                        FirebaseUser user = task.getResult().getUser();
+                        if (user != null) {
+                            // Handle successful login with pairing check
+                            handleSuccessfulLogin(user);
+                        }
                     } else {
-                        // Sign in failed
-                        Toast.makeText(this, "Verification failed. Please try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Sign in failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }

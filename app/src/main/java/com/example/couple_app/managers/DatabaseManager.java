@@ -148,21 +148,67 @@ public class DatabaseManager {
 
         String newPin = generatePinCode();
 
-        checkPinExists(newPin, exists -> { // Now this lambda is compatible with PinCheckCallback
+        checkPinExists(newPin, exists -> {
             if (exists) {
                 Log.d(TAG, "PIN " + newPin + " already exists. Retrying... Attempts left: " + (retriesLeft - 1));
                 generateAndSavePinRecursive(userId, finalCallback, retriesLeft - 1);
             } else {
+                // First check if user document exists
                 db.collection(USERS_COLLECTION)
                         .document(userId)
-                        .update("pinCode", newPin)
-                        .addOnSuccessListener(aVoid -> {
-                            Log.d(TAG, "PIN generated and saved: " + newPin);
-                            finalCallback.onSuccess(newPin);
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                // Document exists, update pinCode
+                                db.collection(USERS_COLLECTION)
+                                        .document(userId)
+                                        .update("pinCode", newPin)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d(TAG, "PIN generated and updated: " + newPin);
+                                            finalCallback.onSuccess(newPin);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.w(TAG, "Error updating PIN", e);
+                                            finalCallback.onError("Failed to update PIN: " + e.getMessage());
+                                        });
+                            } else {
+                                // Document doesn't exist, create new user document with PIN
+                                // Get current user info from Firebase Auth
+                                com.google.firebase.auth.FirebaseUser currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+                                if (currentUser != null) {
+                                    User newUser;
+                                    if (currentUser.getEmail() != null) {
+                                        // Email user
+                                        newUser = new User(userId,
+                                            currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User",
+                                            currentUser.getEmail());
+                                    } else {
+                                        // Phone user
+                                        newUser = new User(userId,
+                                            currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User",
+                                            currentUser.getPhoneNumber(), true);
+                                    }
+                                    newUser.setPinCode(newPin);
+
+                                    db.collection(USERS_COLLECTION)
+                                            .document(userId)
+                                            .set(newUser)
+                                            .addOnSuccessListener(aVoid -> {
+                                                Log.d(TAG, "User document created with PIN: " + newPin);
+                                                finalCallback.onSuccess(newPin);
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Log.w(TAG, "Error creating user document with PIN", e);
+                                                finalCallback.onError("Failed to create user with PIN: " + e.getMessage());
+                                            });
+                                } else {
+                                    finalCallback.onError("No authenticated user found");
+                                }
+                            }
                         })
                         .addOnFailureListener(e -> {
-                            Log.w(TAG, "Error saving PIN", e);
-                            finalCallback.onError("Failed to generate PIN: " + e.getMessage());
+                            Log.w(TAG, "Error checking user document existence", e);
+                            finalCallback.onError("Failed to check user document: " + e.getMessage());
                         });
             }
         });
@@ -482,5 +528,21 @@ public class DatabaseManager {
                 Log.w(TAG, "Error marking message as read", e);
                 callback.onError("Failed to mark message as read: " + e.getMessage());
             });
+    }
+
+    // Check if phone number exists in database
+    public void checkPhoneNumberExists(String phoneNumber, DatabaseCallback<Boolean> callback) {
+        db.collection(USERS_COLLECTION)
+                .whereEqualTo("phoneNumber", phoneNumber)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        boolean exists = !task.getResult().isEmpty();
+                        callback.onSuccess(exists);
+                    } else {
+                        Log.w(TAG, "Error checking phone number existence", task.getException());
+                        callback.onError("Failed to check phone number: " + task.getException().getMessage());
+                    }
+                });
     }
 }
