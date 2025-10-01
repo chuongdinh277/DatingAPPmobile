@@ -7,7 +7,11 @@ import android.widget.Toast;
 
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import android.widget.FrameLayout;
+import android.view.View;
+import android.os.Build;
 
 import com.example.couple_app.R;
 import com.example.couple_app.managers.DatabaseManager;
@@ -21,9 +25,39 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Thiết lập system bars trước khi load layout
+        setupSystemBars();
+
         // Load layout gốc chứa FrameLayout + bottom bar
         super.setContentView(R.layout.menu_button);
         setupBottomBar();
+    }
+
+    // Phương thức xử lý system bars để tránh phần màu đen
+    private void setupSystemBars() {
+        // Enable edge-to-edge display
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        // Thiết lập màu navigation bar và status bar
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
+            // Sử dụng màu hồng giống với nền app
+            getWindow().setNavigationBarColor(getResources().getColor(R.color.couple_pink_bg));
+
+            // Thiết lập màu icon trên system bars
+            WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+            controller.setAppearanceLightStatusBars(true);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                controller.setAppearanceLightNavigationBars(true);
+            }
+        }
+
+        // Tránh navigation bar contrast trên Android 10+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            getWindow().setNavigationBarContrastEnforced(false);
+        }
     }
 
     // Hàm set layout con vào trong FrameLayout baseContent

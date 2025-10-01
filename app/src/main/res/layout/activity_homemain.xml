@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFDBED"
+    android:background="@color/couple_pink_bg"
     tools:context=".activities.HomeMainActivity">
 
     <!-- ViewPager2 để hiển thị các fragments -->

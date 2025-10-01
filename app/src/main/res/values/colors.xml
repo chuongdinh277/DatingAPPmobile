@@ -15,9 +15,9 @@
     <color name="couple_primary">#FF6200EE</color>
     <color name="couple_secondary">#FF03DAC5</color>
     <color name="couple_accent">#FFFF4081</color>
+    <color name="couple_pink_bg">#FCC9E0</color>
 
     <!-- Adaptive colors for light theme -->
-    <color name="background_primary">#FFFFFF</color>
     <color name="background_secondary">#F5F5F5</color>
     <color name="surface_color">#FFFFFF</color>
     <color name="text_primary">#000000</color>

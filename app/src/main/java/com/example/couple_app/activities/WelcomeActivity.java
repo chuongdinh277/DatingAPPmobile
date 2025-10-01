@@ -3,10 +3,13 @@ package com.example.couple_app.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
-
+import android.os.Build;
+import android.view.View;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.example.couple_app.R;
 import com.example.couple_app.utils.LoginPreferences;
@@ -30,6 +33,10 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Thiết lập navigation bar trong suốt trước khi load layout
+        setupTransparentSystemBars();
+
         setContentView(R.layout.welcome);
 
         // Initialize Firebase Auth
@@ -65,6 +72,38 @@ public class WelcomeActivity extends AppCompatActivity {
                 });
 
         setupClickListeners();
+    }
+
+    // Phương thức thiết lập navigation bar và status bar trong suốt
+    private void setupTransparentSystemBars() {
+        // Enable edge-to-edge display
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Thiết lập status bar và navigation bar trong suốt
+            getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
+
+            // Thiết lập màu icon trên system bars
+            WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+            controller.setAppearanceLightStatusBars(true);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                controller.setAppearanceLightNavigationBars(true);
+            }
+        }
+
+        // Tắt navigation bar contrast trên Android 10+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            getWindow().setNavigationBarContrastEnforced(false);
+        }
+
+        // Thiết lập full screen flags
+        getWindow().getDecorView().setSystemUiVisibility(
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        );
     }
 
     private void checkLoginState() {
