@@ -34,126 +34,197 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Thiết lập navigation bar trong suốt trước khi load layout
-        setupTransparentSystemBars();
+        try {
+            // Thiết lập navigation bar trong suốt trước khi load layout
+            setupTransparentSystemBars();
 
-        setContentView(R.layout.welcome);
+            setContentView(R.layout.welcome);
 
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
+            // Initialize Firebase Auth
+            mAuth = FirebaseAuth.getInstance();
 
-        // Check if user is already logged in before showing welcome screen
-        checkLoginState();
+            // Configure Google Sign In
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.default_web_client_id))
+                    .requestEmail()
+                    .build();
 
-        // Configure Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
+            mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        @SuppressWarnings("deprecation")
-        GoogleSignInClient client = GoogleSignIn.getClient(this, gso);
-        mGoogleSignInClient = client;
-
-        // Initialize Google Sign-In launcher
-        googleSignInLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        @SuppressWarnings("deprecation")
-                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                        try {
-                            GoogleSignInAccount account = task.getResult(ApiException.class);
-                            firebaseAuthWithGoogle(account.getIdToken());
-                        } catch (ApiException e) {
-                            Toast.makeText(this, "Google sign in failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            // Initialize Google Sign-In launcher
+            googleSignInLauncher = registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                            try {
+                                GoogleSignInAccount account = task.getResult(ApiException.class);
+                                firebaseAuthWithGoogle(account.getIdToken());
+                            } catch (ApiException e) {
+                                Toast.makeText(this, "Google sign in failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
+                    });
 
-        setupClickListeners();
+            setupClickListeners();
+        } catch (Exception e) {
+            // Log error và không crash app
+            android.util.Log.e("WelcomeActivity", "Error in onCreate", e);
+        }
     }
 
     // Phương thức thiết lập navigation bar và status bar trong suốt
     private void setupTransparentSystemBars() {
-        // Enable edge-to-edge display
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        try {
+            // Enable edge-to-edge display
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Thiết lập status bar và navigation bar trong suốt
-            getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-            getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // Thiết lập status bar và navigation bar trong suốt
+                getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
 
-            // Thiết lập màu icon trên system bars
-            WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
-            controller.setAppearanceLightStatusBars(true);
+                // Sử dụng màu an toàn cho navigation bar
+                int navBarColor = androidx.core.content.ContextCompat.getColor(this, R.color.couple_pink_bg);
+                getWindow().setNavigationBarColor(navBarColor);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                controller.setAppearanceLightNavigationBars(true);
+                // Thiết lập màu icon trên system bars
+                WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+                controller.setAppearanceLightStatusBars(true);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    controller.setAppearanceLightNavigationBars(true);
+                }
+            }
+
+            // Tắt navigation bar contrast trên Android 10+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                getWindow().setNavigationBarContrastEnforced(false);
+            }
+
+            // Sử dụng WindowInsetsController thay vì deprecated system UI flags
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                // Android 11+ - Sử dụng WindowInsetsController
+                WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+                controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            } else {
+                // Android 10 và thấp hơn - Sử dụng deprecated flags (nhưng vẫn cần thiết cho compatibility)
+                getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                );
+            }
+        } catch (Exception e) {
+            android.util.Log.e("WelcomeActivity", "Error setting up transparent system bars", e);
+            // Fallback: sử dụng màu mặc định
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    getWindow().setStatusBarColor(getResources().getColor(android.R.color.black, getTheme()));
+                    getWindow().setNavigationBarColor(getResources().getColor(android.R.color.black, getTheme()));
+                }
+            } catch (Exception fallbackException) {
+                android.util.Log.e("WelcomeActivity", "Fallback also failed", fallbackException);
             }
         }
+    }
 
-        // Tắt navigation bar contrast trên Android 10+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            getWindow().setNavigationBarContrastEnforced(false);
-        }
-
-        // Thiết lập full screen flags
-        getWindow().getDecorView().setSystemUiVisibility(
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        );
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Chỉ check login state khi activity đã được resume hoàn toàn
+        checkLoginState();
     }
 
     private void checkLoginState() {
-        // Check SharedPreferences first
-        if (LoginPreferences.isLoggedIn(this)) {
-            // Also check Firebase Auth state
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-            if (currentUser != null) {
-                // User is still authenticated, go to home
-                navigateToHome(currentUser);
-            } else {
-                // Firebase session expired, clear saved login state
-                LoginPreferences.clearLoginState(this);
+        // Đảm bảo activity không bị destroyed
+        if (isDestroyed() || isFinishing()) {
+            return;
+        }
+
+        try {
+            // Check SharedPreferences first
+            if (LoginPreferences.isLoggedIn(this)) {
+                // Also check Firebase Auth state
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                if (currentUser != null) {
+                    // User is still authenticated, go to home
+                    navigateToHome(currentUser);
+                } else {
+                    // Firebase session expired, clear saved login state
+                    LoginPreferences.clearLoginState(this);
+                }
             }
+        } catch (Exception e) {
+            android.util.Log.e("WelcomeActivity", "Error checking login state", e);
         }
     }
 
     private void navigateToHome(FirebaseUser user) {
+        // Đảm bảo activity không bị destroyed trước khi navigate
+        if (isDestroyed() || isFinishing()) {
+            return;
+        }
+
         // First check if user needs pairing
         checkPairingStatus(user);
     }
 
     private void checkPairingStatus(FirebaseUser user) {
-        // Check if user is already paired before going to HomeMainActivity
-        com.example.couple_app.managers.DatabaseManager databaseManager =
-                com.example.couple_app.managers.DatabaseManager.getInstance();
+        // Đảm bảo activity không bị destroyed
+        if (isDestroyed() || isFinishing()) {
+            return;
+        }
 
-        databaseManager.getCoupleByUserId(user.getUid(), new com.example.couple_app.managers.DatabaseManager.DatabaseCallback<com.example.couple_app.models.Couple>() {
-            @Override
-            public void onSuccess(com.example.couple_app.models.Couple couple) {
-                // User is already paired, go to HomeMainActivity
-                Intent intent = new Intent(WelcomeActivity.this, HomeMainActivity.class);
-                if (user != null) {
-                    intent.putExtra("user_name", user.getDisplayName() != null ? user.getDisplayName() : LoginPreferences.getUserName(WelcomeActivity.this));
-                    intent.putExtra("user_email", user.getEmail());
-                    intent.putExtra("user_id", user.getUid());
-                    intent.putExtra("coupleId", couple.getCoupleId());
+        try {
+            // Check if user is already paired before going to HomeMainActivity
+            com.example.couple_app.managers.DatabaseManager databaseManager =
+                    com.example.couple_app.managers.DatabaseManager.getInstance();
+
+            databaseManager.getCoupleByUserId(user.getUid(), new com.example.couple_app.managers.DatabaseManager.DatabaseCallback<com.example.couple_app.models.Couple>() {
+                @Override
+                public void onSuccess(com.example.couple_app.models.Couple couple) {
+                    // Kiểm tra lại activity state trước khi navigate
+                    if (isDestroyed() || isFinishing()) {
+                        return;
+                    }
+
+                    // User is already paired, go to HomeMainActivity
+                    Intent intent = new Intent(WelcomeActivity.this, HomeMainActivity.class);
+                    if (user != null) {
+                        intent.putExtra("user_name", user.getDisplayName() != null ? user.getDisplayName() : LoginPreferences.getUserName(WelcomeActivity.this));
+                        intent.putExtra("user_email", user.getEmail());
+                        intent.putExtra("user_id", user.getUid());
+                        intent.putExtra("coupleId", couple.getCoupleId());
+                    }
+
+                    try {
+                        startActivity(intent);
+                        finish();
+                    } catch (Exception e) {
+                        android.util.Log.e("WelcomeActivity", "Error starting HomeMainActivity", e);
+                    }
                 }
-                startActivity(intent);
-                finish();
-            }
 
-            @Override
-            public void onError(String error) {
-                // User is not paired yet, go to PairingActivity
-                Intent intent = new Intent(WelcomeActivity.this, PairingActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+                @Override
+                public void onError(String error) {
+                    // Kiểm tra lại activity state trước khi navigate
+                    if (isDestroyed() || isFinishing()) {
+                        return;
+                    }
+
+                    // User is not paired yet, go to PairingActivity
+                    Intent intent = new Intent(WelcomeActivity.this, PairingActivity.class);
+                    try {
+                        startActivity(intent);
+                        finish();
+                    } catch (Exception e) {
+                        android.util.Log.e("WelcomeActivity", "Error starting PairingActivity", e);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            android.util.Log.e("WelcomeActivity", "Error in checkPairingStatus", e);
+        }
     }
 
     private void setupClickListeners() {

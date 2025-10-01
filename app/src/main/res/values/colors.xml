@@ -41,6 +41,7 @@
 
     <!-- Light Theme Colors -->
     <color name="background_light">#FFFFFFFF</color>
+    <color name="background_primary">#FFFFFFFF</color>
     <color name="surface_light">#FFFFFFFF</color>
     <color name="on_background_light">#FF1C1B1F</color>
     <color name="on_surface_light">#FF1C1B1F</color>

@@ -89,6 +89,7 @@
             android:layout_height="wrap_content"
             android:hint="Nhập mã PIN của đối phương"
             android:inputType="number"
+            android:textColor="@color/black"
             android:maxLength="6"
             android:textSize="18sp"
             android:textAlignment="center"

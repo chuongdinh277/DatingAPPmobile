@@ -20,11 +20,17 @@
 
         <ImageButton
             android:id="@+id/btn_back"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="29dp"
+            android:layout_height="29dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="0dp"
+            android:background="@null"
+            android:contentDescription="Back"
+            android:padding="2dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/left_arrow"
-            app:tint="@android:color/white" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_partner_name"
@@ -67,6 +73,7 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/bg_message_input"
+            android:textColor="@color/black"
             android:hint="Type a message..."
             android:imeOptions="actionSend"
             android:inputType="textCapSentences|textMultiLine"
