@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.auth.FirebaseAuthSettings;
 
 import java.util.concurrent.TimeUnit;
 
@@ -73,6 +74,9 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void initializeFirebaseAuth() {
         mAuth = FirebaseAuth.getInstance();
+        FirebaseAuthSettings firebaseAuthSettings = mAuth.getFirebaseAuthSettings();
+        firebaseAuthSettings.setAppVerificationDisabledForTesting(true);
+
     }
 
     private void initializePhoneAuthCallbacks() {

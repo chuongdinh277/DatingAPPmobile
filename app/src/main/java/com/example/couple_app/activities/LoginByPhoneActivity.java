@@ -8,7 +8,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 
 import com.example.couple_app.R;
 import com.example.couple_app.utils.LoginPreferences;
@@ -18,16 +20,20 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.auth.FirebaseAuthSettings;
+import com.google.firebase.FirebaseTooManyRequestsException;
 
 import java.util.concurrent.TimeUnit;
 
 public class LoginByPhoneActivity extends AppCompatActivity {
     private EditText etPhoneNumber, etVerificationCode;
     private Button btnSendCode, btnVerifyCode, btnLogin;
+    private TextView tvQuotaError, tvAlternativeLogin;
     private FirebaseAuth mAuth;
     private String mVerificationId;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
+    private boolean quotaExceeded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +42,9 @@ public class LoginByPhoneActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+        FirebaseAuthSettings authSettings = mAuth.getFirebaseAuthSettings();
+        // Only disable for testing - remove in production
+        authSettings.setAppVerificationDisabledForTesting(true);
 
         // Check if user is already logged in
         checkLoginState();
@@ -48,10 +57,16 @@ public class LoginByPhoneActivity extends AppCompatActivity {
         btnVerifyCode = findViewById(R.id.btnVerifyCode);
         btnLogin = findViewById(R.id.btnLogin);
 
-        // Initially hide verification code section
+        // Add quota error text view (you'll need to add this to your layout)
+        tvQuotaError = findViewById(R.id.tvQuotaError);
+        tvAlternativeLogin = findViewById(R.id.tvAlternativeLogin);
+
+        // Initially hide verification code section and error messages
         etVerificationCode.setVisibility(View.GONE);
         btnVerifyCode.setVisibility(View.GONE);
         btnLogin.setVisibility(View.GONE);
+        if (tvQuotaError != null) tvQuotaError.setVisibility(View.GONE);
+        if (tvAlternativeLogin != null) tvAlternativeLogin.setVisibility(View.GONE);
 
         // Back button click
         btnBack.setOnClickListener(view -> {
@@ -188,7 +203,7 @@ public class LoginByPhoneActivity extends AppCompatActivity {
 
             @Override
             public void onVerificationFailed(FirebaseException e) {
-                Toast.makeText(LoginByPhoneActivity.this, "Verification failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                handleVerificationError(e);
             }
 
             @Override
@@ -206,14 +221,72 @@ public class LoginByPhoneActivity extends AppCompatActivity {
         };
     }
 
+    private void handleVerificationError(FirebaseException e) {
+        if (e instanceof FirebaseTooManyRequestsException) {
+            // SMS quota exceeded
+            quotaExceeded = true;
+            showQuotaExceededDialog();
+        } else if (e.getMessage() != null && (e.getMessage().contains("17052") || e.getMessage().contains("Exceeded quota"))) {
+            // Handle the specific error code 17052
+            quotaExceeded = true;
+            showQuotaExceededDialog();
+        } else {
+            Toast.makeText(LoginByPhoneActivity.this, "Verification failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showQuotaExceededDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("SMS Verification Unavailable")
+                .setMessage("SMS verification is temporarily unavailable due to quota limits. Please try one of these alternatives:\n\n" +
+                        "1. Try again later (quota resets daily)\n" +
+                        "2. Use email login if available\n" +
+                        "3. Contact support for assistance")
+                .setPositiveButton("Try Email Login", (dialog, which) -> {
+                    // Navigate to email login or show email login option
+                    showEmailLoginOption();
+                })
+                .setNegativeButton("Try Later", (dialog, which) -> {
+                    dialog.dismiss();
+                    // Show quota error message
+                    if (tvQuotaError != null) {
+                        tvQuotaError.setText("SMS verification quota exceeded. Please try again later or use email login.");
+                        tvQuotaError.setVisibility(View.VISIBLE);
+                    }
+                })
+                .setNeutralButton("Back", (dialog, which) -> {
+                    finish();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    private void showEmailLoginOption() {
+        // For now, navigate back to welcome screen to show other login options
+        // You can implement email login here if you have it
+        Toast.makeText(this, "Please use the Sign Up option to create an account with email", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(LoginByPhoneActivity.this, WelcomeActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     private void sendVerificationCode(String phoneNumber) {
-        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
-                .setPhoneNumber(phoneNumber)
-                .setTimeout(60L, TimeUnit.SECONDS)
-                .setActivity(this)
-                .setCallbacks(mCallbacks)
-                .build();
-        PhoneAuthProvider.verifyPhoneNumber(options);
+        if (quotaExceeded) {
+            showQuotaExceededDialog();
+            return;
+        }
+
+        try {
+            PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                    .setPhoneNumber(phoneNumber)
+                    .setTimeout(60L, TimeUnit.SECONDS)
+                    .setActivity(this)
+                    .setCallbacks(mCallbacks)
+                    .build();
+            PhoneAuthProvider.verifyPhoneNumber(options);
+        } catch (Exception e) {
+            handleVerificationError(new FirebaseException("Failed to send verification code: " + e.getMessage()));
+        }
     }
 
     private void verifyCode(String code) {

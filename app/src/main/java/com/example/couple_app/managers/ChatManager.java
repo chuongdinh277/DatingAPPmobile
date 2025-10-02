@@ -23,7 +23,20 @@ public class ChatManager {
     private static final String CHATS_PATH = "chats";
 
     private ChatManager() {
-        database = FirebaseDatabase.getInstance().getReference();
+        try {
+            // Use specific database URL for better connection
+            String databaseUrl = "https://couples-app-b83be-default-rtdb.firebaseio.com/";
+            database = FirebaseDatabase.getInstance(databaseUrl).getReference();
+
+            // Enable logging for debugging
+            FirebaseDatabase.getInstance(databaseUrl).setLogLevel(com.google.firebase.database.Logger.Level.DEBUG);
+
+            Log.d(TAG, "ChatManager initialized with database URL: " + databaseUrl);
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing ChatManager", e);
+            // Fallback to default instance
+            database = FirebaseDatabase.getInstance().getReference();
+        }
     }
 
     public static synchronized ChatManager getInstance() {
@@ -46,25 +59,46 @@ public class ChatManager {
 
     // Send a message
     public void sendMessage(String coupleId, String senderId, String messageText, ChatCallback callback) {
-        if (coupleId == null || senderId == null || messageText == null || messageText.trim().isEmpty()) {
-            callback.onError("Invalid message data");
+        if (coupleId == null || coupleId.trim().isEmpty()) {
+            Log.e(TAG, "CoupleId is null or empty");
+            callback.onError("Invalid couple ID");
             return;
         }
 
-        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
-        DatabaseReference newMessageRef = chatRef.push();
+        if (senderId == null || senderId.trim().isEmpty()) {
+            Log.e(TAG, "SenderId is null or empty");
+            callback.onError("Invalid sender ID");
+            return;
+        }
 
-        ChatMessage message = new ChatMessage(senderId, messageText.trim());
+        if (messageText == null || messageText.trim().isEmpty()) {
+            Log.e(TAG, "Message text is null or empty");
+            callback.onError("Message cannot be empty");
+            return;
+        }
 
-        newMessageRef.setValue(message)
-            .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Message sent successfully");
-                callback.onMessageSent();
-            })
-            .addOnFailureListener(e -> {
-                Log.w(TAG, "Error sending message", e);
-                callback.onError("Failed to send message: " + e.getMessage());
-            });
+        try {
+            DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+            DatabaseReference newMessageRef = chatRef.push();
+
+            ChatMessage message = new ChatMessage(senderId, messageText.trim());
+
+            Log.d(TAG, "Attempting to send message to path: " + CHATS_PATH + "/" + coupleId);
+            Log.d(TAG, "Message: " + messageText.trim());
+
+            newMessageRef.setValue(message)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Message sent successfully to Firebase");
+                    callback.onMessageSent();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error sending message to Firebase", e);
+                    callback.onError("Failed to send message: " + e.getMessage());
+                });
+        } catch (Exception e) {
+            Log.e(TAG, "Exception while sending message", e);
+            callback.onError("Unexpected error: " + e.getMessage());
+        }
     }
 
     // Listen for new messages in real-time

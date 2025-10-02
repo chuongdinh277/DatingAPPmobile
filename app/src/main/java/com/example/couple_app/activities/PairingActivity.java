@@ -1,6 +1,7 @@
 package com.example.couple_app.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,7 +11,6 @@ import android.widget.TextView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseUser;
 import com.example.couple_app.R;
@@ -19,7 +19,7 @@ import com.example.couple_app.managers.DatabaseManager;
 import com.example.couple_app.models.Couple;
 import com.example.couple_app.models.User;
 
-public class PairingActivity extends AppCompatActivity {
+public class PairingActivity extends BaseActivity {
     private static final String TAG = "PairingActivity";
 
     private TextView tvWelcome, tvYourPin, tvPinDisplay, tvInstructions;
@@ -33,10 +33,19 @@ public class PairingActivity extends AppCompatActivity {
     private String currentUserId;
     private String userPin;
 
+    // Ẩn thanh menu trên màn hình ghép cặp
+    @Override
+    protected boolean shouldShowBottomBar() {
+        return false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pairing);
+
+        // Không hiển thị menu ở màn hình ghép cặp để người dùng tập trung vào việc ghép đôi.
+        // setActiveButton("message");
 
         initViews();
         initManagers();
@@ -210,12 +219,45 @@ public class PairingActivity extends AppCompatActivity {
     }
 
     private void navigateToChat(String coupleId, String partnerName) {
+        // Lưu trạng thái đăng nhập sau khi pairing thành công
+        saveLoginStateAfterPairing(coupleId, partnerName);
+
+        // Chuyển trực tiếp đến MessengerActivity với menu navigation
         Intent intent = new Intent(this, HomeMainActivity.class);
         intent.putExtra("coupleId", coupleId);
         intent.putExtra("partnerName", partnerName);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
+        overridePendingTransition(0, 0);
+
+        // Hiển thị thông báo đăng nhập thành công
+        Toast.makeText(this, "Đã đăng nhập thành công! Chào mừng bạn đến với " + partnerName, Toast.LENGTH_LONG).show();
+
         finish();
+    }
+
+    private void saveLoginStateAfterPairing(String coupleId, String partnerName) {
+        FirebaseUser currentUser = authManager.getCurrentUser();
+        if (currentUser != null) {
+            // Lưu thông tin đăng nhập với thông tin couple
+            SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+
+            // Lưu trạng thái đăng nhập cơ bản
+            editor.putBoolean("isLoggedIn", true);
+            editor.putString("userId", currentUser.getUid());
+            editor.putString("userEmail", currentUser.getEmail());
+            editor.putString("userName", currentUser.getDisplayName());
+
+            // Lưu thông tin couple để tự động vào chat
+            editor.putBoolean("isPaired", true);
+            editor.putString("coupleId", coupleId);
+            editor.putString("partnerName", partnerName);
+
+            editor.apply();
+
+            Log.d(TAG, "Login state saved after successful pairing");
+        }
     }
 
     private void logout() {

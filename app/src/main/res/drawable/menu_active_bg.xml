@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Centered subtle circular background for active menu icon -->
+    <item android:gravity="center">
+        <shape android:shape="rectangle">
+            <size android:width="36dp" android:height="36dp"/>
+            <corners android:radius="18dp"/>
+            <!-- Semi-transparent white to pop on pink toolbar; tweak alpha if needed -->
+            <solid android:color="#26FFFFFF"/>
+        </shape>
+    </item>
+</layer-list>
+

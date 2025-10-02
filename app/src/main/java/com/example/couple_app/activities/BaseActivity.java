@@ -2,11 +2,13 @@ package com.example.couple_app.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import android.widget.FrameLayout;
@@ -14,13 +16,16 @@ import android.view.View;
 import android.os.Build;
 
 import com.example.couple_app.R;
-import com.example.couple_app.managers.DatabaseManager;
-import com.example.couple_app.models.Couple;
-import com.example.couple_app.models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public abstract class BaseActivity extends AppCompatActivity {
+
+    private ImageButton btnHome;
+    private ImageButton btnPlan;
+    private ImageButton btnSettings;
+    private ImageButton btnMessage;
+    private ImageButton btnGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,29 +37,48 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Load layout gốc chứa FrameLayout + bottom bar
         super.setContentView(R.layout.menu_button);
         setupBottomBar();
+
+        // Ẩn thanh menu nếu activity con yêu cầu
+        View bottomBar = findViewById(R.id.bottomBar);
+        if (!shouldShowBottomBar() && bottomBar != null) {
+            View parent = (View) bottomBar.getParent();
+            if (parent != null) parent.setVisibility(View.GONE);
+            bottomBar.setVisibility(View.GONE);
+        }
     }
 
-    // Phương thức xử lý system bars để tránh phần màu đen
+    // Cho phép activity con quyết định có hiển thị bottom bar hay không (mặc định: có)
+    protected boolean shouldShowBottomBar() { return true; }
+
+    // Cho phép activity con bật/tắt edge-to-edge. Mặc định: bật để đẹp, nhưng
+    // với màn hình cần adjustResize (vd. Messenger) nên tắt để bàn phím đẩy nội dung lên.
+    protected boolean shouldUseEdgeToEdge() { return true; }
+
+    // Phương thức xử lý system bars để tránh phần màu đen và cấu hình edge-to-edge
     private void setupSystemBars() {
-        // Enable edge-to-edge display
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        boolean edgeToEdge = shouldUseEdgeToEdge();
+        // Cho phép adjustResize hoạt động tốt khi edgeToEdge=false
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), !edgeToEdge ? true : false);
 
-        // Thiết lập màu navigation bar và status bar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-            // Sử dụng màu hồng giống với nền app
-            getWindow().setNavigationBarColor(getResources().getColor(R.color.couple_pink_bg));
+            // Status bar: edgeToEdge -> transparent, ngược lại dùng màu nền app để tránh viền đen
+            if (edgeToEdge) {
+                getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
+            } else {
+                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.couple_pink_bg));
+            }
+            // Navigation bar luôn dùng màu nền app để tránh đen
+            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.couple_pink_bg));
 
-            // Thiết lập màu icon trên system bars
+            // Thiết lập icon sáng/dark phù hợp
             WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
             controller.setAppearanceLightStatusBars(true);
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 controller.setAppearanceLightNavigationBars(true);
             }
         }
 
-        // Tránh navigation bar contrast trên Android 10+
+        // Tránh navigation bar contrast làm đổi màu (Android 10+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             getWindow().setNavigationBarContrastEnforced(false);
         }
@@ -68,77 +92,97 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void setupBottomBar() {
-        ImageButton btnHome = findViewById(R.id.btnHome);
-        ImageButton btnPlan = findViewById(R.id.btnPlan);
-        ImageButton btnSettings = findViewById(R.id.btnSettings);
-        ImageButton btnMessage = findViewById(R.id.btnMessage);
-        ImageButton btnGame = findViewById(R.id.btnGame);
+        btnHome = findViewById(R.id.btnHome);
+        btnPlan = findViewById(R.id.btnPlan);
+        btnSettings = findViewById(R.id.btnSettings);
+        btnMessage = findViewById(R.id.btnMessage);
+        btnGame = findViewById(R.id.btnGame);
 
         btnHome.setOnClickListener(v -> {
             if (!(this instanceof HomeMainActivity)) {
                 startActivity(new Intent(this, HomeMainActivity.class));
+                overridePendingTransition(0, 0);
                 finish();
+                overridePendingTransition(0, 0);
             }
         });
 
         btnMessage.setOnClickListener(v -> {
-            openMessenger();
+            if (!(this instanceof MessengerActivity)) {
+                openMessenger();
+            }
         });
 
         btnSettings.setOnClickListener(v -> {
             if (!(this instanceof SettingActivity)) {
                 startActivity(new Intent(this, SettingActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                overridePendingTransition(0, 0);
             }
         });
-
-        // Add other button listeners as needed
     }
 
     protected void openMessenger() {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-
         if (currentUser == null) {
             Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show();
             return;
         }
+        startActivity(new Intent(BaseActivity.this, MessengerActivity.class));
+        overridePendingTransition(0, 0);
+        // Không finish để back trở lại được
+    }
 
-        DatabaseManager databaseManager = DatabaseManager.getInstance();
-
-        // Get couple information first
-        databaseManager.getCoupleByUserId(currentUser.getUid(), new DatabaseManager.DatabaseCallback<Couple>() {
-            @Override
-            public void onSuccess(Couple couple) {
-                // Get partner ID
-                String partnerId = couple.getUser1Id().equals(currentUser.getUid()) ?
-                        couple.getUser2Id() : couple.getUser1Id();
-
-                // Get partner name and open messenger
-                databaseManager.getUser(partnerId, new DatabaseManager.DatabaseCallback<User>() {
-                    @Override
-                    public void onSuccess(User partner) {
-                        Intent intent = new Intent(BaseActivity.this, MessengerActivity.class);
-                        intent.putExtra("coupleId", couple.getCoupleId());
-                        intent.putExtra("partnerId", partnerId);
-                        intent.putExtra("partnerName", partner.getName() != null ? partner.getName() : "Partner");
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        Intent intent = new Intent(BaseActivity.this, MessengerActivity.class);
-                        intent.putExtra("coupleId", couple.getCoupleId());
-                        intent.putExtra("partnerId", partnerId);
-                        intent.putExtra("partnerName", "Partner");
-                        startActivity(intent);
-                    }
-                });
+    // Phương thức để highlight nút hiện tại
+    protected void setActiveButton(String buttonName) {
+        try {
+            // Đảm bảo các button đã được khởi tạo
+            if (btnHome == null || btnMessage == null || btnPlan == null || btnGame == null || btnSettings == null) {
+                return;
             }
 
-            @Override
-            public void onError(String error) {
-                Toast.makeText(BaseActivity.this, "You need to pair with someone first", Toast.LENGTH_SHORT).show();
+            // Reset tất cả nút về trạng thái bình thường
+            resetAllButtons();
+
+            // Highlight nút hiện tại - làm nổi bật hơn 1 chút: to hơn và có nền tròn mờ
+            switch (buttonName.toLowerCase()) {
+                case "home":
+                    highlightButton(btnHome);
+                    break;
+                case "message":
+                    highlightButton(btnMessage);
+                    break;
+                case "plan":
+                    highlightButton(btnPlan);
+                    break;
+                case "game":
+                    highlightButton(btnGame);
+                    break;
+                case "settings":
+                    highlightButton(btnSettings);
+                    break;
             }
-        });
+        } catch (Exception e) {
+            // Xử lý lỗi im lặng để không crash app
+            Log.w("BaseActivity", "Error setting active button: " + e.getMessage());
+        }
+    }
+
+    private void highlightButton(ImageButton btn) {
+        if (btn == null) return;
+        btn.setAlpha(1.0f);
+        btn.setScaleX(1.12f);
+        btn.setScaleY(1.12f);
+        btn.setBackgroundResource(R.drawable.menu_active_bg);
+    }
+
+    private void resetAllButtons() {
+        if (btnHome != null) { btnHome.setAlpha(0.6f); btnHome.setScaleX(1.0f); btnHome.setScaleY(1.0f); btnHome.setBackgroundResource(android.R.color.transparent); }
+        if (btnMessage != null) { btnMessage.setAlpha(0.6f); btnMessage.setScaleX(1.0f); btnMessage.setScaleY(1.0f); btnMessage.setBackgroundResource(android.R.color.transparent); }
+        if (btnPlan != null) { btnPlan.setAlpha(0.6f); btnPlan.setScaleX(1.0f); btnPlan.setScaleY(1.0f); btnPlan.setBackgroundResource(android.R.color.transparent); }
+        if (btnGame != null) { btnGame.setAlpha(0.6f); btnGame.setScaleX(1.0f); btnGame.setScaleY(1.0f); btnGame.setBackgroundResource(android.R.color.transparent); }
+        if (btnSettings != null) { btnSettings.setAlpha(0.6f); btnSettings.setScaleX(1.0f); btnSettings.setScaleY(1.0f); btnSettings.setBackgroundResource(android.R.color.transparent); }
     }
 }

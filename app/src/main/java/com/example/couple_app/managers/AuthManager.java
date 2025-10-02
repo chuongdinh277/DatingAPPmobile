@@ -2,6 +2,7 @@ package com.example.couple_app.managers;
 
 import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthSettings;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.auth.AuthCredential;
@@ -23,6 +24,7 @@ public class AuthManager {
 
     private AuthManager() {
         mAuth = FirebaseAuth.getInstance();
+        mAuth.getFirebaseAuthSettings().setAppVerificationDisabledForTesting(true);
     }
 
     public static synchronized AuthManager getInstance() {

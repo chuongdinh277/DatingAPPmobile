@@ -21,7 +21,8 @@
             android:layout_height="100dp"
             android:background="@drawable/circle_mask"
             android:scaleType="centerCrop"
-            />
+            android:clipToOutline="true"
+            android:outlineProvider="background"/>
 
         <TextView
             android:id="@+id/txtNameLeft"
@@ -97,7 +98,8 @@
             android:layout_height="100dp"
             android:background="@drawable/circle_mask"
             android:scaleType="centerCrop"
-             />
+            android:clipToOutline="true"
+            android:outlineProvider="background" />
 
         <TextView
             android:id="@+id/txtNameRight"

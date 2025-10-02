@@ -35,16 +35,16 @@
         app:layout_constraintStart_toEndOf="@id/tv_profile"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Info fields -->
-
-    <!-- Footer -->
+    <!-- Avatar -->
     <ImageView
         android:id="@+id/iv_user_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="76dp"
-        android:background="@drawable/circle_shape"
-        android:scaleType="centerInside"
+        android:background="@drawable/circle_mask"
+        android:clipToOutline="true"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/profile"
         android:src="@drawable/user_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.524"
@@ -89,7 +89,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="10dp"
                 android:text="Văn A"
-                android:textSize="14sp" />
+                android:textSize="20sp" />
         </LinearLayout>
 
         <!-- Last Name -->
@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="Nguyễn"
-                android:textSize="14sp" />
+                android:textSize="20sp" />
         </LinearLayout>
 
         <!-- Username -->
@@ -145,7 +145,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="hau hau"
-                android:textSize="14sp" />
+                android:textSize="20sp" />
         </LinearLayout>
 
         <!-- Gmail -->
@@ -172,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="Hauhau@gmail.com"
-                android:textSize="14sp" />
+                android:textSize="15sp" />
         </LinearLayout>
 
         <!-- Phone -->

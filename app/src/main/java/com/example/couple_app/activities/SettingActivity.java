@@ -9,6 +9,7 @@ import com.google.android.material.button.MaterialButton;
 import com.example.couple_app.R;
 import com.example.couple_app.managers.AuthManager;
 import com.example.couple_app.managers.DatabaseManager;
+import com.example.couple_app.utils.AvatarCache;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -20,6 +21,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.List;
+import com.google.firebase.auth.FirebaseAuthSettings;
 
 public class SettingActivity extends BaseActivity {
     private static final String TAG = "SettingActivity";
@@ -35,8 +37,13 @@ public class SettingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.setting);
 
+        // Highlight tab "settings"
+        setActiveButton("settings");
+
         // Initialize Firebase Auth and AuthManager
         mAuth = FirebaseAuth.getInstance();
+        FirebaseAuthSettings firebaseAuthSettings = mAuth.getFirebaseAuthSettings();
+        firebaseAuthSettings.setAppVerificationDisabledForTesting(true);
         authManager = AuthManager.getInstance();
 
         // Setup Google Sign In
@@ -55,8 +62,8 @@ public class SettingActivity extends BaseActivity {
 
         // Profile
         btProfile.setOnClickListener(v -> {
-            // TODO: Create SettingProfileActivity later
-            Toast.makeText(this, "Profile settings coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(SettingActivity.this, SettingProfileActivity.class);
+            startActivity(intent);
         });
 
         // Notification
@@ -393,6 +400,12 @@ public class SettingActivity extends BaseActivity {
     private void performLogout() {
         // Sign out from Firebase Authentication
         mAuth.signOut();
+
+        // Clear cached avatar
+        try {
+            java.io.File f = AvatarCache.getCachedFile(this);
+            if (f.exists()) f.delete();
+        } catch (Exception ignored) {}
 
         // Navigate to welcome screen and clear all previous activities
         Intent intent = new Intent(this, WelcomeActivity.class);

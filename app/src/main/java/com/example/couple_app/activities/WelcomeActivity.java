@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import com.google.firebase.auth.FirebaseAuthSettings;
 
 import com.example.couple_app.R;
 import com.example.couple_app.utils.LoginPreferences;
@@ -42,6 +43,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
             // Initialize Firebase Auth
             mAuth = FirebaseAuth.getInstance();
+            FirebaseAuthSettings firebaseAuthSettings = mAuth.getFirebaseAuthSettings();
+            firebaseAuthSettings.setAppVerificationDisabledForTesting(true);
+
 
             // Configure Google Sign In
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -147,16 +151,48 @@ public class WelcomeActivity extends AppCompatActivity {
                 // Also check Firebase Auth state
                 FirebaseUser currentUser = mAuth.getCurrentUser();
                 if (currentUser != null) {
-                    // User is still authenticated, go to home
-                    navigateToHome(currentUser);
+                    // Kiểm tra xem user đã paired chưa
+                    android.content.SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+                    boolean isPaired = prefs.getBoolean("isPaired", false);
+                    String coupleId = prefs.getString("coupleId", "");
+                    String partnerName = prefs.getString("partnerName", "");
+
+                    if (isPaired && !coupleId.isEmpty()) {
+                        // User đã paired, chuyển thẳng vào HomeMainActivity
+                        android.util.Log.d("WelcomeActivity", "User already paired, navigating to HomeMainActivity");
+                        navigateToHome(coupleId, partnerName);
+                    } else {
+                        // User đã đăng nhập nhưng chưa paired, chuyển vào PairingActivity
+                        android.util.Log.d("WelcomeActivity", "User logged in but not paired, navigating to PairingActivity");
+                        navigateToPairing();
+                    }
                 } else {
-                    // Firebase session expired, clear saved login state
-                    LoginPreferences.clearLoginState(this);
+                    // Firebase user is null, clear login state
+                    LoginPreferences.saveLoginState(this, false, "", "", "");
+                    android.util.Log.d("WelcomeActivity", "Firebase user is null, staying on welcome screen");
                 }
+            } else {
+                android.util.Log.d("WelcomeActivity", "User not logged in, staying on welcome screen");
             }
         } catch (Exception e) {
             android.util.Log.e("WelcomeActivity", "Error checking login state", e);
         }
+    }
+
+    private void navigateToHome(String coupleId, String partnerName) {
+        Intent intent = new Intent(this, HomeMainActivity.class);
+        intent.putExtra("coupleId", coupleId);
+        intent.putExtra("partnerName", partnerName);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void navigateToPairing() {
+        Intent intent = new Intent(this, PairingActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void navigateToHome(FirebaseUser user) {
@@ -303,6 +339,7 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void proceedWithGoogleLogin(AuthCredential credential) {
+
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {

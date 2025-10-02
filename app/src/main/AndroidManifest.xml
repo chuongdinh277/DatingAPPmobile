@@ -16,6 +16,7 @@
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
     <application
+        android:name=".CoupleApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -42,12 +43,14 @@
         <activity
             android:name=".activities.LoginByPhoneActivity"
             android:exported="false"
-            android:theme="@style/Theme.CoupleApp" />
+            android:theme="@style/Theme.CoupleApp"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".activities.SignUpActivity"
             android:exported="false"
-            android:theme="@style/Theme.CoupleApp" />
+            android:theme="@style/Theme.CoupleApp"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- Main Application Activities -->
         <activity
@@ -55,10 +58,6 @@
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
 
-        <activity
-            android:name=".activities.MainActivity"
-            android:exported="false"
-            android:theme="@style/Theme.CoupleApp" />
 
         <!-- BaseActivity - parent for other activities -->
         <activity
@@ -70,15 +69,23 @@
         <activity
             android:name=".activities.MessengerActivity"
             android:exported="false"
-            android:theme="@style/Theme.CoupleApp" />
+            android:theme="@style/Theme.CoupleApp"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".activities.PairingActivity"
             android:exported="false"
-            android:theme="@style/Theme.CoupleApp" />
+            android:theme="@style/Theme.CoupleApp"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".activities.SettingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp" />
+
+        <!-- New: Profile settings screen -->
+        <activity
+            android:name=".activities.SettingProfileActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
 
