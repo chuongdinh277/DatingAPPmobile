@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFDBED">
+    android:background="#FFDBED"
+    android:fitsSystemWindows="true">
 
     <!-- Nút Login with Phone -->
 
@@ -61,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:fontFamily="sans-serif-medium"
-            android:text="Login with Phone"
+            android:text="Đăng nhập với điện thoại"
             android:textColor="#490424"
             android:textSize="16sp" />
     </LinearLayout>
@@ -97,7 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:fontFamily="sans-serif-medium"
-            android:text="Login with Mail"
+            android:text="Đăng nhập với Google"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
     </LinearLayout>
@@ -117,10 +118,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginBottom="68dp"
-        android:text="Don’t have an account? Sign up"
+        android:layout_marginBottom="100dp"
+        android:text="Chưa có tài khoản. Đăng ký ngay?"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

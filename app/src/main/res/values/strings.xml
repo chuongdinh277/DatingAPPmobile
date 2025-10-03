@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">BTL_mobileAPP</string>
+    <string name="app_name">Couple App</string>
+    <!-- Add Google Sign-In Web Client ID - Replace with your actual Web Client ID from Firebase Console -->
+    <string name="default_web_client_id">501013051271-mus50dnnjjdld03pdq9vng4qjfm0usae.apps.googleusercontent.com</string>
     <string name="camera_button">Camera button</string>
     <string name="about">About</string>
     <string name="logout">Logout</string>
@@ -15,4 +17,7 @@
     <string name="edit">Edit</string>
     <string name="hint_message">Nhắn tin</string>
     <string name="send">Gửi</string>
+
+    <!-- imgbb API key placeholder; replace with your key from imgbb.com -->
+    <string name="imgbb_api_key">cbd67551d48201d765fb10302d9a870e</string>
 </resources>

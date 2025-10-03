@@ -1,15 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Primary colors -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <!-- Basic colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blue">#0069FF</color>
+    <!-- Couple app theme colors -->
+    <color name="couple_primary">#FF6200EE</color>
+    <color name="couple_secondary">#FF03DAC5</color>
+    <color name="couple_accent">#FFFF4081</color>
+    <color name="couple_pink_bg">#FCC9E0</color>
+
+    <!-- Adaptive colors for light theme -->
+    <color name="background_secondary">#F5F5F5</color>
+    <color name="surface_color">#FFFFFF</color>
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="divider_color">#E0E0E0</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="button_text">#FFFFFF</color>
+
+    <!-- Chat colors -->
+    <color name="chat_bubble_sent">#E3F2FD</color>
+    <color name="chat_bubble_received">#F3E5F5</color>
+    <color name="chat_text_sent">#1976D2</color>
+    <color name="chat_text_received">#7B1FA2</color>
+
+    <!-- Status colors -->
+    <color name="success_color">#4CAF50</color>
+    <color name="error_color">#F44336</color>
+    <color name="warning_color">#FF9800</color>
+    <color name="info_color">#2196F3</color>
+
+    <!-- Light Theme Colors -->
+    <color name="background_light">#FFFFFFFF</color>
+    <color name="background_primary">#FFFFFFFF</color>
+    <color name="surface_light">#FFFFFFFF</color>
+    <color name="on_background_light">#FF1C1B1F</color>
+    <color name="on_surface_light">#FF1C1B1F</color>
+    <color name="text_secondary_light">#FF5F5F5F</color>
+    <color name="divider_light">#FFE0E0E0</color>
+
+    <!-- Common Colors -->
+    <color name="red">#FFFF0000</color>
+    <color name="google_button_text">#FF000000</color>
+    <color name="pink">#FFFFC0CB</color>
+    <color name="dark_pink">#FFDB7093</color>
     <color name="bg_app">#FDD9E6</color>
     <color name="pill_pink">#F9B7D0</color>
     <color name="pill_maroon">#990033</color>
     <color name="underline_dark">#3F0303</color>
     <color name="underline_light">#FFFFFF</color>
     <color name="signup_red">#C21807</color>
-    <color name="black">#FF000000</color>
-    <color name="title_shadow">#8B3A7A</color>
-    <color name="pink">#F38ABF</color>
-    <color name="blue">#0069FF</color>
-    <color name="white">#FFFFFF</color>
 
+    <!-- Account Linking colors -->
+    <color name="google_blue">#4285F4</color>
+    <color name="phone_green">#34A853</color>
+    <color name="error_red">#EA4335</color>
+    <color name="warning_yellow">#FFF3CD</color>
 </resources>

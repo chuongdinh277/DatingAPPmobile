@@ -6,11 +6,6 @@
     android:layout_height="match_parent"
     android:background="#FCC9E0">
 
-    <include
-        android:id="@+id/header"
-        layout="@layout/layout_header" />
-
-
 
     <include
         android:id="@+id/layoutUserInfo"

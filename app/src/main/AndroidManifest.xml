@@ -21,7 +21,22 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.LoginByPhoneActivity" />
+        <activity
+            android:name=".activities.SignUpActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BTL_mobileAPP" />
+
+
+        <activity
+            android:name=".activities.LoginByPhoneActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BTL_mobileAPP" />
+
+        <activity
+            android:name=".activities.PairingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BTL_mobileAPP" />
+
         <activity android:name=".activities.LoginByEmailActivity" />
         <activity android:name=".activities.HomeMainActivity" />
         <activity android:name=".activities.PlanActivity" />
@@ -33,7 +48,8 @@
         <activity android:name=".activities.SettingPrivacyActivity" />
         <activity android:name=".activities.SettingAboutActivity" />
         <activity android:name=".activities.SettingNotificationActivity" />
-
+        <activity android:name=".activities.CreatePasswordActivity" />
+        <activity android:name=".activities.VerifyOTPActivity" />
     </application>
 
 </manifest>

@@ -181,9 +181,6 @@
         <!-- Phần nội dung khác -->
     </LinearLayout>
 
-
-
-
     <include
         android:id="@+id/layoutUserInfo"
         layout="@layout/user_profile_item"
@@ -193,6 +190,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
