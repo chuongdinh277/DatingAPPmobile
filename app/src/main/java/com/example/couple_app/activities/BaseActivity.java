@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import android.widget.FrameLayout;
 import android.view.View;
 import android.os.Build;
@@ -37,6 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Load layout gốc chứa FrameLayout + bottom bar
         super.setContentView(R.layout.menu_button);
         setupBottomBar();
+        setupInsetsHandling();
 
         // Ẩn thanh menu nếu activity con yêu cầu
         View bottomBar = findViewById(R.id.bottomBar);
@@ -54,11 +57,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     // với màn hình cần adjustResize (vd. Messenger) nên tắt để bàn phím đẩy nội dung lên.
     protected boolean shouldUseEdgeToEdge() { return true; }
 
+    // Cho phép activity con yêu cầu "pin" bottom bar khi IME mở
+    protected boolean pinBottomBarOverIme() { return false; }
+
     // Phương thức xử lý system bars để tránh phần màu đen và cấu hình edge-to-edge
     private void setupSystemBars() {
         boolean edgeToEdge = shouldUseEdgeToEdge();
-        // Cho phép adjustResize hoạt động tốt khi edgeToEdge=false
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), !edgeToEdge ? true : false);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), !edgeToEdge);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // Status bar: edgeToEdge -> transparent, ngược lại dùng màu nền app để tránh viền đen
@@ -84,6 +89,40 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    private void setupInsetsHandling() {
+        final View root = findViewById(android.R.id.content);
+        final View content = findViewById(R.id.baseContent);
+        final View bottomBarContainer = findViewById(R.id.bottomBarContainer);
+        if (root == null) return;
+
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            // System bars
+            final WindowInsetsCompat sys = insets;
+            final int statusTop = sys.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            final int navBottom = sys.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            final int left = sys.getInsets(WindowInsetsCompat.Type.systemBars()).left;
+            final int right = sys.getInsets(WindowInsetsCompat.Type.systemBars()).right;
+            // IME
+            final int imeBottom = sys.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+            final boolean imeVisible = sys.isVisible(WindowInsetsCompat.Type.ime());
+
+            if (content != null) {
+                int bottomPad = pinBottomBarOverIme() ? (imeVisible ? imeBottom : navBottom) : navBottom;
+                content.setPadding(left, statusTop, right, bottomPad);
+            }
+            if (bottomBarContainer != null) {
+                // Chỉ chèn padding theo nav bar, không bị đẩy bởi IME
+                bottomBarContainer.setPadding(
+                        bottomBarContainer.getPaddingLeft(),
+                        bottomBarContainer.getPaddingTop(),
+                        bottomBarContainer.getPaddingRight(),
+                        navBottom
+                );
+            }
+            return insets;
+        });
+    }
+
     // Hàm set layout con vào trong FrameLayout baseContent
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
@@ -100,10 +139,16 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         btnHome.setOnClickListener(v -> {
             if (!(this instanceof HomeMainActivity)) {
-                startActivity(new Intent(this, HomeMainActivity.class));
-                overridePendingTransition(0, 0);
-                finish();
-                overridePendingTransition(0, 0);
+                setActiveButton("home");
+                navigateNoAnim(HomeMainActivity.class);
+            }
+        });
+
+        // Open Plan screen when tapping the Plan button
+        btnPlan.setOnClickListener(v -> {
+            if (!(this instanceof PlanActivity)) {
+                setActiveButton("plan");
+                navigateNoAnim(PlanActivity.class);
             }
         });
 
@@ -115,12 +160,17 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         btnSettings.setOnClickListener(v -> {
             if (!(this instanceof SettingActivity)) {
-                startActivity(new Intent(this, SettingActivity.class));
-                overridePendingTransition(0, 0);
-                finish();
-                overridePendingTransition(0, 0);
+                setActiveButton("settings");
+                navigateNoAnim(SettingActivity.class);
             }
         });
+    }
+
+    private void navigateNoAnim(Class<?> target) {
+        startActivity(new Intent(this, target));
+        overridePendingTransition(0, 0);
+        finish();
+        overridePendingTransition(0, 0);
     }
 
     protected void openMessenger() {

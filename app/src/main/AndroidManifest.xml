@@ -89,6 +89,11 @@
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
 
+        <activity
+            android:name=".activities.PlanActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp"
+            android:windowSoftInputMode="adjustNothing" />
 
     </application>
 

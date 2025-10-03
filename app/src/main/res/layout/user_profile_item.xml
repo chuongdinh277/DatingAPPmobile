@@ -17,8 +17,8 @@
 
         <ImageView
             android:id="@+id/avtLeft"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:background="@drawable/circle_mask"
             android:scaleType="centerCrop"
             android:clipToOutline="true"
@@ -94,8 +94,8 @@
 
         <ImageView
             android:id="@+id/avtRight"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:background="@drawable/circle_mask"
             android:scaleType="centerCrop"
             android:clipToOutline="true"

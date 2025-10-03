@@ -7,47 +7,47 @@
     android:layout_gravity="center_horizontal"
     android:background="#FCC9E0">
 
+    <!-- Avatar -->
+
     <TextView
         android:id="@+id/tv_profile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="36dp"
         android:text="@string/profile"
         android:textColor="#800D42"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.54"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/btn_edit"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="132dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/edit"
-        android:padding="10dp"
+        android:padding="0dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_edit"
         app:layout_constraintStart_toEndOf="@id/tv_profile"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Avatar -->
     <ImageView
         android:id="@+id/iv_user_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="76dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/circle_mask"
         android:clipToOutline="true"
-        android:scaleType="centerCrop"
         android:contentDescription="@string/profile"
+        android:scaleType="centerCrop"
         android:src="@drawable/user_icon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.524"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_profile" />
 
@@ -66,7 +66,7 @@
 
         <!-- First Name -->
         <LinearLayout
-            android:layout_width="240dp"
+            android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:background="@drawable/rectangle_shape_30"
             android:backgroundTint="@color/pink"
@@ -79,6 +79,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="15dp"
                 android:text="@string/first_name"
+                android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -87,6 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:textColor="@color/black"
                 android:layout_marginLeft="10dp"
                 android:text="Văn A"
                 android:textSize="20sp" />
@@ -94,7 +96,7 @@
 
         <!-- Last Name -->
         <LinearLayout
-            android:layout_width="240dp"
+            android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:background="@drawable/rectangle_shape_30"
@@ -108,6 +110,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="15dp"
                 android:text="@string/last_name"
+                android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -117,12 +120,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="Nguyễn"
+                android:textColor="@color/black"
                 android:textSize="20sp" />
         </LinearLayout>
 
         <!-- Username -->
         <LinearLayout
-            android:layout_width="240dp"
+            android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:background="@drawable/rectangle_shape_30"
@@ -136,6 +140,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="15dp"
                 android:text="@string/username"
+                android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -145,12 +150,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="hau hau"
+                android:textColor="@color/black"
                 android:textSize="20sp" />
         </LinearLayout>
 
         <!-- Gmail -->
         <LinearLayout
-            android:layout_width="240dp"
+            android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:background="@drawable/rectangle_shape_30"
@@ -163,6 +169,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:text="@string/gmail"
+                android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -172,12 +179,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="Hauhau@gmail.com"
+                android:textColor="@color/black"
                 android:textSize="15sp" />
         </LinearLayout>
 
         <!-- Phone -->
         <LinearLayout
-            android:layout_width="240dp"
+            android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:background="@drawable/rectangle_shape_30"
@@ -190,6 +198,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:text="@string/phone"
+                android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -199,22 +208,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:text="0978367256"
+                android:textColor="@color/black"
                 android:textSize="14sp" />
         </LinearLayout>
 
         <!-- Upload Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/bt_upload"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="15dp"
-            android:text="@string/upload"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:visibility="invisible"
-            app:backgroundTint="#0EA470" />
 
     </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/bt_upload"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:text="@string/upload"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="invisible"
+        app:backgroundTint="#0EA470"
+        tools:layout_editor_absoluteX="155dp"
+        tools:layout_editor_absoluteY="221dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
