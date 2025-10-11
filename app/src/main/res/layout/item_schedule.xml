@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:padding="12dp"
     android:layout_margin="8dp"
-    android:background="#F4978E"
+    android:background="#FFB2B2"
     android:clipToPadding="false">
 
     <TextView
@@ -15,7 +15,8 @@
         android:layout_weight="1"
         android:text="Nội dung lịch"
         android:textColor="@android:color/black"
-        android:textSize="14sp"/>
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <ImageButton
         android:id="@+id/btnDelete"

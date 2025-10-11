@@ -51,7 +51,11 @@ public class PlanActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHeaderColor(R.color.plan_header_color);
+        setBottomBarColor(R.color.plan_bottom_bar_color);
         setContentView(R.layout.plan);
+
+
 
         calendarView = findViewById(R.id.calendarView);
         tvMonthYear = findViewById(R.id.tvMonthYear);

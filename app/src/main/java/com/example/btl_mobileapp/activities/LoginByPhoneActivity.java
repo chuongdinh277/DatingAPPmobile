@@ -38,7 +38,7 @@ public class LoginByPhoneActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // Check if user is already logged in
-        //checkLoginState();
+        checkLoginState();
 
         // Initialize views
         ImageButton btnBack = findViewById(R.id.welcomeBack);

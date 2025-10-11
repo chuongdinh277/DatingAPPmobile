@@ -50,6 +50,13 @@
         <activity android:name=".activities.SettingNotificationActivity" />
         <activity android:name=".activities.CreatePasswordActivity" />
         <activity android:name=".activities.VerifyOTPActivity" />
+
+        <activity android:name=".activities.GameListActivity" />
+        <activity android:name=".activities.GarticActivity" />
+        <activity android:name=".activities.WaitingRoomGarticActivity" />
+        <activity android:name=".activities.CaroActivity" />
+        <activity android:name=".activities.WaitingRoomCaroActivity" />
+
     </application>
 
 </manifest>

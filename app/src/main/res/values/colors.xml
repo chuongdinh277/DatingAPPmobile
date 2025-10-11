@@ -26,7 +26,8 @@
     <color name="divider_color">#E0E0E0</color>
     <color name="card_background">#FFFFFF</color>
     <color name="button_text">#FFFFFF</color>
-
+    <!-- Thêm màu này nếu chưa có. Đây là màu icon khi KHÔNG được chọn (màu xám) -->
+    <color name="default_button_color">#757575</color>
     <!-- Chat colors -->
     <color name="chat_bubble_sent">#E3F2FD</color>
     <color name="chat_bubble_received">#F3E5F5</color>
@@ -65,4 +66,17 @@
     <color name="phone_green">#34A853</color>
     <color name="error_red">#EA4335</color>
     <color name="warning_yellow">#FFF3CD</color>
+
+
+    <color name="home_header_color">#FF90B1</color>
+    <color name="plan_header_color">#FFFFFF</color>
+    <color name="messenger_header_color">#FFFFFF</color>
+
+
+    <color name="home_bottom_bar_color">#FF90B1</color>
+    <color name="plan_bottom_bar_color">#FFE8F7</color>
+    <color name="messenger_bottom_bar_color">#81D4FA</color>
+    <color name="game_bottom_bar_color">#FFCDD2</color>
+    <color name="setting_bottom_bar_color">#E1BEE7</color>
+
 </resources>
