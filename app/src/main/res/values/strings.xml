@@ -20,4 +20,27 @@
 
     <!-- imgbb API key placeholder; replace with your key from imgbb.com -->
     <string name="imgbb_api_key">cbd67551d48201d765fb10302d9a870e</string>
+    <string name="your_code_label">Your Code:</string>
+    <string name="default_pin_code">000000</string>
+    <string name="friend_code_hint">Friend Code</string>
+    <string name="pair">Pair</string>
+    <string name="logout_vi">Đăng xuất</string>
+
+    <!-- Plan screen strings -->
+    <string name="schedule_today_title">Lịch trình hôm nay</string>
+    <string name="schedule_today_title_full">Lịch trình ngày hôm nay %1$d/%2$d/%3$d</string>
+    <string name="schedule_day_title">Lịch trình ngày %1$d/%2$d/%3$d</string>
+    <string name="hint_new_plan">Nhập kế hoạch...</string>
+    <string name="save">Lưu</string>
+    <string name="add_plan_cd">Thêm kế hoạch</string>
+    <string name="schedule_item_default">Nội dung lịch</string>
+    <string name="delete_schedule_cd">Xóa lịch trình</string>
+    <string name="schedule_month_year">Tháng %1$d, %2$d</string>
+
+    <!-- Bottom bar content descriptions -->
+    <string name="cd_task">Task</string>
+    <string name="cd_message">Mess</string>
+    <string name="cd_home">Home</string>
+    <string name="cd_game">Game</string>
+    <string name="cd_settings">Setting</string>
 </resources>

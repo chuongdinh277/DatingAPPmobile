@@ -77,13 +77,8 @@ public class MessengerActivity extends BaseActivity {
         btnSend = findViewById(R.id.bt_sendMessage);
         // Use the messenger title TextView for partner name display
         tvPartnerName = findViewById(R.id.tv_messenger);
-        loadingOverlay = findViewById(R.id.loading_overlay);
 
-        // Nút back mới
-        View backBtn = findViewById(R.id.btn_back_messenger);
-        if (backBtn != null) {
-            backBtn.setOnClickListener(v -> onBackPressed());
-        }
+
 
         chatManager = ChatManager.getInstance();
         databaseManager = DatabaseManager.getInstance();

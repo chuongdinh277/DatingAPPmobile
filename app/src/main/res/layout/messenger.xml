@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FCC9E0">
+    android:background="#F0F2F5">
 
     <include
         android:id="@+id/header"
@@ -13,40 +13,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Nút back riêng cho màn hình Message -->
-    <ImageButton
-        android:id="@+id/btn_back_messenger"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="4dp"
-        android:background="@null"
-        android:padding="6dp"
-        android:src="@drawable/left_arrow"
-        android:scaleType="fitCenter"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header" />
-
-    <TextView
-        android:id="@+id/tv_messenger"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="0dp"
-        android:text="Messenger"
-        android:textColor="#000000"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/btn_back_messenger"
-        app:layout_constraintTop_toBottomOf="@id/header" />
-
     <LinearLayout
-        android:id="@+id/llayout_chat"
+        android:id="@+id/message_input_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#D53C3C"
+        android:background="#FFFFFF"
         android:orientation="horizontal"
-        android:padding="10dp"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical"
+        android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -54,69 +32,46 @@
         <EditText
             android:id="@+id/et_messenger"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/rectangle_shape_15"
-            android:hint="@string/hint_message"
-            android:padding="10dp"
+
+            android:minHeight="48dp"
+            android:background="@drawable/message_edittext_bg"
+            android:hint="Your message"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
             android:textColor="@color/black"
-            android:textSize="18sp" />
+            android:textSize="16sp"
+            android:inputType="textMultiLine"
+            android:maxHeight="120dp"/>
 
         <ImageButton
             android:id="@+id/bt_sendMessage"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/send_icon"
-            android:contentDescription="@string/send" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_send"
+            android:contentDescription="@string/send"
+            app:tint="#007AFF"/>
     </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_messenger"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#D53C3C"
-        app:layout_constraintBottom_toTopOf="@id/llayout_chat"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@android:color/transparent"
+        android:clipToPadding="false"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@id/message_input_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_messenger" />
-
-    <!-- Loading overlay on top of everything -->
-    <FrameLayout
-        android:id="@+id/loading_overlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#80FFFFFF"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="24dp">
-
-            <ProgressBar
-                style="@android:style/Widget.ProgressBar.Large"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:indeterminate="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Đang tải tin nhắn..."
-                android:textColor="#FF000000"
-                android:textSize="16sp" />
-        </LinearLayout>
-    </FrameLayout>
+        app:layout_constraintTop_toBottomOf="@id/header" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

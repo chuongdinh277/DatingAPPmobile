@@ -12,7 +12,8 @@
         android:layout_marginEnd="48dp"
         android:background="@drawable/bg_message_received"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="12dp"
+        >
 
         <TextView
             android:id="@+id/tv_sender_name"

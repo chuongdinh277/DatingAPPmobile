@@ -79,4 +79,7 @@
     <color name="game_bottom_bar_color">#FFCDD2</color>
     <color name="setting_bottom_bar_color">#E1BEE7</color>
 
+    <color name="app_background_color">#FFFBF0</color>
+
+
 </resources>

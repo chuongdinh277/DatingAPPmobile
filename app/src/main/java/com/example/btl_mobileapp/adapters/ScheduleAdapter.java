@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,15 +52,18 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         });
 
         holder.btnDelete.setOnClickListener(v -> {
+            int pos = holder.getBindingAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION) return;
+            ScheduleItem current = schedules.get(pos);
             FirebaseFirestore.getInstance()
                     .collection("couple_plans")
-                    .document(item.getId())
+                    .document(current.getId())
                     .delete()
                     .addOnSuccessListener(aVoid -> {
-                        schedules.remove(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, schedules.size());
-                    });
+                        schedules.remove(pos);
+                        notifyItemRemoved(pos);
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(v.getContext(), "Xóa thất bại", Toast.LENGTH_SHORT).show());
         });
     }
 
@@ -79,6 +83,8 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         }
     }
 
+    // Bên trong file ScheduleAdapter.java
+
     public static class ScheduleItem {
         private String id;
         private String content;
@@ -88,7 +94,31 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
             this.content = content;
         }
 
-        public String getId() { return id; }
-        public String getContent() { return content; }
+        public String getId() {
+            return id;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        // --- THÊM PHƯƠNG THỨC NÀY VÀO ---
+        // Phương thức này dùng để cập nhật nội dung của một kế hoạch đã có.
+        public void setContent(String content) {
+            this.content = content;
+        }
+    }
+    // Thêm vào file ScheduleAdapter.java
+    public void addItem(ScheduleItem newItem) {
+        schedules.add(newItem);
+        notifyItemInserted(schedules.size() - 1);
+    }
+
+    public void updateItem(ScheduleItem itemToUpdate, String newContent) {
+        int position = schedules.indexOf(itemToUpdate);
+        if (position != -1) {
+            schedules.get(position).setContent(newContent);
+            notifyItemChanged(position);
+        }
     }
 }
