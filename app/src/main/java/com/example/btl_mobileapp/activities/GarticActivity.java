@@ -159,8 +159,8 @@ public class GarticActivity extends AppCompatActivity {
             roomRef.child("currentWord").removeEventListener(currentWordListener);
 
         if(isMyTurn){
-            tvCurrentWord.setText("Đang chọn từ...");
-            tvTimer.setText("Thời gian: 30s");
+            tvCurrentWord.setText("Load...");
+            tvTimer.setText("30s");
 
             // Chọn từ mới
             roomRef.child("currentWord").addListenerForSingleValueEvent(new SimpleValueListener() {
@@ -221,11 +221,11 @@ public class GarticActivity extends AppCompatActivity {
         turnTimer = new CountDownTimer(TURN_TIME_MS,1000){
             @Override
             public void onTick(long millisUntilFinished){
-                tvTimer.setText("Thời gian: "+(millisUntilFinished/1000)+"s");
+                tvTimer.setText((millisUntilFinished/1000)+"s");
             }
             @Override
             public void onFinish(){
-                tvTimer.setText("Hết thời gian vẽ!");
+                tvTimer.setText("00");
                 Bitmap bmp = drawingView.exportBitmap();
                 roomRef.child("drawingData").setValue(bitmapToBase64(bmp));
             }
@@ -237,11 +237,11 @@ public class GarticActivity extends AppCompatActivity {
         turnTimer = new CountDownTimer(TURN_TIME_MS,1000){
             @Override
             public void onTick(long millisUntilFinished){
-                tvTimer.setText("Thời gian: "+(millisUntilFinished/1000)+"s");
+                tvTimer.setText((millisUntilFinished/1000)+"s");
             }
             @Override
             public void onFinish(){
-                tvTimer.setText("Hết thời gian đoán!");
+                tvTimer.setText("00");
                 endGuessingRound();
             }
         }.start();
@@ -303,7 +303,7 @@ public class GarticActivity extends AppCompatActivity {
     private void updateScoreUI(){
         int myScore = scores.getOrDefault(userId,0);
         int otherScore = scores.getOrDefault(otherPlayerId,0);
-        tvScore.setText("Điểm: "+myScore+" - "+otherScore);
+        tvScore.setText(+myScore+" - "+otherScore);
     }
 
     private abstract static class SimpleValueListener implements ValueEventListener{

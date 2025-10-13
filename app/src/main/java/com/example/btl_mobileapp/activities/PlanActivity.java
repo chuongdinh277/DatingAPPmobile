@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +39,7 @@ public class PlanActivity extends BaseActivity {
     private FloatingActionButton fabAddPlan;
     private LinearLayout llAddPlan;
     private EditText etNewPlan;
-    private Button btnSavePlan;
+    private ImageButton btnSavePlan;
 
     private User currentUser;
     private Calendar selectedDate;

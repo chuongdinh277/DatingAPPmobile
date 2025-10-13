@@ -4,17 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/background_home"
+    android:paddingBottom="70dp" >
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/background_home"
-        android:scaleType="centerCrop"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/textView3"
@@ -50,8 +43,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="0dp">
 
         <include
             android:id="@+id/header"
@@ -60,7 +53,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/heartContainer"
             android:layout_width="wrap_content"
-            android:layout_height="224dp"
+            android:layout_height="259dp"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="60dp"
             android:background="@drawable/bg_transparent_panel"
@@ -108,7 +101,7 @@
                             android:gravity="center"
                             android:text="1"
                             android:textColor="#FFFFFF"
-                            android:textSize="22sp"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
                     </FrameLayout>
 
@@ -119,7 +112,7 @@
                         android:fontFamily="@font/pacifico"
                         android:text="năm"
                         android:textColor="#FFFFFF"
-                        android:textSize="28sp" />
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -147,7 +140,7 @@
                             android:gravity="center"
                             android:text="3"
                             android:textColor="#FFFFFF"
-                            android:textSize="22sp"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
                     </FrameLayout>
 
@@ -158,7 +151,7 @@
                         android:fontFamily="@font/pacifico"
                         android:text="tháng"
                         android:textColor="#FFFFFF"
-                        android:textSize="28sp" />
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -186,7 +179,7 @@
                             android:gravity="center"
                             android:text="2"
                             android:textColor="#FFFFFF"
-                            android:textSize="22sp"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
                     </FrameLayout>
 
@@ -197,7 +190,7 @@
                         android:fontFamily="@font/pacifico"
                         android:text="tuần"
                         android:textColor="#FFFFFF"
-                        android:textSize="28sp" />
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -236,7 +229,7 @@
                         android:fontFamily="@font/pacifico"
                         android:text="ngày"
                         android:textColor="#FFFFFF"
-                        android:textSize="28sp" />
+                        android:textSize="20sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -246,9 +239,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="25dp"
+                android:fontFamily="@font/pacifico"
                 android:text="00:37:50"
                 android:textColor="#FFFFFF"
-                android:fontFamily="@font/pacifico"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -262,7 +255,7 @@
         layout="@layout/user_profile_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

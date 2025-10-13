@@ -81,5 +81,8 @@
 
     <color name="app_background_color">#FFFBF0</color>
 
-
+    <color name="app_background_soft">#FFFBF8</color>
+    <color name="primary_text">#333333</color>
+    <color name="secondary_text">#757575</color>
+    <color name="accent_color">#E91E63</color>
 </resources>
