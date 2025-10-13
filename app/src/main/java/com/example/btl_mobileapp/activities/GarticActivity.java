@@ -159,7 +159,7 @@ public class GarticActivity extends AppCompatActivity {
             roomRef.child("currentWord").removeEventListener(currentWordListener);
 
         if(isMyTurn){
-            tvCurrentWord.setText("Load...");
+            tvCurrentWord.setText("Đang chọn từ...");
             tvTimer.setText("30s");
 
             // Chọn từ mới
@@ -225,7 +225,7 @@ public class GarticActivity extends AppCompatActivity {
             }
             @Override
             public void onFinish(){
-                tvTimer.setText("00");
+                tvTimer.setText("Hết thời gian vẽ!");
                 Bitmap bmp = drawingView.exportBitmap();
                 roomRef.child("drawingData").setValue(bitmapToBase64(bmp));
             }
@@ -241,7 +241,7 @@ public class GarticActivity extends AppCompatActivity {
             }
             @Override
             public void onFinish(){
-                tvTimer.setText("00");
+                tvTimer.setText("Hết thời gian đoán!");
                 endGuessingRound();
             }
         }.start();
@@ -303,7 +303,7 @@ public class GarticActivity extends AppCompatActivity {
     private void updateScoreUI(){
         int myScore = scores.getOrDefault(userId,0);
         int otherScore = scores.getOrDefault(otherPlayerId,0);
-        tvScore.setText(+myScore+" - "+otherScore);
+        tvScore.setText("Điểm: "+myScore+" - "+otherScore);
     }
 
     private abstract static class SimpleValueListener implements ValueEventListener{
