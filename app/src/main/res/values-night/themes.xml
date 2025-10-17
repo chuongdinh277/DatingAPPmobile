@@ -14,7 +14,7 @@
         <item name="colorOnSurface">@color/white</item>
 
         <!-- Status Bar cho dark theme -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/white</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- Navigation Bar cho dark theme - Tránh phần màu đen -->

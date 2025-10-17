@@ -1,9 +1,12 @@
 package com.example.couple_app.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.LayoutRes;
@@ -40,6 +43,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.setContentView(R.layout.menu_button);
         setupBottomBar();
         setupInsetsHandling();
+        Window window = getWindow();
+        window.setNavigationBarColor(Color.WHITE);
+        window.setStatusBarColor(Color.TRANSPARENT);
 
         // Ẩn thanh menu nếu activity con yêu cầu
         View bottomBar = findViewById(R.id.bottomBar);
@@ -66,14 +72,15 @@ public abstract class BaseActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), !edgeToEdge);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Status bar: edgeToEdge -> transparent, ngược lại dùng màu nền app để tránh viền đen
-            if (edgeToEdge) {
-                getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-            } else {
-                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.couple_pink_bg));
-            }
-            // Navigation bar luôn dùng màu nền app để tránh đen
-            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.couple_pink_bg));
+            // Status bar & Navigation bar: edgeToEdge -> transparent, ngược lại dùng màu nền app để tránh viền đen
+//            if (edgeToEdge) {
+//                getWindow().setStatusBarColor(Color.WHITE);
+//                getWindow().setNavigationBarColor(Color.WHITE);
+//            } else {
+//                int bg = ContextCompat.getColor(this, R.color.white);
+//                getWindow().setStatusBarColor(bg);
+//                getWindow().setNavigationBarColor(bg);
+//            }
 
             // Thiết lập icon sáng/dark phù hợp
             WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
@@ -164,6 +171,12 @@ public abstract class BaseActivity extends AppCompatActivity {
                 navigateNoAnim(SettingActivity.class);
             }
         });
+        btnGame.setOnClickListener(v -> {
+            if (!(this instanceof GameListActivity)) {
+                setActiveButton("game");
+                navigateNoAnim(GameListActivity.class);
+            }
+        });
     }
 
     private void navigateNoAnim(Class<?> target) {
@@ -172,6 +185,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         finish();
         overridePendingTransition(0, 0);
     }
+
 
     protected void openMessenger() {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();

@@ -38,7 +38,27 @@
             </intent-filter>
         </activity>
 
-
+        <!-- Game related activities -->
+        <activity
+            android:name=".activities.GameListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp" />
+        <activity
+            android:name=".activities.WaitingRoomGarticActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp" />
+        <activity
+            android:name=".activities.GarticActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp" />
+        <activity
+            android:name=".activities.WaitingRoomCaroActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp" />
+        <activity
+            android:name=".activities.CaroActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp" />
 
         <activity
             android:name=".activities.LoginByPhoneActivity"

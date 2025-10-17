@@ -174,6 +174,26 @@ public class SignUpActivity extends AppCompatActivity {
         signInWithPhoneAuthCredential(credential);
     }
 
+    private void createFakeEmailtoSignin(String phoneNumber) {
+        String fakeEmail = phoneNumber.replaceAll("[^\\d]", "") + "@couplesapp.com";
+        String fakePassword = "defaultPassword"; // You can set a default password or generate one
+
+        mAuth.createUserWithEmailAndPassword(fakeEmail, fakePassword)
+            .addOnCompleteListener(this, task -> {
+                hideProgressBar();
+                if (task.isSuccessful()) {
+                    // Sign up success - save user to database
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null) {
+                        String name = etName.getText().toString().trim();
+
+                    }
+                } else {
+                    Toast.makeText(SignUpActivity.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+    }
+
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {

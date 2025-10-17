@@ -14,13 +14,11 @@
         <item name="colorOnSurface">@color/text_primary</item>
 
         <!-- Status Bar -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/white</item>
         <item name="android:windowLightStatusBar">true</item>
 
         <!-- Navigation Bar - Tránh phần màu đen -->
-        <item name="android:navigationBarColor">@color/couple_pink_bg</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
-        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:navigationBarColor">@color/white</item>
 
         <!-- Edge-to-edge display -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>

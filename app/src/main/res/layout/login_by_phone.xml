@@ -49,8 +49,8 @@
         <!-- Phone Number Input -->
         <EditText
             android:id="@+id/etPhoneNumber"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_width="336dp"
+            android:layout_height="60dp"
             android:layout_marginStart="36dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="36dp"

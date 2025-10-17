@@ -12,6 +12,7 @@ public class LoginPreferences {
     private static final String KEY_USER_PHONE = "userPhone";
     private static final String KEY_LOGIN_TYPE = "loginType";
 
+    private static final String KEY_COUPLE_ID = "coupleId";
     private Context context;
 
     // Constructor for instance usage
@@ -100,6 +101,10 @@ public class LoginPreferences {
         return prefs.getString(KEY_USER_ID, "");
     }
 
+    public static String getCoupleId(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_COUPLE_ID, "");
+    }
     public static void clearLoginState(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
