@@ -10,37 +10,27 @@ public class User {
     private String userId;
     private String name;
     private String email;
-    private String phoneNumber; // New field for phone number
+    private String phoneNumber;
     private String profilePicUrl;
     private String pinCode;
     private String partnerId;
     private Timestamp startLoveDate;
+    private String dateOfBirth;
+    private String gender; // Thêm trường giới tính
 
-    // Default constructor required for Firebase
+    // Constructors
     public User() {}
 
-    // Constructor for email registration
     public User(String userId, String name, String email) {
         this.userId = userId;
         this.name = name;
         this.email = email;
-        this.phoneNumber = null; // null when registering with email
-        this.profilePicUrl = "";
-        this.pinCode = null;
-        this.partnerId = null;
-        this.startLoveDate = null;
     }
 
-    // Constructor for phone registration
     public User(String userId, String name, String phoneNumber, boolean isPhoneRegistration) {
         this.userId = userId;
         this.name = name;
-        this.email = null; // null when registering with phone
         this.phoneNumber = phoneNumber;
-        this.profilePicUrl = "";
-        this.pinCode = null;
-        this.partnerId = null;
-        this.startLoveDate = null;
     }
 
     // Getters and Setters
@@ -59,6 +49,8 @@ public class User {
     public String getProfilePicUrl() { return profilePicUrl; }
     public void setProfilePicUrl(String profilePicUrl) { this.profilePicUrl = profilePicUrl; }
 
+
+
     public String getPinCode() { return pinCode; }
     public void setPinCode(String pinCode) { this.pinCode = pinCode; }
 
@@ -67,4 +59,10 @@ public class User {
 
     public Timestamp getStartLoveDate() { return startLoveDate; }
     public void setStartLoveDate(Timestamp startLoveDate) { this.startLoveDate = startLoveDate; }
+
+    public String getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 }

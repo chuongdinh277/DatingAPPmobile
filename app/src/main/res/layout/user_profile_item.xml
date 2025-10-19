@@ -10,6 +10,7 @@
     android:padding="16dp">
 
     <LinearLayout
+        android:id="@+id/userProfileLeft"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -92,6 +93,7 @@
         android:layout_marginHorizontal="20dp"/>
 
     <LinearLayout
+        android:id="@+id/userProfileRight"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

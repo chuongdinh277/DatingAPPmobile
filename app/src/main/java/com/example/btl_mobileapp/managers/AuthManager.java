@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AuthManager {
     private static final String TAG = "AuthManager";
@@ -218,7 +220,7 @@ public class AuthManager {
                 profileBuilder.setDisplayName(name);
             }
 
-            if (photoUrl != null && !photoUrl.isEmpty()) {
+            if (photoUrl != null) { // Allow empty string to clear photo
                 profileBuilder.setPhotoUri(android.net.Uri.parse(photoUrl));
             }
 
@@ -227,7 +229,16 @@ public class AuthManager {
             user.updateProfile(profileUpdates)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            DatabaseManager.getInstance().updateUserProfile(user.getUid(), name, photoUrl, callback);
+                            // Create a Map to hold updates for Firestore
+                            Map<String, Object> dbUpdates = new HashMap<>();
+                            if (name != null) {
+                                dbUpdates.put("name", name);
+                            }
+                            if (photoUrl != null) {
+                                dbUpdates.put("profilePicUrl", photoUrl);
+                            }
+                            // Call the updated method in DatabaseManager
+                            DatabaseManager.getInstance().updateUserProfile(user.getUid(), dbUpdates, callback);
                         } else {
                             String errorMessage = task.getException() != null ?
                                     task.getException().getMessage() : "Profile update failed";
@@ -238,6 +249,7 @@ public class AuthManager {
             callback.onError("No user signed in");
         }
     }
+
 
     public void changePassword(String newPassword, AuthActionCallback callback) {
         FirebaseUser user = mAuth.getCurrentUser();

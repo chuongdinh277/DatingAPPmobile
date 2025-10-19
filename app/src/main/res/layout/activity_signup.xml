@@ -5,39 +5,36 @@
     android:layout_height="match_parent"
     android:background="#FFDBED">
 
-    <!-- Back Button -->
     <ImageButton
-        android:id="@+id/btnBack"
-        android:layout_width="78dp"
-        android:layout_height="68dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginStart="16dp"
-        android:background="@null"
-        android:contentDescription="Back"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/left_arrow"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:id="@+id/btnBack"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:layout_marginTop="16dp"
+    android:layout_marginStart="16dp"
+    android:background="@null"
+    android:contentDescription="Back"
+    android:padding="8dp"
+    android:scaleType="fitCenter"
+    android:src="@drawable/ic_arrow_back_pink"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Logo/Image -->
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="250dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="64dp"
+        android:layout_width="200dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/capture" />
 
-    <!-- Title -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="@font/pacifico"
         android:gravity="center"
         android:text="Tạo tài khoản mới"
         android:textColor="#800D42"
@@ -47,12 +44,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageView" />
 
-    <!-- Subtitle -->
     <TextView
         android:id="@+id/tvSubtitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:gravity="center"
         android:text="Tham gia cộng đồng các cặp đôi hạnh phúc"
         android:textColor="#800D42"
@@ -61,116 +59,114 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
-    <!-- Name Input -->
     <EditText
         android:id="@+id/etName"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="36dp"
-        android:background="@drawable/bg_btn_phone"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/bg_rounded_edittext_pink"
         android:gravity="center_vertical"
         android:hint="Họ và tên"
         android:inputType="textPersonName|textCapWords"
         android:paddingStart="18dp"
         android:paddingEnd="18dp"
-        android:textColorHint="#800D42"
+        android:textColor="#800D42"
+        android:textColorHint="#BF800D42"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
 
-    <!-- Phone Number Input -->
     <EditText
         android:id="@+id/etPhoneNumber"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
-        android:background="@drawable/bg_btn_phone"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/bg_rounded_edittext_pink"
         android:gravity="center_vertical"
         android:hint="Số điện thoại"
         android:inputType="phone"
         android:paddingStart="18dp"
         android:paddingEnd="18dp"
-        android:textColorHint="#800D42"
+        android:textColor="#800D42"
+        android:textColorHint="#BF800D42"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etName" />
 
-    <!-- Password Input (Initially Hidden for phone mode) -->
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
-        android:background="@drawable/bg_btn_mail"
-        android:gravity="center_vertical"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/bg_rounded_edittext_purple" android:gravity="center_vertical"
         android:hint="Mật khẩu"
         android:inputType="textPassword"
         android:paddingStart="18dp"
         android:paddingEnd="18dp"
         android:textColor="@android:color/white"
-        android:textColorHint="@android:color/white"
+        android:textColorHint="#BFFFFFFF"
         android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etPhoneNumber" />
 
-    <!-- Send Code Button -->
     <Button
         android:id="@+id/btnSendCode"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
-        android:background="@drawable/bg_btn_mail"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/bg_rounded_button_purple"
         android:text="Gửi mã xác nhận"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etPhoneNumber" />
+        app:layout_constraintTop_toBottomOf="@id/etPhoneNumber"
+        app:backgroundTint="#800D42"
+        />
 
-    <!-- Verification Code Input (Initially Hidden) -->
     <EditText
         android:id="@+id/etVerificationCode"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
-        android:background="@drawable/bg_btn_phone"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/bg_rounded_edittext_pink"
         android:gravity="center_vertical"
         android:hint="Mã xác nhận"
         android:inputType="number"
         android:maxLength="6"
         android:paddingStart="18dp"
         android:paddingEnd="18dp"
-        android:textColorHint="#800D42"
+        android:textColor="#800D42"
+        android:textColorHint="#BF800D42"
         android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnSendCode" />
 
-    <!-- Verify Code Button (Initially Hidden) -->
     <Button
         android:id="@+id/btnVerifyCode"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
-        android:background="@drawable/bg_btn_mail"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/bg_rounded_button_purple"
         android:text="Xác nhận mã"
         android:textColor="@android:color/white"
         android:textSize="16sp"
@@ -180,15 +176,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etVerificationCode" />
 
-    <!-- Sign Up Button (Initially Hidden) -->
     <Button
         android:id="@+id/btnSignUp"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="36dp"
-        android:background="@drawable/bg_btn_phone"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/bg_rounded_button_pink"
         android:text="Tạo tài khoản"
         android:textColor="#800D42"
         android:textSize="18sp"
@@ -198,30 +193,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnVerifyCode" />
 
-    <!-- Switch Options -->
     <LinearLayout
         android:id="@+id/llSwitchOptions"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="36dp"
+        android:layout_marginEnd="32dp"
         android:orientation="horizontal"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etPassword">
-
-        <TextView
-            android:id="@+id/tvSwitchToPhone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Đăng ký bằng SĐT"
-            android:textColor="#800D42"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:padding="8dp"
-            android:visibility="gone" />
+        app:layout_constraintTop_toBottomOf="@id/etPassword"> <TextView
+        android:id="@+id/tvSwitchToPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đăng ký bằng SĐT"
+        android:textColor="#800D42"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -243,7 +235,6 @@
 
     </LinearLayout>
 
-    <!-- Progress Bar -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -254,18 +245,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Login Link -->
     <TextView
         android:id="@+id/tvLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="48dp"
         android:text="Đã có tài khoản? Đăng nhập"
         android:textColor="#800D42"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.514"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSendCode"
+        app:layout_constraintVertical_bias="0.967" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

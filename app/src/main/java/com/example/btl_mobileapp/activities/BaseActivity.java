@@ -108,7 +108,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         LinearLayout bottomBar = findViewById(R.id.bottomBar);
         if (bottomBar != null) {
             // Lấy bán kính bo góc từ tài nguyên hoặc đặt một giá trị cố định
-            float radius = getResources().getDimension(R.dimen.bottom_bar_radius);
+            float radius = 0;
             bottomBar.setBackground(getRoundedDrawable(colorResId, radius));
         }
     }

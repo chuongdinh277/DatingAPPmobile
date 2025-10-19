@@ -14,8 +14,8 @@
         android:id="@+id/tvWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="476dp"
-        android:fontFamily="sans-serif-medium"
+        android:layout_marginTop="456dp"
+        android:fontFamily="@font/pacifico"
         android:gravity="center"
         android:shadowColor="#F38ABF"
         android:shadowDx="10"
@@ -66,7 +66,8 @@
             android:fontFamily="sans-serif-medium"
             android:text="Đăng nhập với điện thoại"
             android:textColor="#490424"
-            android:textSize="16sp" />
+            android:textSize="18sp"
+            android:textStyle="bold"/>
     </LinearLayout>
 
     <LinearLayout
@@ -102,7 +103,8 @@
             android:fontFamily="sans-serif-medium"
             android:text="Đăng nhập với Google"
             android:textColor="@android:color/white"
-            android:textSize="16sp" />
+            android:textSize="18sp"
+            android:textStyle="bold"/>
     </LinearLayout>
 
     <ImageView
@@ -124,8 +126,9 @@
         android:layout_gravity="center"
         android:layout_marginBottom="100dp"
         android:text="Chưa có tài khoản. Đăng ký ngay?"
-        android:textColor="@android:color/black"
-        android:textSize="12sp"
+        android:textColor="#800D42"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

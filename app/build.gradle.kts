@@ -45,6 +45,8 @@ dependencies {
     // Google Play Services for Google Sign-In
     implementation(libs.play.services.auth)
 
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.recyclerview)

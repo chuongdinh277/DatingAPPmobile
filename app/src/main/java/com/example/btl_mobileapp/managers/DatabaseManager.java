@@ -92,14 +92,11 @@ public class DatabaseManager {
                 });
     }
 
-    // Update user profile in Firestore
-    public void updateUserProfile(String userId, String name, String profilePicUrl, AuthManager.AuthActionCallback callback) {
-        Map<String, Object> updates = new HashMap<>();
-        if (name != null && !name.isEmpty()) {
-            updates.put("name", name);
-        }
-        if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
-            updates.put("profilePicUrl", profilePicUrl);
+    // Update user profile in Firestore using a Map for flexibility
+    public void updateUserProfile(String userId, Map<String, Object> updates, AuthManager.AuthActionCallback callback) {
+        if (updates == null || updates.isEmpty()) {
+            callback.onSuccess(); // Nothing to update
+            return;
         }
 
         db.collection(USERS_COLLECTION)
@@ -594,3 +591,4 @@ public class DatabaseManager {
                 });
     }
 }
+

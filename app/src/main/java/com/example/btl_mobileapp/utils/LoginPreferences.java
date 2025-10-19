@@ -13,7 +13,6 @@ public class LoginPreferences {
     private static final String KEY_LOGIN_TYPE = "loginType";
 
     private static final String KEY_COUPLE_ID = "coupleId";
-
     private Context context;
 
     // Constructor for instance usage
@@ -22,7 +21,7 @@ public class LoginPreferences {
     }
 
     // Instance methods (used by LoginActivity)
-    public void saveLoginState(String userId, String name, String email, String phone, String loginType, String coupleId) {
+    public void saveLoginState(String userId, String name, String email, String phone, String loginType) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
@@ -31,10 +30,8 @@ public class LoginPreferences {
         editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_PHONE, phone);
         editor.putString(KEY_LOGIN_TYPE, loginType);
-        editor.putString(KEY_COUPLE_ID, coupleId); // 🔹 thêm dòng này
         editor.apply();
     }
-
 
     public boolean isLoggedIn() {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -64,11 +61,6 @@ public class LoginPreferences {
     public String getLoginType() {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         return prefs.getString(KEY_LOGIN_TYPE, "email");
-    }
-
-    public static String getCoupleId(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        return prefs.getString(KEY_COUPLE_ID, "");
     }
 
     public void clearLoginState() {
@@ -109,6 +101,10 @@ public class LoginPreferences {
         return prefs.getString(KEY_USER_ID, "");
     }
 
+    public static String getCoupleId(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(KEY_COUPLE_ID, "");
+    }
     public static void clearLoginState(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();

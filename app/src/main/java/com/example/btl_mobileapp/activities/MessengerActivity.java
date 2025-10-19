@@ -57,16 +57,11 @@ public class MessengerActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.messenger);
-
-        // Không highlight tab vì đã ẩn menu
-        // setActiveButton("message");
-
         initViews();
         getIntentData();
         setupRecyclerView();
         setupClickListeners();
 
-        // Hiển thị overlay và đảm bảo lấy couple/partner trước khi load messages
         showLoading(true);
         ensureCoupleThenLoadMessages();
     }

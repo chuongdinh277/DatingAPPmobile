@@ -44,14 +44,14 @@ public class GarticActivity extends AppCompatActivity {
     private boolean isMyTurn;
 
     private CountDownTimer turnTimer;
-    private static final int TURN_TIME_MS = 30_000;
+    private static final int TURN_TIME_MS = 15_000;
 
     private Map<String, Integer> scores = new HashMap<>();
     private final int WIN_SCORE = 10;
 
     private DrawingView drawingView;
 
-    private String[] wordList = {"Cat","Dog","House","Car","Tree","Apple","Sun","Moon"};
+    private String[] wordList = {"Tree"};
 
     private boolean isGuessingPhase = false;
 
@@ -160,7 +160,7 @@ public class GarticActivity extends AppCompatActivity {
 
         if(isMyTurn){
             tvCurrentWord.setText("Đang chọn từ...");
-            tvTimer.setText("30s");
+            tvTimer.setText("15s");
 
             // Chọn từ mới
             roomRef.child("currentWord").addListenerForSingleValueEvent(new SimpleValueListener() {

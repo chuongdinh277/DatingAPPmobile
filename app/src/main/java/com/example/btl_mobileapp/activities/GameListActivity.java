@@ -18,7 +18,6 @@ public class GameListActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setBottomBarColor(R.color.game_bottom_bar_color);
         setContentView(R.layout.gamelist);
 
         btnGameGartic = findViewById(R.id.btnGame1);

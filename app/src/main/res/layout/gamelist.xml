@@ -1,77 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#FFFFFF"
-    android:orientation="vertical"
-    android:fillViewport="true"
-    >
+    android:background="#F5F5F5"
+    android:fillViewport="true">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ForLove"
-            android:textColor="#800D42"
-            android:textSize="36sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="30dp" />
+        <include
+            android:id="@+id/header"
+            layout="@layout/layout_header" />
+
 
         <LinearLayout
             android:id="@+id/btnGame1"
             android:layout_width="match_parent"
-            android:layout_height="269dp"
-            android:layout_marginTop="50dp"
-            android:layout_marginBottom="50dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/bg_card"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="12dp"
 
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="50dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
                 android:text="Gartic"
-                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="202dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/garticio" />
+                android:src="@drawable/garticio"
+                app:shapeAppearanceOverlay="@style/RoundedImageView" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/btnGame2"
             android:layout_width="match_parent"
-            android:layout_height="269dp"
-            android:layout_marginBottom="50dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/bg_card"
             android:orientation="vertical"
-            android:layout_marginTop="30dp"
-            android:padding="8dp">
+            android:padding="12dp"
+
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="24dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
                 android:text="Caro"
-                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="202dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/caro" />
+                android:src="@drawable/caro"
+                app:shapeAppearanceOverlay="@style/RoundedImageView" />
+
 
         </LinearLayout>
 

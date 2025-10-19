@@ -3,254 +3,247 @@ package com.example.btl_mobileapp.activities;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.example.btl_mobileapp.R;
 import com.example.btl_mobileapp.managers.DatabaseManager;
 import com.example.btl_mobileapp.models.User;
-import com.example.btl_mobileapp.utils.AvatarCache;
-import com.example.btl_mobileapp.utils.NameCache;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class HomeMain2Fragment extends Fragment {
-
-    // Executor để tải ảnh bất đồng bộ
     private static final ExecutorService IMAGE_EXECUTOR = Executors.newFixedThreadPool(2);
 
-    // Khai báo các biến View cho phần đếm ngày
+    // Views for Day Counter
     private TextView tvDaysCount, tvSince;
 
-    public HomeMain2Fragment() {
-        // Required empty public constructor
-    }
+    // Views for User Profiles
+    private ImageView avtLeft, avtRight, imgGenderLeft, imgGenderRight;
+    private TextView txtNameLeft, txtNameRight, tvAgeLeft, tvAgeRight, tvZodiacLeft, tvZodiacRight;
+    private LinearLayout userProfileLeft, userProfileRight;
+
+    public HomeMain2Fragment() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate layout
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.homemain2, container, false);
-
-        // Lấy tham chiếu tới các TextViews của phần đếm ngày
-        tvDaysCount = root.findViewById(R.id.tvDaysCount);
-        tvSince = root.findViewById(R.id.tvSince);
-
-        // Bắt đầu quá trình tải và hiển thị thông tin
-        bindUserProfile(root);
-
+        initViews(root);
+        loadCoupleData();
         return root;
     }
 
-    /**
-     * Phương thức chính để tải và hiển thị thông tin người dùng, partner, và ngày kỷ niệm.
-     * @param root View gốc của Fragment.
-     */
-    private void bindUserProfile(View root) {
+    private void initViews(View root) {
+        // Day Counter Views
+        tvDaysCount = root.findViewById(R.id.tvDaysCount);
+        tvSince = root.findViewById(R.id.tvSince);
+
+        // User Info Container
         View userInfo = root.findViewById(R.id.layoutUserInfo);
-        if (userInfo == null) return;
+        userProfileLeft = userInfo.findViewById(R.id.userProfileLeft);
+        avtLeft = userInfo.findViewById(R.id.avtLeft);
+        txtNameLeft = userInfo.findViewById(R.id.txtNameLeft);
+        tvAgeLeft = userInfo.findViewById(R.id.tvAgeLeft);
+        tvZodiacLeft = userInfo.findViewById(R.id.tvZodiacLeft);
+        imgGenderLeft = userInfo.findViewById(R.id.imgGenderLeft);
 
-        ImageView avtLeft = userInfo.findViewById(R.id.avtLeft);
-        ImageView avtRight = userInfo.findViewById(R.id.avtRight);
-        TextView txtNameLeft = userInfo.findViewById(R.id.txtNameLeft);
-        TextView txtNameRight = userInfo.findViewById(R.id.txtNameRight);
+        userProfileRight = userInfo.findViewById(R.id.userProfileRight);
+        avtRight = userInfo.findViewById(R.id.avtRight);
+        txtNameRight = userInfo.findViewById(R.id.txtNameRight);
+        tvAgeRight = userInfo.findViewById(R.id.tvAgeRight);
+        tvZodiacRight = userInfo.findViewById(R.id.tvZodiacRight);
+        imgGenderRight = userInfo.findViewById(R.id.imgGenderRight);
+    }
 
-        safeSetText(txtNameLeft, "");
-        safeSetText(txtNameRight, "");
-
+    private void loadCoupleData() {
         FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
         if (fbUser == null) return;
 
-        String uid = fbUser.getUid();
-
-        // Tải avatar từ cache nếu có
-        Bitmap cached = AvatarCache.getCachedBitmap(requireContext());
-        if (cached != null && avtLeft != null) {
-            avtLeft.setImageBitmap(cached);
-        }
-
-        // Tải tên từ cache nếu có
-        String cachedCurrentName = NameCache.getCurrentName(requireContext());
-        String cachedPartnerId = NameCache.getPartnerId(requireContext());
-        String cachedPartnerName = NameCache.getPartnerName(requireContext());
-
-        if (!TextUtils.isEmpty(cachedCurrentName)) {
-            safeSetText(txtNameLeft, cachedCurrentName);
-        } else {
-            String fallbackName = fbUser.getDisplayName();
-            if (TextUtils.isEmpty(fallbackName)) fallbackName = fbUser.getEmail();
-            if (!TextUtils.isEmpty(fallbackName)) {
-                safeSetText(txtNameLeft, fallbackName);
-            }
-        }
-
-        if (!TextUtils.isEmpty(cachedPartnerName)) {
-            safeSetText(txtNameRight, cachedPartnerName);
-        }
-
-        // Luôn tải dữ liệu từ Firestore để đảm bảo thông tin mới nhất
-        DatabaseManager.getInstance().getUser(uid, new DatabaseManager.DatabaseCallback<User>() {
+        DatabaseManager.getInstance().getUser(fbUser.getUid(), new DatabaseManager.DatabaseCallback<User>() {
             @Override
-            public void onSuccess(User user) {
-                if (!isAdded() || user == null) return;
+            public void onSuccess(User currentUser) {
+                if (currentUser == null || !isAdded()) return;
 
-                // 1. CẬP NHẬT SỐ NGÀY
-//                if (user.getAnniversaryDate() != null) {
-//                    updateDayCounter(user.getAnniversaryDate());
-//                }
-
-                // 2. CẬP NHẬT TÊN VÀ AVATAR NGƯỜI DÙNG HIỆN TẠI
-                String displayName = user.getName();
-                if (TextUtils.isEmpty(displayName)) displayName = fbUser.getDisplayName();
-                if (TextUtils.isEmpty(displayName)) displayName = fbUser.getEmail();
-                safeSetText(txtNameLeft, displayName != null ? displayName : "");
-                NameCache.setCurrentName(requireContext(), displayName);
-
-                if (cached == null && !TextUtils.isEmpty(user.getProfilePicUrl())) {
-                    loadImageAsync(user.getProfilePicUrl(), bmp -> {
-                        if (bmp != null && avtLeft != null) avtLeft.setImageBitmap(bmp);
-                    });
-                } else if (cached == null && fbUser.getPhotoUrl() != null) {
-                    loadImageAsync(fbUser.getPhotoUrl().toString(), bmp -> {
-                        if (bmp != null && avtLeft != null) avtLeft.setImageBitmap(bmp);
-                    });
+                // Update the day counter as soon as we have the date
+                if (currentUser.getStartLoveDate() != null) {
+                    updateDayCounter(currentUser.getStartLoveDate());
                 }
 
-                // 3. CẬP NHẬT THÔNG TIN PARTNER
-                if (!TextUtils.isEmpty(user.getPartnerId())) {
-                    fetchAndBindPartner(user.getPartnerId(), avtRight, txtNameRight);
-                    NameCache.setPartnerId(requireContext(), user.getPartnerId());
+                if (!TextUtils.isEmpty(currentUser.getPartnerId())) {
+                    DatabaseManager.getInstance().getUser(currentUser.getPartnerId(), new DatabaseManager.DatabaseCallback<User>() {
+                        @Override
+                        public void onSuccess(User partnerUser) {
+                            if (partnerUser != null && isAdded()) {
+                                arrangeAndBindProfiles(currentUser, partnerUser);
+                            }
+                        }
+                        @Override
+                        public void onError(String error) {
+                            arrangeAndBindProfiles(currentUser, null);
+                        }
+                    });
                 } else {
-                    NameCache.clearPartner(requireContext());
-                    safeSetText(txtNameRight, "");
-                   // if(avtRight != null) avtRight.setImageResource(R.drawable.ic_default_avatar); // Reset avatar
+                    arrangeAndBindProfiles(currentUser, null);
                 }
             }
-
             @Override
-            public void onError(String error) {
-                if (!isAdded()) return;
-                Log.e("HomeMain2Fragment", "Lỗi tải thông tin user: " + error);
-            }
+            public void onError(String error) { /* Handle error */ }
         });
     }
 
-    /**
-     * Tính toán và cập nhật số ngày lên giao diện.
-     * @param anniversaryDateStr Ngày kỷ niệm dạng chuỗi "yyyy-MM-dd".
-     */
-    private void updateDayCounter(String anniversaryDateStr) {
-        if (anniversaryDateStr == null || anniversaryDateStr.isEmpty() || !isAdded()) {
-            return;
+    private void updateDayCounter(Timestamp startDate) {
+        if (startDate == null || !isAdded()) return;
+
+        long diffInMillis = new Date().getTime() - startDate.toDate().getTime();
+        long daysBetween = TimeUnit.MILLISECONDS.toDays(diffInMillis) + 1; // Add 1 to be inclusive
+
+        String sinceDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(startDate.toDate());
+
+        safeSetText(tvDaysCount, String.format(Locale.getDefault(), "%d ngày", daysBetween));
+        safeSetText(tvSince, "Từ " + sinceDate);
+    }
+
+    private void arrangeAndBindProfiles(User user1, @Nullable User user2) {
+        User userLeft, userRight = null;
+
+        if (user2 != null && "Male".equals(user2.getGender()) && "Female".equals(user1.getGender())) {
+            // If user1 is female and user2 is male, swap them
+            userLeft = user2;
+            userRight = user1;
+        } else {
+            // Default: user1 on left, user2 on right (handles Male/Female, same gender, or single user)
+            userLeft = user1;
+            userRight = user2;
         }
 
+        bindSingleProfile(userLeft, avtLeft, txtNameLeft, tvAgeLeft, tvZodiacLeft, imgGenderLeft);
+        userProfileLeft.setVisibility(View.VISIBLE);
+
+        if (userRight != null) {
+            bindSingleProfile(userRight, avtRight, txtNameRight, tvAgeRight, tvZodiacRight, imgGenderRight);
+            userProfileRight.setVisibility(View.VISIBLE);
+        } else {
+            userProfileRight.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void bindSingleProfile(User user, ImageView avatar, TextView name, TextView age, TextView zodiac, ImageView genderIcon) {
+        safeSetText(name, user.getName());
+        loadImageAsync(user.getProfilePicUrl(), avatar::setImageBitmap);
+
+        String dob = user.getDateOfBirth();
+        if (!TextUtils.isEmpty(dob)) {
+            safeSetText(age, String.valueOf(calculateAge(dob)));
+            safeSetText(zodiac, getZodiacSign(dob));
+        }
+
+        String gender = user.getGender();
+        if (gender != null) {
+            switch (gender) {
+                case "Male":
+                    genderIcon.setImageResource(R.drawable.gender);
+                    break;
+                case "Female":
+                    genderIcon.setImageResource(R.drawable.girl);
+                    break;
+                default:
+                    // Hide icon if gender is "Other" or not set
+                    genderIcon.setVisibility(View.GONE);
+                    break;
+            }
+        } else {
+            genderIcon.setVisibility(View.GONE);
+        }
+    }
+
+    // --- Helper Methods (Copied from HomeMain1Fragment) ---
+
+    private int calculateAge(String dobString) {
+        if (TextUtils.isEmpty(dobString)) return 0;
         try {
-            DateTimeFormatter dbFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate startDate = LocalDate.parse(anniversaryDateStr, dbFormatter);
-            LocalDate today = LocalDate.now();
-
-            long daysBetween = ChronoUnit.DAYS.between(startDate, today) + 1;
-
-            DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String displayDate = startDate.format(displayFormatter);
-
-            requireActivity().runOnUiThread(() -> {
-                tvDaysCount.setText(String.format(Locale.getDefault(), "%d ngày", daysBetween));
-                tvSince.setText(String.format("Từ %s", displayDate));
-            });
-
-        } catch (DateTimeParseException e) {
-            Log.e("HomeMain2Fragment", "Lỗi parse ngày: " + anniversaryDateStr, e);
+            Date dob = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(dobString);
+            Calendar dobCal = Calendar.getInstance();
+            dobCal.setTime(dob);
+            Calendar today = Calendar.getInstance();
+            int age = today.get(Calendar.YEAR) - dobCal.get(Calendar.YEAR);
+            if (today.get(Calendar.DAY_OF_YEAR) < dobCal.get(Calendar.DAY_OF_YEAR)) {
+                age--;
+            }
+            return age;
+        } catch (ParseException e) {
+            return 0;
         }
     }
 
-    /**
-     * Tải thông tin của partner và hiển thị.
-     */
-    private void fetchAndBindPartner(String partnerId, ImageView avtRight, TextView txtNameRight) {
-        DatabaseManager.getInstance().getUser(partnerId, new DatabaseManager.DatabaseCallback<User>() {
-            @Override
-            public void onSuccess(User partner) {
-                if (!isAdded() || partner == null) return;
+    private String getZodiacSign(String dobString) {
+        if (TextUtils.isEmpty(dobString)) return "";
+        try {
+            Date dob = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(dobString);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dob);
+            int day = cal.get(Calendar.DAY_OF_MONTH);
+            int month = cal.get(Calendar.MONTH) + 1;
 
-                String partnerName = partner.getName();
-                safeSetText(txtNameRight, partnerName != null ? partnerName : "");
-                NameCache.setPartnerName(requireContext(), partnerName);
+            if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) return "Bạch Dương";
+            if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) return "Kim Ngưu";
+            if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) return "Song Tử";
+            if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) return "Cự Giải";
+            if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) return "Sư Tử";
+            if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) return "Xử Nữ";
+            if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) return "Thiên Bình";
+            if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) return "Bọ Cạp";
+            if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) return "Nhân Mã";
+            if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) return "Ma Kết";
+            if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) return "Bảo Bình";
+            if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) return "Song Ngư";
 
-                if (!TextUtils.isEmpty(partner.getProfilePicUrl())) {
-                    loadImageAsync(partner.getProfilePicUrl(), bmp -> {
-                        if (bmp != null && avtRight != null) avtRight.setImageBitmap(bmp);
-                    });
+        } catch (ParseException e) { return ""; }
+        return "";
+    }
+
+    private void loadImageAsync(String urlStr, BitmapCallback callback) {
+        if (TextUtils.isEmpty(urlStr)) return;
+        IMAGE_EXECUTOR.execute(() -> {
+            try {
+                URL url = new URL(urlStr);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap bmp = BitmapFactory.decodeStream(input);
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> callback.onBitmap(bmp));
                 }
-            }
-
-            @Override
-            public void onError(String error) {
-                if (!isAdded()) return;
-                Log.e("HomeMain2Fragment", "Lỗi tải thông tin partner: " + error);
-            }
+            } catch (Exception e) { /* Handle error */ }
         });
+    }
+
+    private void safeSetText(@Nullable TextView tv, @Nullable String text) {
+        if (tv != null && isAdded()) {
+            requireActivity().runOnUiThread(() -> tv.setText(text != null ? text : ""));
+        }
     }
 
     private interface BitmapCallback { void onBitmap(Bitmap bmp); }
-
-    /**
-     * Tải ảnh từ URL một cách bất đồng bộ.
-     */
-    private void loadImageAsync(String urlStr, BitmapCallback callback) {
-        if (TextUtils.isEmpty(urlStr)) { if (callback != null) callback.onBitmap(null); return; }
-        IMAGE_EXECUTOR.execute(() -> {
-            Bitmap bmp = null;
-            HttpURLConnection conn = null;
-            try {
-                URL url = new URL(urlStr);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(15000);
-                conn.setReadTimeout(20000);
-                conn.connect();
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    try (InputStream is = conn.getInputStream()) {
-                        bmp = BitmapFactory.decodeStream(is);
-                    }
-                }
-            } catch (Exception e) {
-                Log.e("HomeMain2Fragment", "Lỗi tải ảnh: " + urlStr, e);
-            } finally {
-                if (conn != null) conn.disconnect();
-            }
-            if (!isAdded()) return;
-            final Bitmap result = bmp;
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> {
-                    if (callback != null) callback.onBitmap(result);
-                });
-            }
-        });
-    }
-
-    /**
-     * Set text cho TextView một cách an toàn trên Main Thread.
-     */
-    private void safeSetText(@Nullable TextView tv, @Nullable String text) {
-        if (tv == null || !isAdded() || getActivity() == null) return;
-        getActivity().runOnUiThread(() -> tv.setText(text != null ? text : ""));
-    }
 }
