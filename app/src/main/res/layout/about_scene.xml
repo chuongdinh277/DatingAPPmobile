@@ -39,6 +39,7 @@
             android:inputType="textMultiLine"
             android:lineSpacingExtra="2dp"
             android:scrollHorizontally="true"
+            android:singleLine="false"
             android:textIsSelectable="true" />
     </ScrollView>
 

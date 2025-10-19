@@ -29,6 +29,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rc_notification"
         android:layout_width="match_parent"
         android:layout_height="430dp"
         android:layout_marginTop="28dp"

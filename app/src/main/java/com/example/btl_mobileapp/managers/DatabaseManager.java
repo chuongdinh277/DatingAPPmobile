@@ -1,8 +1,14 @@
 package com.example.btl_mobileapp.managers;
 
 import android.util.Log;
+
+import com.example.btl_mobileapp.models.Notification;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.Timestamp;
 import com.example.btl_mobileapp.models.User;
@@ -24,6 +30,8 @@ public class DatabaseManager {
     private static final String COUPLES_COLLECTION = "couples";
     private static final String AI_SUGGESTIONS_COLLECTION = "ai_suggestions";
     private static final String MESSAGES_COLLECTION = "messages";
+
+    private static final String NOTIFICATION_COLLECTION = "notifications";
 
     private DatabaseManager() {
         db = FirebaseFirestore.getInstance();

@@ -32,7 +32,7 @@
         android:id="@+id/iv_image"
         android:layout_width="240dp"
         android:layout_height="240dp"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="80dp"
         android:background="@drawable/rectangle_shape_15"
         android:backgroundTint="#C52F2F"
         android:scaleType="fitCenter"
@@ -43,29 +43,15 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_libImage" />
 
     <TextView
-        android:id="@+id/tv_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:text="HauHau"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_image" />
-
-    <TextView
         android:id="@+id/tv_timeImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="592dp"
+        android:layout_marginTop="508dp"
         android:text="1 ngày trước"
         android:textColor="#666565"
         android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.516"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -80,37 +66,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/bt_lib"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/lib_image_icon" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/bt_camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|bottom"
-            android:layout_marginLeft="20dp"
-            android:layout_marginBottom="10dp"
-            app:borderWidth="30dp"
-            app:fabSize="normal"
-            app:srcCompat="@drawable/camera_icon"
-            app:strokeColor="@color/black"
-            app:strokeWidth="20dp"
-            app:tint="@null" />
-
-        <ImageButton
-            android:id="@+id/bt_delete"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginLeft="20dp"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/delete_icon" />
-
 
     </LinearLayout>
 
@@ -122,6 +77,40 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bt_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        app:borderWidth="30dp"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/camera_icon"
+        app:strokeColor="@color/black"
+        app:strokeWidth="20dp"
+        app:tint="@null"
+        tools:layout_editor_absoluteX="180dp"
+        tools:layout_editor_absoluteY="580dp" />
+
+    <ImageButton
+        android:id="@+id/bt_delete"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/delete_icon"
+        tools:layout_editor_absoluteX="262dp"
+        tools:layout_editor_absoluteY="580dp" />
+
+    <ImageButton
+        android:id="@+id/bt_lib"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/lib_image_icon"
+        tools:layout_editor_absoluteX="102dp"
+        tools:layout_editor_absoluteY="586dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

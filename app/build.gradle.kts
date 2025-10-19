@@ -45,6 +45,12 @@ dependencies {
     // Google Play Services for Google Sign-In
     implementation(libs.play.services.auth)
 
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("androidx.activity:activity-ktx:1.9.0")
+    implementation("androidx.fragment:fragment-ktx:1.7.1")
+
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.recyclerview)

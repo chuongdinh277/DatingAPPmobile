@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,6 +19,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BTL_mobileAPP">
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <activity
             android:name=".activities.WelcomeActivity"
@@ -25,7 +43,6 @@
             android:name=".activities.SignUpActivity"
             android:exported="false"
             android:theme="@style/Theme.BTL_mobileAPP" />
-
 
         <activity
             android:name=".activities.LoginByPhoneActivity"
@@ -56,6 +73,9 @@
         <activity android:name=".activities.WaitingRoomGarticActivity" />
         <activity android:name=".activities.CaroActivity" />
         <activity android:name=".activities.WaitingRoomCaroActivity" />
+
+        <activity android:name=".activities.showImageActivity" />
+        <activity android:name=".activities.ImageActivity" />
 
     </application>
 
