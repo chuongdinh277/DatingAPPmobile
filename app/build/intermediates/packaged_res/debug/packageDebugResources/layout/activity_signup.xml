@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FFDBED">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
+
+        <!-- Back Button -->
+
+        <!-- Logo/Image -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="42dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:background="@null"
+            android:contentDescription="Back"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/left_arrow" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="250dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="64dp"
+            app:srcCompat="@drawable/capture" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="Tạo tài khoản mới"
+            android:textColor="#800D42"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Tham gia cộng đồng các cặp đôi hạnh phúc"
+            android:textColor="#800D42"
+            android:textSize="16sp" />
+
+        <!-- Name Input -->
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="36dp"
+            android:background="@drawable/bg_btn_phone"
+            android:gravity="center_vertical"
+            android:hint="Họ và tên"
+            android:inputType="textPersonName|textCapWords"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:textColorHint="#800D42"
+            android:textSize="16sp" />
+
+        <!-- Date of Birth Input -->
+        <EditText
+            android:id="@+id/etDateOfBirth"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="36dp"
+            android:background="@drawable/bg_btn_phone"
+            android:gravity="center_vertical"
+            android:hint="Ngày sinh (dd/MM/yyyy)"
+            android:focusable="false"
+            android:clickable="true"
+            android:inputType="none"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+            android:textColorHint="#800D42"
+            android:textSize="16sp" />
+
+        <!-- Phone Number Input -->
+        <EditText
+            android:id="@+id/etPhoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="36dp"
+            android:background="@drawable/bg_btn_phone"
+            android:gravity="center_vertical"
+            android:hint="Số điện thoại"
+            android:inputType="phone"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:textColorHint="#800D42"
+            android:textSize="16sp" />
+
+        <!-- Password Input (Initially Hidden for phone mode) -->
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="36dp"
+            android:background="@drawable/bg_btn_mail"
+            android:gravity="center_vertical"
+            android:hint="Mật khẩu"
+            android:inputType="textPassword"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <!-- Send Code Button -->
+        <Button
+            android:id="@+id/btnSendCode"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="36dp"
+            android:background="@drawable/bg_btn_mail"
+            android:text="Gửi mã xác nhận"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Verification Code Input (Initially Hidden) -->
+        <EditText
+            android:id="@+id/etVerificationCode"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="36dp"
+            android:background="@drawable/bg_btn_phone"
+            android:gravity="center_vertical"
+            android:hint="Mã xác nhận"
+            android:inputType="number"
+            android:maxLength="6"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:textColorHint="#800D42"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <!-- Verify Code Button (Initially Hidden) -->
+        <Button
+            android:id="@+id/btnVerifyCode"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="36dp"
+            android:background="@drawable/bg_btn_mail"
+            android:text="Xác nhận mã"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <!-- Sign Up Button (Initially Hidden) -->
+        <Button
+            android:id="@+id/btnSignUp"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="36dp"
+            android:background="@drawable/bg_btn_phone"
+            android:text="Tạo tài khoản"
+            android:textColor="#800D42"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <!-- Switch Options -->
+        <LinearLayout
+            android:id="@+id/llSwitchOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="36dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tvSwitchToPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đăng ký bằng SĐT"
+                android:textColor="#800D42"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" | "
+                android:textColor="#800D42"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvSwitchToEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đăng ký bằng Email"
+                android:textColor="#800D42"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:padding="8dp" />
+
+        </LinearLayout>
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <!-- Login Link -->
+        <TextView
+            android:id="@+id/tvLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="32dp"
+            android:text="Đã có tài khoản? Đăng nhập"
+            android:textColor="#800D42"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

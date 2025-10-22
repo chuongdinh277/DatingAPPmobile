@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="#FFDBED">
+
+    <!-- Keep existing IDs but simplify UI to match activity_pair_code look -->
+
+    <TextView
+        android:id="@+id/tv_welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_your_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/your_code_label"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_pin_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/default_pin_code"
+        android:textSize="24sp"
+        android:layout_marginBottom="24dp"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_partner_pin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:visibility="visible">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_partner_pin"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="@string/friend_code_hint"
+            android:padding="12dp"
+            android:inputType="number"
+            android:maxLength="6"
+            android:textAlignment="center"
+            android:background="@drawable/bg_edittext" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/btn_pair"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/pair"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#F06292"
+        android:textColor="@android:color/white"
+        android:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btn_logout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="@string/logout_vi"
+        android:visibility="gone" />
+
+</LinearLayout>

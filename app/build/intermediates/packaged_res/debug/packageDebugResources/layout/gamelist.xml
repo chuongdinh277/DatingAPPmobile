@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#FFFFFF"
+    android:paddingEnd="10dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ForLove"
+            android:textColor="#800D42"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="30dp" />
+
+        <LinearLayout
+            android:id="@+id/btnGame1"
+            android:layout_width="match_parent"
+            android:layout_height="269dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:text="Gartic"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/garticio" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnGame2"
+            android:layout_width="match_parent"
+            android:layout_height="269dp"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:layout_marginTop="30dp"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:text="Caro"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                android:src="@drawable/caro" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

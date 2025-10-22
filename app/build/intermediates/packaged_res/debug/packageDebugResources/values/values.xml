@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <color name="accent_color">#E91E63</color>
+    <color name="background_light">#FFFFFFFF</color>
+    <color name="background_primary">#FFFFFFFF</color>
+    <color name="background_secondary">#F5F5F5</color>
+    <color name="bg_app">#FDD9E6</color>
+    <color name="black">#FF000000</color>
+    <color name="button_text">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="chat_bubble_received">#F3E5F5</color>
+    <color name="chat_bubble_sent">#E3F2FD</color>
+    <color name="chat_text_received">#7B1FA2</color>
+    <color name="chat_text_sent">#1976D2</color>
+    <color name="couple_accent">#FFFF4081</color>
+    <color name="couple_pink_bg">#FCC9E0</color>
+    <color name="couple_primary">#FF6200EE</color>
+    <color name="couple_secondary">#FF03DAC5</color>
+    <color name="dark_pink">#FFDB7093</color>
+    <color name="default_button_color">#757575</color>
+    <color name="divider_color">#E0E0E0</color>
+    <color name="divider_light">#FFE0E0E0</color>
+    <color name="error_color">#F44336</color>
+    <color name="error_red">#EA4335</color>
+    <color name="google_blue">#4285F4</color>
+    <color name="google_button_text">#FF000000</color>
+    <color name="info_color">#2196F3</color>
+    <color name="on_background_light">#FF1C1B1F</color>
+    <color name="on_surface_light">#FF1C1B1F</color>
+    <color name="phone_green">#34A853</color>
+    <color name="pill_maroon">#990033</color>
+    <color name="pill_pink">#F9B7D0</color>
+    <color name="pink">#FFFFC0CB</color>
+    <color name="primary_purple">#800D42</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="red">#FFFF0000</color>
+    <color name="signup_red">#C21807</color>
+    <color name="success_color">#4CAF50</color>
+    <color name="surface_color">#FFFFFF</color>
+    <color name="surface_light">#FFFFFFFF</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_secondary_light">#FF5F5F5F</color>
+    <color name="underline_dark">#3F0303</color>
+    <color name="underline_light">#FFFFFF</color>
+    <color name="warning_color">#FF9800</color>
+    <color name="warning_yellow">#FFF3CD</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="about">About</string>
+    <string name="add_plan_cd">Thêm kế hoạch</string>
+    <string name="app_name">Couple App</string>
+    <string name="camera_button">Camera button</string>
+    <string name="cd_game">Game</string>
+    <string name="cd_home">Home</string>
+    <string name="cd_message">Mess</string>
+    <string name="cd_settings">Setting</string>
+    <string name="cd_task">Task</string>
+    <string name="default_pin_code">000000</string>
+    <string name="default_web_client_id" translatable="false">501013051271-mus50dnnjjdld03pdq9vng4qjfm0usae.apps.googleusercontent.com</string>
+    <string name="delete_schedule_cd">Xóa lịch trình</string>
+    <string name="edit">Edit</string>
+    <string name="firebase_database_url" translatable="false">https://couples-app-b83be-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+    <string name="first_name">First Name :</string>
+    <string name="friend_code_hint">Friend Code</string>
+    <string name="gcm_defaultSenderId" translatable="false">501013051271</string>
+    <string name="gmail">Gmail :</string>
+    <string name="google_api_key" translatable="false">AIzaSyD7h8KUV0503ZzdjbZmEM8gFQ79Ay6MVtA</string>
+    <string name="google_app_id" translatable="false">1:501013051271:android:c8f3b0a380cdc2dfa90522</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD7h8KUV0503ZzdjbZmEM8gFQ79Ay6MVtA</string>
+    <string name="google_storage_bucket" translatable="false">couples-app-b83be.firebasestorage.app</string>
+    <string name="hint_message">Nhắn tin</string>
+    <string name="hint_new_plan">Nhập kế hoạch...</string>
+    <string name="imgbb_api_key">cbd67551d48201d765fb10302d9a870e</string>
+    <string name="last_name">Last Name :</string>
+    <string name="logout">Logout</string>
+    <string name="logout_vi">Đăng xuất</string>
+    <string name="notification">Notification</string>
+    <string name="pair">Pair</string>
+    <string name="phone">Phone Number :</string>
+    <string name="privacy">Privacy</string>
+    <string name="profile">Profile</string>
+    <string name="project_id" translatable="false">couples-app-b83be</string>
+    <string name="save">Lưu</string>
+    <string name="schedule_day_title">Lịch trình ngày %1$d/%2$d/%3$d</string>
+    <string name="schedule_item_default">Nội dung lịch</string>
+    <string name="schedule_month_year">Tháng %1$d, %2$d</string>
+    <string name="schedule_today_title">Lịch trình hôm nay</string>
+    <string name="schedule_today_title_full">Lịch trình ngày hôm nay %1$d/%2$d/%3$d</string>
+    <string name="send">Gửi</string>
+    <string name="upload">Upload</string>
+    <string name="username">Username :</string>
+    <string name="your_code_label">Your Code:</string>
+    <style name="Base.Theme.CoupleApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/couple_primary</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorSecondary">@color/couple_secondary</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="android:colorBackground">@color/background_primary</item>
+        <item name="colorSurface">@color/surface_color</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+
+        
+        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        
+        <item name="android:navigationBarColor">@color/white</item>
+
+        
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:fitsSystemWindows">false</item>
+
+        
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+    <style name="CustomCalendarTheme" parent="android:Widget.Material.CalendarView">
+        <item name="android:weekDayTextAppearance">@style/CustomCalendarTheme.WeekDay</item>
+        <item name="android:dateTextAppearance">@style/CustomCalendarTheme.Date</item>
+    </style>
+    <style name="CustomCalendarTheme.Date" parent="android:TextAppearance.Material.Medium">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">#333333</item>
+    </style>
+    <style name="CustomCalendarTheme.WeekDay" parent="android:TextAppearance.Material.Small">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">#B0004B</item>
+    </style>
+    <style name="CustomPasswordInput" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">#9B004E</item>
+        <item name="hintTextColor">#FFFFFFFF</item>
+        <item name="android:textColorHint">#FFFFFFFF</item>
+        <item name="boxStrokeColor">#FFFFFFFF</item>
+
+    </style>
+    <style name="ProfileEditText" parent="Widget.AppCompat.EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">@drawable/edit_text_background</item>
+        <item name="android:paddingHorizontal">18dp</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="ProfileEditText.Disabled">
+        <item name="android:textColor">#E1BEE7</item> 
+        <item name="android:backgroundTint">#FF7EB3</item> 
+        <item name="android:enabled">false</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
+    <style name="ProfileEditText.Editable">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorHint">#FCE4EC</item>
+    </style>
+    <style name="ProfileLabel" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#D81B60</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+    </style>
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+    <style name="Theme.CoupleApp" parent="Base.Theme.CoupleApp"/>
+    <style name="Theme.CoupleApp.Fullscreen" parent="Theme.CoupleApp">
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" ns1:targetApi="p">shortEdges</item>
+    </style>
+</resources>

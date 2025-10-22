@@ -1,0 +1,662 @@
+[
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\font_pacifico.ttf.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\font\\pacifico.ttf"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_edittext_message.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\edittext_message.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_home.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_home.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_delete_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\delete_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_canvas.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_canvas.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_background_home.jpg.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\background_home.jpg"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_zodiac_pink.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_zodiac_pink.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-xhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-xxxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_user_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\user_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_menu_button.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\menu_button.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_setting_privacy.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\setting_privacy.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_login_button.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_login_button.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_button_primary.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\button_primary.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_chevron_right.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_chevron_right.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_heart.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\heart.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_edit.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_edit.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\xml_data_extraction_rules.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\xml\\data_extraction_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_circle_shape.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\circle_shape.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_rounded_edittext_purple.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_rounded_edittext_purple.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_rounded_button_purple.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_rounded_button_purple.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_button_logout.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\button_logout.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-xhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_notification.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_notification.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_homemain2.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\homemain2.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_splash.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_splash.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_plan_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\plan_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_rounded_toolbar.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\rounded_toolbar.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_button_send.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\button_send.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_base.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_base.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_waiting_room_gartic.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_waiting_room_gartic.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-mdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-mdpi\\ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_user_profile_item.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\user_profile_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_box.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_box.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_calendar_container.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_calendar_container.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_edittext.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_edittext.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_rounded_background.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\rounded_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_message_received.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_message_received.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bubble_received.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bubble_received.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_view_progress.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\view_progress.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_input_area.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_input_area.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_launcher_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_game_caro.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_game_caro.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_gartic.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_gartic.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_heart_with_border.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\heart_with_border.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-xxxhdpi\\ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_caro.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_caro.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_girl.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\girl.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_rectangle_shape_30.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\rectangle_shape_30.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_pair_code.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_pair_code.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_draw.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_draw.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_caro_o.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_caro_o.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_pairing.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_pairing.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_homemain1.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\homemain1.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_btn_register.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_btn_register.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_btn_phone.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_btn_phone.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_signup.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_signup.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_information_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\information_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-xxhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_bottom_nav_item_selected.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_bottom_nav_item_selected.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_rectangle_shape_15.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\rectangle_shape_15.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_setting_item_background.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\setting_item_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_avatar_edit_icon_background.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\avatar_edit_icon_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_gallery.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_gallery.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_camera_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\camera_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_pencil.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\pencil.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_guess_game.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_guess_game.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_edittext_rounded.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_edittext_rounded.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_send.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_send.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_setting_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\setting_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_plan.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\plan.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bottom_nav_item_tint.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bottom_nav_item_tint.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_item_message_received.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\item_message_received.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-xxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bubble_sent.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bubble_sent.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_waiting_room_caro.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_waiting_room_caro.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_about_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\about_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_pill_maroon.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_pill_maroon.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_circle_mask.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\circle_mask.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_gradient_pink.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_gradient_pink.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_zodiac.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_zodiac.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_send_button.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_send_button.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_zodiac_blue.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_zodiac_blue.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_message_input.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_message_input.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_caro_cell.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_caro_cell.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-hdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-hdpi\\ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_add.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_add.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_task.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_task.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_rounded_button_pink.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_rounded_button_pink.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_phone.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\phone.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\xml_backup_rules.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\xml\\backup_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_capture.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\capture.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_lib_image_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\lib_image_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_gender.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\gender.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_btn_mail.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_btn_mail.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_message_edittext_bg.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\message_edittext_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_google.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_google.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-mdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_age_blue.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_age_blue.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_logout_button_background.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\logout_button_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_welcome.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\welcome.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_arrow_back_pink.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_arrow_back_pink.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_header_game.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_header_game.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_setting.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\setting.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_item_message_sent.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\item_message_sent.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_caro_x.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_caro_x.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_menu_active_bg.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\menu_active_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_score_display.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_score_display.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_default_avatar.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_default_avatar.xml"
+    },
+    {
+        "merged": "com.example.couple_app-debug-47:/layout_menu_button.xml.flat",
+        "source": "com.example.couple_app-main-49:/layout/menu_button.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_lib_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\lib_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_camera_shape_draw.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\camera_shape_draw.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_caro.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\caro.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-hdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_message_sent.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_message_sent.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_heart_outline.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_heart_outline.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_left_arrow.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\left_arrow.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-xhdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-xhdpi\\ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_login_by_phone.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\login_by_phone.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_privacy_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\privacy_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_layout_header.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\layout_header.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\color_bottom_nav_item_tint.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\color\\bottom_nav_item_tint.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_pen.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_pen.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_garticio.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\garticio.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-xxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-xxhdpi\\ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_rounded_button.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\rounded_button.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_about_scene.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\about_scene.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_age.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_age.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-mdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_rounded_edittext_pink.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_rounded_edittext_pink.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_view.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\view.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_grid_board.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_grid_board.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_item_schedule.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\item_schedule.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_game.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_game.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_arrow_down.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_arrow_down.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_card.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_card.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_gmail.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\gmail.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_game_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\game_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-hdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_couples_app_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\couples_app_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_word_display.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_word_display.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_settings.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_settings.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_button_accent_rounded.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_button_accent_rounded.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_circle_white.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\circle_white.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_home_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\home_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_navbar.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_navbar.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_pill_pink.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_pill_pink.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_edit_text_background.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\edit_text_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_messenger.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\messenger.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_waiting_room_caro.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_waiting_room_caro.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_chat.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_chat.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_button_secondary.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\button_secondary.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_inner_box.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_inner_box.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_setting_profile.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\setting_profile.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_activity_homemain.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\activity_homemain.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_transparent_panel.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_transparent_panel.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_error_message.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_error_message.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_age_pink.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_age_pink.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\layout_gamelist.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\layout\\gamelist.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_send_icon.png.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\send_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\drawable_bg_waiting_room.xml.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\drawable\\bg_waiting_room.xml"
+    },
+    {
+        "merged": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-debug-47:\\mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\Anhnguyen\\.gradle\\daemon\\8.13\\com.example.couple_app-main-49:\\mipmap-xxxhdpi\\ic_launcher.webp"
+    }
+]

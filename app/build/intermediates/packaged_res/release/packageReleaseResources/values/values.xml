@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_primary">#FFFFFF</color>
+    <color name="background_secondary">#F5F5F5</color>
+    <color name="black">#FF000000</color>
+    <color name="button_text">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="chat_bubble_received">#F3E5F5</color>
+    <color name="chat_bubble_sent">#E3F2FD</color>
+    <color name="chat_text_received">#7B1FA2</color>
+    <color name="chat_text_sent">#1976D2</color>
+    <color name="couple_accent">#FFFF4081</color>
+    <color name="couple_primary">#FF6200EE</color>
+    <color name="couple_secondary">#FF03DAC5</color>
+    <color name="divider_color">#E0E0E0</color>
+    <color name="error_color">#F44336</color>
+    <color name="info_color">#2196F3</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="success_color">#4CAF50</color>
+    <color name="surface_color">#FFFFFF</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#757575</color>
+    <color name="warning_color">#FF9800</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">Couple App</string>
+    <string name="default_web_client_id">501013051271-mus50dnnjjdld03pdq9vng4qjfm0usae.apps.googleusercontent.com</string>
+    <string name="firebase_database_url" translatable="false">https://couples-app-b83be-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+    <string name="gcm_defaultSenderId" translatable="false">501013051271</string>
+    <string name="google_api_key" translatable="false">AIzaSyD7h8KUV0503ZzdjbZmEM8gFQ79Ay6MVtA</string>
+    <string name="google_app_id" translatable="false">1:501013051271:android:c8f3b0a380cdc2dfa90522</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD7h8KUV0503ZzdjbZmEM8gFQ79Ay6MVtA</string>
+    <string name="google_storage_bucket" translatable="false">couples-app-b83be.firebasestorage.app</string>
+    <string name="project_id" translatable="false">couples-app-b83be</string>
+    <style name="Theme.CoupleApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        
+        <item name="android:colorBackground">@color/background_primary</item>
+        <item name="colorSurface">@color/surface_color</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:windowLightStatusBar">true</item>
+        
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>
