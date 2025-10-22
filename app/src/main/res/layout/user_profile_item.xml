@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="160dp"
+    android:layout_marginBottom="20dp"
     android:gravity="center"
     android:orientation="horizontal"
     android:padding="16dp">
 
-    <!-- Avatar bên trái -->
     <LinearLayout
+        android:id="@+id/userProfileLeft"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -17,19 +19,21 @@
 
         <ImageView
             android:id="@+id/avtLeft"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:background="@drawable/circle_mask"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+
             android:scaleType="centerCrop"
+            android:background="@drawable/circle_mask"
             android:clipToOutline="true"
-            android:outlineProvider="background"/>
+            android:outlineProvider="background" />
 
         <TextView
             android:id="@+id/txtNameLeft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Tên A"
+            android:text="Kim ji won"
+            android:fontFamily="@font/pacifico"
             android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -37,25 +41,24 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
             android:gravity="center"
-            android:layout_marginTop="8dp">
+            android:orientation="horizontal">
 
-            <!-- Ô giới tính + tuổi -->
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="20dp"
+                android:background="@drawable/bg_age_blue"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:background="@drawable/bg_age">
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp">
 
                 <ImageView
                     android:id="@+id/imgGenderLeft"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_marginEnd="4dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginEnd="2dp"
                     android:src="@drawable/gender" />
 
                 <TextView
@@ -64,28 +67,32 @@
                     android:layout_height="wrap_content"
                     android:text="20"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp" />
+                    android:textSize="11sp" />
             </LinearLayout>
 
-            <!-- Ô cung hoàng đạo -->
             <TextView
                 android:id="@+id/tvZodiacLeft"
-                android:layout_width="96dp"
-                android:layout_height="36dp"
-                android:layout_marginStart="6dp"
-                android:background="@drawable/bg_zodiac"
-                android:fontFamily="cursive"
+                android:layout_width="70dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_zodiac_pink"
                 android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="Xử Nữ"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="Nhân mã"
                 android:textColor="@android:color/white"
-                android:textSize="16dp" />
+                android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Avatar bên phải -->
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginHorizontal="20dp"/>
+
     <LinearLayout
+        android:id="@+id/userProfileRight"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -94,8 +101,9 @@
 
         <ImageView
             android:id="@+id/avtRight"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+
             android:background="@drawable/circle_mask"
             android:scaleType="centerCrop"
             android:clipToOutline="true"
@@ -106,7 +114,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Tên B"
+            android:text="Kim Hau Hau"
+            android:fontFamily="@font/pacifico"
             android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -114,26 +123,25 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
             android:gravity="center"
-            android:layout_marginTop="8dp">
+            android:orientation="horizontal">
 
-            <!-- Ô giới tính + tuổi -->
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="20dp"
+                android:background="@drawable/bg_age_blue"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:background="@drawable/bg_age">
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp">
 
                 <ImageView
                     android:id="@+id/imgGenderRight"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/gender" />
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginEnd="2dp"
+                    android:src="@drawable/girl" />
 
                 <TextView
                     android:id="@+id/tvAgeRight"
@@ -141,23 +149,21 @@
                     android:layout_height="wrap_content"
                     android:text="20"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp" />
+                    android:textSize="11sp" />
             </LinearLayout>
 
-            <!-- Ô cung hoàng đạo -->
             <TextView
                 android:id="@+id/tvZodiacRight"
-                android:layout_width="96dp"
-                android:layout_height="36dp"
-                android:layout_marginStart="6dp"
-                android:background="@drawable/bg_zodiac"
-                android:fontFamily="cursive"
+                android:layout_width="70dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_zodiac_pink"
                 android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="Song Ngư"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="Sư Tử"
                 android:textColor="@android:color/white"
-                android:textSize="16dp" />
+                android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

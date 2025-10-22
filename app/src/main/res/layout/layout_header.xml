@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/headerLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#FCC9E0"
+    android:layout_height="60dp"
+    android:background="#FF90B1"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="5dp">
+    android:padding="10dp">
 
     <!-- Tên app -->
     <TextView
@@ -15,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="ForLove"
-        android:textColor="#7C0F59"
+        android:textColor="#FFFFFF"
         android:textSize="28sp"
         android:textStyle="bold"
         android:ellipsize="none"

@@ -92,6 +92,31 @@ public class DatabaseManager {
             });
     }
 
+    // Create user document in Firestore (for phone registration with date of birth)
+    public void createUserDocumentWithPhoneAndDOB(FirebaseUser firebaseUser, String name, String phoneNumber, java.time.LocalDate dateOfBirth, AuthManager.AuthCallback callback) {
+        String userId = firebaseUser.getUid();
+        User user = new User(userId, name, phoneNumber, true); // true indicates phone registration
+
+        // Set date of birth - convert LocalDate to String
+        if (dateOfBirth != null) {
+            // Convert LocalDate to String format "yyyy-MM-dd"
+            String dateOfBirthString = dateOfBirth.toString();
+            user.setDateOfBirth(dateOfBirthString);
+        }
+
+        db.collection(USERS_COLLECTION)
+            .document(userId)
+            .set(user)
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "User document with phone and DOB created successfully");
+                callback.onSuccess(firebaseUser);
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "Error creating user document with phone and DOB", e);
+                callback.onError("Failed to create user profile: " + e.getMessage());
+            });
+    }
+
     // Update user profile in Firestore
     public void updateUserProfile(String userId, String name, String profilePicUrl, AuthManager.AuthActionCallback callback) {
         Map<String, Object> updates = new HashMap<>();
@@ -115,6 +140,26 @@ public class DatabaseManager {
             });
     }
 
+    // Update user profile in Firestore using a Map for flexibility
+    public void updateUserProfile(String userId, Map<String, Object> updates, AuthManager.AuthActionCallback callback) {
+        if (updates == null || updates.isEmpty()) {
+            callback.onSuccess(); // Nothing to update
+            return;
+        }
+
+        db.collection(USERS_COLLECTION)
+                .document(userId)
+                .update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "User profile updated successfully");
+                    callback.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Error updating user profile", e);
+                    callback.onError("Failed to update profile: " + e.getMessage());
+                });
+    }
+
     // Update user email in Firestore (for Google account linking)
     public void updateUserEmail(String userId, String email, AuthManager.AuthActionCallback callback) {
         Map<String, Object> updates = new HashMap<>();
@@ -131,6 +176,25 @@ public class DatabaseManager {
             .addOnFailureListener(e -> {
                 Log.w(TAG, "Error updating user email", e);
                 callback.onError("Failed to update email: " + e.getMessage());
+            });
+    }
+
+    // Update user FCM token in Firestore
+    public void updateUserFcmToken(String userId, String fcmToken, DatabaseActionCallback callback) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("fcmToken", fcmToken);
+        updates.put("updatedAt", Timestamp.now());
+
+        db.collection(USERS_COLLECTION)
+            .document(userId)
+            .update(updates)
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "FCM token updated successfully");
+                callback.onSuccess();
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "Error updating FCM token", e);
+                callback.onError("Failed to update FCM token: " + e.getMessage());
             });
     }
 
@@ -258,7 +322,7 @@ public class DatabaseManager {
                         .addOnSuccessListener(currentUserDoc -> {
                             if (currentUserDoc.exists()) {
                                 User currentUser = currentUserDoc.toObject(User.class);
-                                if (currentUser.getPartnerId() != null) {
+                                if (currentUser != null && currentUser.getPartnerId() != null && !currentUser.getPartnerId().isEmpty()) {
                                     callback.onError("You are already connected to a partner");
                                     return;
                                 }
@@ -274,14 +338,15 @@ public class DatabaseManager {
                 } else if (task.isSuccessful() && task.getResult().isEmpty()) {
                     callback.onError("Invalid PIN or user already connected");
                 } else {
-                    callback.onError("Error finding user with PIN: " + task.getException().getMessage());
+                    String errorMsg = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                    callback.onError("Error finding user with PIN: " + errorMsg);
                 }
             });
     }
 
     // Create couple document and update both users
     private void createCoupleDocument(String user1Id, String user2Id, DatabaseCallback<String> callback) {
-        // Create couple document
+        // Create couple document with a specific ID
         String coupleId = db.collection(COUPLES_COLLECTION).document().getId();
 
         Timestamp now = Timestamp.now();
@@ -289,16 +354,16 @@ public class DatabaseManager {
         Couple couple = new Couple(coupleId, user1Id, user2Id, now);
         couple.setUser1Id(user1Id);
         couple.setUser2Id(user2Id);
-        couple.setStartDate(Timestamp.now());
+        couple.setStartDate(now);
         couple.setSharedStories(new ArrayList<>());
 
+        // Use .document(coupleId).set() instead of .add() to ensure we use the correct ID
         db.collection(COUPLES_COLLECTION)
-            .add(couple)
-            .addOnSuccessListener(documentReference -> {
-                String coupleId_ = documentReference.getId();
-
+            .document(coupleId)
+            .set(couple)
+            .addOnSuccessListener(aVoid -> {
                 // Update both users with partner info
-                updateUsersWithPartnerInfo(user1Id, user2Id, coupleId_, Timestamp.now(), callback);
+                updateUsersWithPartnerInfo(user1Id, user2Id, coupleId, now, callback);
             })
             .addOnFailureListener(e -> {
                 Log.w(TAG, "Error creating couple document", e);

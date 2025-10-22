@@ -27,9 +27,9 @@
         android:theme="@style/Theme.CoupleApp"
         tools:targetApi="31">
 
-        <!-- Main entry point - WelcomeActivity -->
+        <!-- Splash Screen - Main entry point -->
         <activity
-            android:name=".activities.WelcomeActivity"
+            android:name=".activities.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.CoupleApp">
             <intent-filter>
@@ -37,6 +37,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Welcome/Login Screen -->
+        <activity
+            android:name=".activities.WelcomeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp" />
 
         <!-- Game related activities -->
         <activity
@@ -114,6 +120,26 @@
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustNothing" />
+
+        <!-- Firebase Cloud Messaging Service -->
+        <service
+            android:name=".services.FirebaseCloudMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Firebase Cloud Messaging default notification metadata -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/purple_500" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="couple_app_messages" />
 
     </application>
 

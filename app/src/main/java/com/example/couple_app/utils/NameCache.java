@@ -1,5 +1,7 @@
 package com.example.couple_app.utils;
-
+/*
+class Lưu trữ và truy xuất tên người dùng và thông tin đối tác trong SharedPreferences
+ */
 import android.content.Context;
 import android.content.SharedPreferences;
 

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FCC9E0" >
+    android:background="@drawable/background_home">
 
     <TextView
         android:id="@+id/textView3"
@@ -36,157 +37,237 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <include
+        android:id="@+id/header"
+        layout="@layout/layout_header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <include
-            android:id="@+id/header"
-            layout="@layout/layout_header" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/heartContainer"
+        android:layout_width="0dp"
+        android:layout_height="259dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/bg_transparent_panel"
+        android:elevation="6dp"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
 
         <LinearLayout
+            android:id="@+id/timeUnitsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="180dp"
             android:gravity="center"
             android:orientation="horizontal"
-            android:padding="16dp"
-            android:weightSum="4">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Ô Năm -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="100dp"
-                android:layout_margin="6dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_box"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/txtYears"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="1"
-                    android:textColor="@android:color/white"
-                    android:textSize="28sp" />
+                <FrameLayout
+                    android:layout_width="110dp"
+                    android:layout_height="95dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_heart_outline"
+                        android:contentDescription="@string/app_name"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/txtYears"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="1"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_inner_box"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="2dp"
-                    android:text="Năm"
-                    android:textColor="#95005C"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/pacifico"
+                    android:text="năm"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp" />
             </LinearLayout>
 
-            <!-- Ô Tháng -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="100dp"
-                android:layout_margin="6dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_box"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/txtMonths"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="3"
-                    android:textColor="@android:color/white"
-                    android:textSize="28sp" />
+                <FrameLayout
+                    android:layout_width="110dp"
+                    android:layout_height="95dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_heart_outline"
+                        android:contentDescription="@string/app_name"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/txtMonths"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="3"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_inner_box"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="2dp"
-                    android:text="Tháng"
-                    android:textColor="#95005C"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/pacifico"
+                    android:text="tháng"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp" />
             </LinearLayout>
 
-            <!-- Ô Tuần -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="100dp"
-                android:layout_margin="6dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_box"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/txtWeeks"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="2"
-                    android:textColor="@android:color/white"
-                    android:textSize="28sp" />
+                <FrameLayout
+                    android:layout_width="110dp"
+                    android:layout_height="95dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_heart_outline"
+                        android:contentDescription="@string/app_name"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/txtWeeks"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="2"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_inner_box"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="2dp"
-                    android:text="Tuần"
-                    android:textColor="#95005C"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/pacifico"
+                    android:text="tuần"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp" />
             </LinearLayout>
 
-            <!-- Ô Ngày -->
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="100dp"
-                android:layout_margin="6dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_box"
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/txtDays"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="12"
-                    android:textColor="@android:color/white"
-                    android:textSize="28sp" />
+                <FrameLayout
+                    android:layout_width="110dp"
+                    android:layout_height="95dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_heart_outline"
+                        android:contentDescription="@string/app_name"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/txtDays"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="12"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_inner_box"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="2dp"
-                    android:text="Ngày"
-                    android:textColor="#95005C"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="0dp"
+                    android:fontFamily="@font/pacifico"
+                    android:text="ngày"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp" />
             </LinearLayout>
-
         </LinearLayout>
 
-        <!-- Phần nội dung khác -->
-    </LinearLayout>
+        <TextView
+            android:id="@+id/txtTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="25dp"
+            android:fontFamily="@font/pacifico"
+            android:text="00:37:50"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/txtStartDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="25dp"
+            android:gravity="start"
+            android:text="Ngày bắt đầu:\n01/01/2024"
+            android:textAlignment="textStart"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include
         android:id="@+id/layoutUserInfo"
         layout="@layout/user_profile_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="160dp"
+        android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

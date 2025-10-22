@@ -4,79 +4,86 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FCC9E0">
+    tools:context=".activities.HomeMain2Fragment"
+    android:background="@drawable/background_home"
+    android:paddingBottom="70dp">
 
+    <include
+        android:id="@+id/headerTop"
+        layout="@layout/layout_header" />
+
+    <FrameLayout
+        android:id="@+id/heartContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_transparent_panel"
+        android:elevation="6dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerTop"
+        app:layout_constraintBottom_toTopOf="@id/layoutUserInfo">
+
+        <ImageView
+            android:id="@+id/heartImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/heart_with_border" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="20dp"
+
+            android:translationY="-25dp">
+
+            <TextView
+                android:id="@+id/tvTogether"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đã bên nhau"
+                android:textColor="#FFFFFF"
+                android:textSize="21sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDaysCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:fontFamily="@font/pacifico"
+                android:text="1234 ngày"
+                android:textColor="#FFFFFF"
+                android:textSize="42sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSince"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Từ 01/01/2022"
+                android:textColor="#FFFFFF"
+                android:textSize="19sp" />
+        </LinearLayout>
+
+    </FrameLayout>
 
     <include
         android:id="@+id/layoutUserInfo"
         layout="@layout/user_profile_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Khung chứa trái tim -->
-    <FrameLayout
-        android:id="@+id/heartContainer"
-        android:layout_width="600dp"
-        android:layout_height="600dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- Trái tim PNG -->
-        <ImageView
-            android:id="@+id/heartImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/heart" />
-
-        <!-- Text trong trái tim -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <!-- Dòng 1 -->
-            <TextView
-                android:id="@+id/tvTogether"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Đã bên nhau"
-                android:textColor="#7C0F59"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <!-- Dòng 2 (số ngày) -->
-            <TextView
-                android:id="@+id/tvDaysCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="1234 ngày"
-                android:textColor="#D31CAB"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-            <!-- Dòng 3 (từ ngày) -->
-            <TextView
-                android:id="@+id/tvSince"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center"
-                android:text="Từ 01/01/2022"
-                android:textColor="#7C0F59"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -65,4 +65,7 @@
     <color name="phone_green">#34A853</color>
     <color name="error_red">#EA4335</color>
     <color name="warning_yellow">#FFF3CD</color>
+    <color name="default_button_color">#757575</color>
+    <color name="accent_color">#E91E63</color>
+    <color name="primary_purple">#800D42</color>
 </resources>

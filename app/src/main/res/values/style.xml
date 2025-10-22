@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomPasswordInput" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">#9B004E</item>
+        <item name="hintTextColor">#FFFFFFFF</item>
+        <item name="android:textColorHint">#FFFFFFFF</item>
+        <item name="boxStrokeColor">#FFFFFFFF</item>
+
+    </style>
+
+    <style name="CustomCalendarTheme" parent="android:Widget.Material.CalendarView">
+        <item name="android:weekDayTextAppearance">@style/CustomCalendarTheme.WeekDay</item>
+        <item name="android:dateTextAppearance">@style/CustomCalendarTheme.Date</item>
+    </style>
+
+    <style name="CustomCalendarTheme.WeekDay" parent="android:TextAppearance.Material.Small">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">#B0004B</item>
+    </style>
+
+    <style name="CustomCalendarTheme.Date" parent="android:TextAppearance.Material.Medium">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">#333333</item>
+    </style>
+
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="ProfileLabel" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#D81B60</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+    </style>
+
+    <!-- Base style for all EditText fields in the profile screen -->
+    <style name="ProfileEditText" parent="Widget.AppCompat.EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">@drawable/edit_text_background</item>
+        <item name="android:paddingHorizontal">18dp</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- Style for EditText fields that can be edited by the user -->
+    <style name="ProfileEditText.Editable">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorHint">#FCE4EC</item>
+    </style>
+
+    <!-- Style for EditText fields that are for display only (disabled) -->
+    <style name="ProfileEditText.Disabled">
+        <item name="android:textColor">#E1BEE7</item> <!-- Lighter color for disabled text -->
+        <item name="android:backgroundTint">#FF7EB3</item> <!-- Slightly different background tint -->
+        <item name="android:enabled">false</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
+
+</resources>

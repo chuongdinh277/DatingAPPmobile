@@ -1,6 +1,8 @@
 package com.example.couple_app.activities;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,11 +11,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +34,7 @@ import com.example.couple_app.managers.DatabaseManager;
 import com.example.couple_app.models.User;
 import com.example.couple_app.utils.AvatarCache;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -38,349 +46,391 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SettingProfileActivity extends BaseActivity {
     private static final String TAG = "SettingProfileActivity";
 
-    private ImageView ivUserImage;
-    private MaterialButton btUpload;
+    private CircleImageView ivUserImage;
+    private EditText etUsername, etDob, etStartLoveDate, etEmail, etPhone;
+    private ImageView ivBack, ivEdit, ivEditAvatar;
+    private MaterialButton btSaveChanges;
+    private RadioGroup rgGender;
+    private RadioButton rbMale, rbFemale, rbOther;
+
     private ActivityResultLauncher<String> pickImageLauncher;
-    private Uri selectedImageUri;
+    private Bitmap newAvatarBitmap = null;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private ExecutorService ioExecutor;
+    private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
+
+    private DatabaseManager dbManager;
+    private AuthManager authManager;
+    private FirebaseUser currentUser;
+    private User currentUserData;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.setting_profile);
 
-        setActiveButton("settings");
+        initViews();
+        initManagers();
 
-        ioExecutor = Executors.newSingleThreadExecutor();
+        currentUser = authManager.getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "User not logged in!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
+        setupImagePicker();
+        setupClickListeners();
+        loadUserProfile();
+        setEditingState(false); // Start in view-only mode
+    }
+
+    private void initViews() {
+        ivBack = findViewById(R.id.iv_back);
+        ivEdit = findViewById(R.id.iv_edit);
         ivUserImage = findViewById(R.id.iv_user_image);
-        btUpload = findViewById(R.id.bt_upload);
-        ImageButton btnEdit = findViewById(R.id.btn_edit);
+        ivEditAvatar = findViewById(R.id.iv_edit_avatar);
+        btSaveChanges = findViewById(R.id.bt_save_changes);
 
-        // Initially hidden, click Edit to show upload button
-        btUpload.setVisibility(View.INVISIBLE);
-        btnEdit.setOnClickListener(v -> btUpload.setVisibility(
-                btUpload.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE));
+        etUsername = findViewById(R.id.et_username);
+        etDob = findViewById(R.id.et_dob);
+        etStartLoveDate = findViewById(R.id.et_start_love_date);
+        etEmail = findViewById(R.id.et_email);
+        etPhone = findViewById(R.id.et_phone);
 
-        // Prepare image picker
+        rgGender = findViewById(R.id.rg_gender);
+        rbMale = findViewById(R.id.rb_male);
+        rbFemale = findViewById(R.id.rb_female);
+        rbOther = findViewById(R.id.rb_other);
+    }
+
+    private void initManagers() {
+        dbManager = DatabaseManager.getInstance();
+        authManager = AuthManager.getInstance();
+    }
+
+    private void setEditingState(boolean isEditing) {
+        etUsername.setEnabled(isEditing);
+        etDob.setEnabled(isEditing);
+        etStartLoveDate.setEnabled(isEditing);
+
+        for (int i = 0; i < rgGender.getChildCount(); i++) {
+            rgGender.getChildAt(i).setEnabled(isEditing);
+        }
+
+        ivEdit.setVisibility(isEditing ? View.GONE : View.VISIBLE);
+        btSaveChanges.setVisibility(isEditing ? View.VISIBLE : View.GONE);
+        ivEditAvatar.setVisibility(isEditing ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    private void setupImagePicker() {
         pickImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             if (uri != null) {
-                selectedImageUri = uri;
-                // Preview immediately
-                ivUserImage.setImageURI(uri);
-                // Start upload
-                uploadSelectedImage();
+                try {
+                    newAvatarBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                    ivUserImage.setImageBitmap(newAvatarBitmap);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error loading image from URI", e);
+                    Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-
-        btUpload.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
-
-        // Populate current user info and avatar
-        populateUserInfo();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (ioExecutor != null) {
-            ioExecutor.shutdownNow();
-        }
+    private void setupClickListeners() {
+        ivBack.setOnClickListener(v -> onBackPressed());
+        ivEdit.setOnClickListener(v -> setEditingState(true));
+        ivEditAvatar.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
+        btSaveChanges.setOnClickListener(v -> saveProfileChanges());
+
+        etDob.setOnClickListener(v -> {
+            if (etDob.isEnabled()) showDatePickerDialog(etDob);
+        });
+        etStartLoveDate.setOnClickListener(v -> {
+            if (etStartLoveDate.isEnabled()) showDatePickerDialog(etStartLoveDate);
+        });
     }
 
-    private void populateUserInfo() {
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser == null) {
-            Toast.makeText(this, "Chưa đăng nhập", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // First try cache for instant display
-        try {
-            Bitmap cached = AvatarCache.getCachedBitmap(this);
-            if (cached != null) {
-                ivUserImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                ivUserImage.setImageBitmap(cached);
-            }
-        } catch (Exception ignore) { }
-
-        // Text fields
-        try {
-            TextView tvFirst = findViewById(R.id.tv_firstname_value);
-            TextView tvLast = findViewById(R.id.tv_lastname_value);
-            TextView tvUsername = findViewById(R.id.tv_username_value);
-            TextView tvGmail = findViewById(R.id.tv_gmail_value);
-            TextView tvPhone = findViewById(R.id.tv_phone_value);
-
-            String displayName = firebaseUser.getDisplayName();
-            String email = firebaseUser.getEmail();
-            String phone = firebaseUser.getPhoneNumber();
-
-            if (displayName != null && !displayName.isEmpty()) {
-                String[] parts = displayName.trim().split("\\s+");
-                if (parts.length > 1) {
-                    tvLast.setText(parts[parts.length - 1]);
-                    StringBuilder firstBuilder = new StringBuilder();
-                    for (int i = 0; i < parts.length - 1; i++) {
-                        if (i > 0) firstBuilder.append(' ');
-                        firstBuilder.append(parts[i]);
-                    }
-                    tvFirst.setText(firstBuilder.toString());
-                } else {
-                    tvFirst.setText(displayName);
-                    tvLast.setText("-");
+    private void showDatePickerDialog(final EditText editText) {
+        Calendar calendar = Calendar.getInstance();
+        String currentDateStr = editText.getText().toString();
+        if (!currentDateStr.isEmpty()) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                Date date = sdf.parse(currentDateStr);
+                if (date != null) {
+                    calendar.setTime(date);
                 }
-                tvUsername.setText(displayName);
-            } else {
-                tvFirst.setText("-");
-                tvLast.setText("-");
-                tvUsername.setText("-");
+            } catch (ParseException e) {
+                Log.e(TAG, "Error parsing date: ", e);
             }
-
-            tvGmail.setText(email != null ? email : "-");
-            tvPhone.setText(phone != null ? phone : "-");
-        } catch (Exception e) {
-            Log.w(TAG, "Failed to populate text fields", e);
         }
 
-        // If we already showed cache, we can skip network fetch unless cache is missing
-        if (AvatarCache.hasCache(this)) {
-            return;
-        }
+        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.MONTH, month);
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            editText.setText(sdf.format(calendar.getTime()));
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
 
-        // Load avatar from Firestore user if available
-        DatabaseManager.getInstance().getUser(firebaseUser.getUid(), new DatabaseManager.DatabaseCallback<User>() {
+    private void loadUserProfile() {
+        if (currentUser.getDisplayName() != null && !currentUser.getDisplayName().isEmpty()) {
+            etUsername.setText(currentUser.getDisplayName());
+        }
+        etEmail.setText(currentUser.getEmail());
+        etPhone.setText(currentUser.getPhoneNumber());
+        loadAvatar();
+
+        dbManager.getUser(currentUser.getUid(), new DatabaseManager.DatabaseCallback<User>() {
             @Override
             public void onSuccess(User user) {
-                String url = user != null ? user.getProfilePicUrl() : null;
-                if (url != null && !url.isEmpty()) {
-                    loadImageFromUrl(url);
-                } else if (firebaseUser.getPhotoUrl() != null) {
-                    loadImageFromUrl(firebaseUser.getPhotoUrl().toString());
-                } else {
-                    ivUserImage.setImageResource(R.drawable.user_icon);
+                if (user != null) {
+                    currentUserData = user;
+                    if (user.getName() != null) {
+                        etUsername.setText(user.getName());
+                    }
+                    etDob.setText(user.getDateOfBirth());
+                    etStartLoveDate.setText(formatTimestamp(user.getStartLoveDate()));
+                    if (user.getGender() != null) {
+                        switch (user.getGender()) {
+                            case "Male":
+                                rbMale.setChecked(true);
+                                break;
+                            case "Female":
+                                rbFemale.setChecked(true);
+                                break;
+                            case "Other":
+                                rbOther.setChecked(true);
+                                break;
+                        }
+                    }
                 }
             }
-
             @Override
             public void onError(String error) {
-                Log.w(TAG, "getUser error: " + error);
-                if (firebaseUser.getPhotoUrl() != null) {
-                    loadImageFromUrl(firebaseUser.getPhotoUrl().toString());
-                } else {
-                    ivUserImage.setImageResource(R.drawable.user_icon);
-                }
+                Log.w(TAG, "Could not load additional user details: " + error);
             }
         });
+    }
+
+    private String formatTimestamp(Timestamp timestamp) {
+        if (timestamp == null) return "";
+        return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(timestamp.toDate());
+    }
+
+    private void loadAvatar() {
+        Bitmap cachedAvatar = AvatarCache.getCachedBitmap(this);
+        if (cachedAvatar != null) {
+            ivUserImage.setImageBitmap(cachedAvatar);
+        } else {
+            dbManager.getUser(currentUser.getUid(), new DatabaseManager.DatabaseCallback<User>() {
+                @Override
+                public void onSuccess(User user) {
+                    if (user != null && !TextUtils.isEmpty(user.getProfilePicUrl())) {
+                        loadImageFromUrl(user.getProfilePicUrl());
+                    } else if (currentUser.getPhotoUrl() != null) {
+                        loadImageFromUrl(currentUser.getPhotoUrl().toString());
+                    }
+                }
+                @Override
+                public void onError(String error) {
+                    Log.w(TAG, "Failed to get user data for avatar: " + error);
+                }
+            });
+        }
     }
 
     private void loadImageFromUrl(String urlStr) {
-        if (ioExecutor == null) ioExecutor = Executors.newSingleThreadExecutor();
         ioExecutor.execute(() -> {
-            HttpURLConnection conn = null;
             try {
                 URL url = new URL(urlStr);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(15000);
-                conn.setReadTimeout(20000);
-                conn.setInstanceFollowRedirects(true);
-                conn.connect();
-                int code = conn.getResponseCode();
-                InputStream is = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
-                Bitmap bmp;
-                try (InputStream autoClose = is) {
-                    bmp = BitmapFactory.decodeStream(autoClose);
-                }
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap bmp = BitmapFactory.decodeStream(input);
                 if (bmp != null) {
-                    // Save to cache for next time
                     AvatarCache.saveBitmapToCache(getApplicationContext(), bmp);
-                    Bitmap finalBmp = bmp;
-                    mainHandler.post(() -> {
-                        ivUserImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        ivUserImage.setImageBitmap(finalBmp);
-                    });
-                } else {
-                    throw new Exception("Bitmap decode null");
+                    mainHandler.post(() -> ivUserImage.setImageBitmap(bmp));
                 }
             } catch (Exception e) {
-                Log.w(TAG, "Failed to load avatar: " + e.getMessage());
-                mainHandler.post(() -> ivUserImage.setImageResource(R.drawable.user_icon));
-            } finally {
-                if (conn != null) conn.disconnect();
+                Log.e(TAG, "Error loading image from URL", e);
             }
         });
     }
 
-    private void uploadSelectedImage() {
-        if (selectedImageUri == null) return;
-
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser == null) {
-            Toast.makeText(this, "Chưa đăng nhập", Toast.LENGTH_SHORT).show();
+    private void saveProfileChanges() {
+        String newUsername = etUsername.getText().toString().trim();
+        if (TextUtils.isEmpty(newUsername)) {
+            etUsername.setError("Username cannot be empty");
             return;
         }
 
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Saving...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        String newDobStr = etDob.getText().toString().trim();
+        String newStartLoveDateStr = etStartLoveDate.getText().toString().trim();
+        int selectedGenderId = rgGender.getCheckedRadioButtonId();
+        String newGender = "";
+        if (selectedGenderId == R.id.rb_male) {
+            newGender = "Male";
+        } else if (selectedGenderId == R.id.rb_female) {
+            newGender = "Female";
+        } else if (selectedGenderId == R.id.rb_other) {
+            newGender = "Other";
+        }
+
+        if (newAvatarBitmap != null) {
+            uploadAvatarAndThenUpdateAllData(progressDialog, newUsername, newDobStr, newStartLoveDateStr, newGender);
+        } else {
+            updateAllData(progressDialog, newUsername, newDobStr, newStartLoveDateStr, newGender, null);
+        }
+    }
+
+    private void uploadAvatarAndThenUpdateAllData(ProgressDialog dialog, String username, String dob, String startLoveDate, String gender) {
         String apiKey = getString(R.string.imgbb_api_key);
-        if (apiKey == null || apiKey.isEmpty() || apiKey.startsWith("REPLACE_")) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Thiếu API key imgbb")
-                    .setMessage("Hãy thêm khoá imgbb_api_key trong strings.xml để tải ảnh lên.")
-                    .setPositiveButton("OK", null)
-                    .show();
-            return;
-        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        newAvatarBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+        String base64Image = Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
 
-        AlertDialog progress = new AlertDialog.Builder(this)
-                .setView(getLayoutInflater().inflate(R.layout.view_progress, null))
-                .setCancelable(false)
-                .create();
-        try { progress.show(); } catch (Exception ignored) {}
-
-        Executors.newSingleThreadExecutor().execute(() -> {
+        ioExecutor.execute(() -> {
             try {
-                // Read and downscale to avoid huge payload
-                Bitmap bitmap = decodeSampledBitmapFromUri(selectedImageUri, 800, 800);
-                if (bitmap == null) throw new Exception("Không đọc được ảnh");
-                final Bitmap uploadBmp = bitmap;
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                uploadBmp.compress(Bitmap.CompressFormat.JPEG, 85, baos);
-                byte[] bytes = baos.toByteArray();
-                String base64 = Base64.encodeToString(bytes, Base64.NO_WRAP);
-
-                String uploadUrl = "https://api.imgbb.com/1/upload?key=" + URLEncoder.encode(apiKey, "UTF-8");
-                URL url = new URL(uploadUrl);
+                URL url = new URL("https://api.imgbb.com/1/upload?key=" + apiKey);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
-                conn.setConnectTimeout(20000);
-                conn.setReadTimeout(30000);
-                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-                String body = "image=" + URLEncoder.encode(base64, "UTF-8");
+                String body = "image=" + URLEncoder.encode(base64Image, "UTF-8");
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(body.getBytes());
                 }
 
-                int code = conn.getResponseCode();
-                InputStream is = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
-                String resp = readAll(is);
-                conn.disconnect();
+                InputStream is = conn.getResponseCode() == 200 ? conn.getInputStream() : conn.getErrorStream();
+                ByteArrayOutputStream result = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = is.read(buffer)) != -1) result.write(buffer, 0, length);
+                String responseStr = result.toString("UTF-8");
 
-                if (code < 200 || code >= 300) {
-                    throw new Exception("Upload thất bại: " + code + " - " + resp);
+                if (conn.getResponseCode() == 200) {
+                    String imageUrl = new JSONObject(responseStr).getJSONObject("data").getString("url");
+                    updateAllData(dialog, username, dob, startLoveDate, gender, imageUrl);
+                } else {
+                    throw new Exception("Upload failed: " + responseStr);
                 }
-
-                JSONObject json = new JSONObject(resp);
-                JSONObject data = json.getJSONObject("data");
-                String urlReturned = data.getString("url");
-
-                // Save to Firestore and FirebaseAuth profile
-                DatabaseManager.getInstance().updateUserProfile(firebaseUser.getUid(), null, urlReturned,
-                        new AuthManager.AuthActionCallback() {
-                            @Override
-                            public void onSuccess() {
-                                AuthManager.getInstance().updateProfile(null, urlReturned, new AuthManager.AuthActionCallback() {
-                                    @Override
-                                    public void onSuccess() {
-                                        // Save uploaded bitmap to cache immediately
-                                        AvatarCache.saveBitmapToCache(getApplicationContext(), uploadBmp);
-                                        mainHandler.post(() -> {
-                                            try { progress.dismiss(); } catch (Exception ignored) {}
-                                            Toast.makeText(SettingProfileActivity.this, "Cập nhật ảnh đại diện thành công", Toast.LENGTH_SHORT).show();
-                                            ivUserImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                                            ivUserImage.setImageBitmap(uploadBmp);
-                                        });
-                                    }
-
-                                    @Override
-                                    public void onError(String error) {
-                                        // Still update cache and UI because Firestore already saved URL
-                                        AvatarCache.saveBitmapToCache(getApplicationContext(), uploadBmp);
-                                        mainHandler.post(() -> {
-                                            try { progress.dismiss(); } catch (Exception ignored) {}
-                                            Toast.makeText(SettingProfileActivity.this, "Đã lưu URL ảnh, nhưng cập nhật hồ sơ Auth thất bại", Toast.LENGTH_LONG).show();
-                                            ivUserImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                                            ivUserImage.setImageBitmap(uploadBmp);
-                                        });
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onError(String error) {
-                                mainHandler.post(() -> {
-                                    try { progress.dismiss(); } catch (Exception ignored) {}
-                                    Toast.makeText(SettingProfileActivity.this, "Lỗi lưu Firestore: " + error, Toast.LENGTH_LONG).show();
-                                });
-                            }
-                        });
-
             } catch (Exception e) {
-                Log.e(TAG, "Upload error", e);
+                Log.e(TAG, "Avatar upload failed", e);
                 mainHandler.post(() -> {
-                    try { progress.dismiss(); } catch (Exception ignored) {}
-                    new AlertDialog.Builder(SettingProfileActivity.this)
-                            .setTitle("Tải ảnh thất bại")
-                            .setMessage(e.getMessage() != null ? e.getMessage() : "Lỗi không xác định")
-                            .setPositiveButton("Đóng", null)
-                            .show();
+                    dialog.dismiss();
+                    Toast.makeText(this, "Avatar upload failed.", Toast.LENGTH_LONG).show();
+                    setEditingState(true);
                 });
             }
         });
     }
 
-    private Bitmap decodeSampledBitmapFromUri(Uri uri, int reqWidth, int reqHeight) {
+    private void updateAllData(ProgressDialog dialog, String username, String dobStr, String startLoveDateStr, String gender, @Nullable String avatarUrl) {
+        authManager.updateProfile(username, avatarUrl, new AuthManager.AuthActionCallback() {
+            @Override
+            public void onSuccess() {
+                updateFirestoreDatabase(dialog, username, dobStr, startLoveDateStr, gender, avatarUrl);
+            }
+            @Override
+            public void onError(String error) {
+                dialog.dismiss();
+                Toast.makeText(SettingProfileActivity.this, "Failed to update auth profile: " + error, Toast.LENGTH_LONG).show();
+                setEditingState(true);
+            }
+        });
+    }
+
+    private Timestamp convertStringToTimestamp(String dateStr) {
+        if (TextUtils.isEmpty(dateStr)) return null;
         try {
-            // First decode with inJustDecodeBounds=true to check dimensions
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            try (InputStream is1 = getContentResolver().openInputStream(uri)) {
-                BitmapFactory.decodeStream(is1, null, options);
-            }
-            // Calculate inSampleSize
-            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-            // Decode bitmap with inSampleSize set
-            options.inJustDecodeBounds = false;
-            try (InputStream is2 = getContentResolver().openInputStream(uri)) {
-                return BitmapFactory.decodeStream(is2, null, options);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "decodeSampledBitmapFromUri error", e);
+            return new Timestamp(new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(dateStr));
+        } catch (ParseException e) {
+            Log.e(TAG, "Error parsing date string to Timestamp", e);
             return null;
         }
     }
 
-    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        int height = options.outHeight;
-        int width = options.outWidth;
-        int inSampleSize = 1;
+    private void updateFirestoreDatabase(ProgressDialog dialog, String username, String dobStr, String startLoveDateStr, String gender, @Nullable String avatarUrl) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("name", username);
+        updates.put("dateOfBirth", dobStr);
+        updates.put("startLoveDate", convertStringToTimestamp(startLoveDateStr));
+        updates.put("gender", gender);
+        if (avatarUrl != null) updates.put("profilePicUrl", avatarUrl);
 
-        if (height > reqHeight || width > reqWidth) {
-            int halfHeight = height / 2;
-            int halfWidth = width / 2;
-
-            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
+        dbManager.updateUserProfile(currentUser.getUid(), updates, new AuthManager.AuthActionCallback() {
+            @Override
+            public void onSuccess() {
+                updatePartnerProfile(dialog, updates);
             }
-        }
-        return inSampleSize;
+            @Override
+            public void onError(String error) {
+                dialog.dismiss();
+                Toast.makeText(SettingProfileActivity.this, "Failed to update database: " + error, Toast.LENGTH_LONG).show();
+                setEditingState(true);
+            }
+        });
     }
 
-    private String readAll(InputStream is) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buf = new byte[4096];
-        int n;
-        while ((n = is.read(buf)) != -1) {
-            baos.write(buf, 0, n);
+    private void updatePartnerProfile(ProgressDialog dialog, Map<String, Object> originalUpdates) {
+        if (currentUserData != null && !TextUtils.isEmpty(currentUserData.getPartnerId()) && originalUpdates.containsKey("startLoveDate")) {
+            Map<String, Object> partnerUpdates = new HashMap<>();
+            partnerUpdates.put("startLoveDate", originalUpdates.get("startLoveDate"));
+
+            dbManager.updateUserProfile(currentUserData.getPartnerId(), partnerUpdates, new AuthManager.AuthActionCallback() {
+                @Override
+                public void onSuccess() {
+                    handleSuccessfulUpdate(dialog);
+                }
+                @Override
+                public void onError(String error) {
+                    dialog.dismiss();
+                    Toast.makeText(SettingProfileActivity.this, "Updated your profile, but failed to update partner's profile: " + error, Toast.LENGTH_LONG).show();
+                    setEditingState(true);
+                }
+            });
+        } else {
+            handleSuccessfulUpdate(dialog);
         }
-        return baos.toString();
+    }
+
+    private void handleSuccessfulUpdate(ProgressDialog dialog) {
+        if (newAvatarBitmap != null) {
+            AvatarCache.saveBitmapToCache(getApplicationContext(), newAvatarBitmap);
+        }
+        dialog.dismiss();
+        Toast.makeText(SettingProfileActivity.this, "Profile updated successfully!", Toast.LENGTH_SHORT).show();
+        setEditingState(false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!ioExecutor.isShutdown()) {
+            ioExecutor.shutdown();
+        }
     }
 }

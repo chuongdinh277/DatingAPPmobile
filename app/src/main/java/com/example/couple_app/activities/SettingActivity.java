@@ -37,8 +37,7 @@ public class SettingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.setting);
 
-        // Highlight tab "settings"
-        setActiveButton("settings");
+
 
         // Initialize Firebase Auth and AuthManager
         mAuth = FirebaseAuth.getInstance();

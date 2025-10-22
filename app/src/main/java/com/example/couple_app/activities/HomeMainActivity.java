@@ -22,9 +22,6 @@ public class HomeMainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homemain);
 
-        // Highlight tab "home"
-        setActiveButton("home");
-
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 

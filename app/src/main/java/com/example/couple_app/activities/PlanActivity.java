@@ -231,11 +231,6 @@ public class PlanActivity extends BaseActivity {
     }
 
     @Override
-    protected boolean pinBottomBarOverIme() {
-        return true;
-    }
-
-    @Override
     protected boolean shouldUseEdgeToEdge() {
         // Đồng bộ với Home/Settings để bottom bar không bị đẩy lên
         return true;
@@ -244,7 +239,6 @@ public class PlanActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Highlight nút Plan trên bottom bar
-        setActiveButton("plan");
+
     }
 }

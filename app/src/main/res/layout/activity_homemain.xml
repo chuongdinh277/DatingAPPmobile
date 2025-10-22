@@ -8,7 +8,7 @@
     android:background="@color/couple_pink_bg"
     tools:context=".activities.HomeMainActivity">
 
-    <!-- ViewPager2 để hiển thị các fragments -->
+    <!-- ViewPager2 để hi���n thị các fragments -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="0dp"
@@ -16,6 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -102,17 +102,38 @@ public class PairingActivity extends BaseActivity {
             @Override
             public void onSuccess(Couple couple) {
                 showLoading(false);
+
+                if (couple == null) {
+                    Log.e(TAG, "Couple object is null in checkExistingPairing");
+                    generateUserPin();
+                    return;
+                }
+
                 String coupleId = couple.getCoupleId();
-                String partnerId = couple.getUser1Id().equals(currentUserId) ? couple.getUser2Id() : couple.getUser1Id();
+                String user1Id = couple.getUser1Id();
+                String user2Id = couple.getUser2Id();
+
+                if (user1Id == null || user2Id == null || coupleId == null) {
+                    Log.e(TAG, "Couple data incomplete");
+                    generateUserPin();
+                    return;
+                }
+
+                String partnerId = user1Id.equals(currentUserId) ? user2Id : user1Id;
+
                 // Fetch partner name
                 databaseManager.getUser(partnerId, new DatabaseManager.DatabaseCallback<User>() {
                     @Override
                     public void onSuccess(User partner) {
-                        navigateToChat(coupleId, partner != null && partner.getName() != null ? partner.getName() : "Đối phương");
+                        String partnerName = (partner != null && partner.getName() != null)
+                            ? partner.getName()
+                            : "Đối phương";
+                        navigateToChat(coupleId, partnerName);
                     }
 
                     @Override
                     public void onError(String error) {
+                        Log.e(TAG, "Error fetching partner in checkExistingPairing: " + error);
                         navigateToChat(coupleId, "Đối phương");
                     }
                 });
@@ -181,31 +202,10 @@ public class PairingActivity extends BaseActivity {
         databaseManager.connectCoupleWithPin(currentUserId, partnerPin, new DatabaseManager.DatabaseCallback<String>() {
             @Override
             public void onSuccess(String coupleId) {
-                showLoading(false);
-                Toast.makeText(PairingActivity.this, "Ghép cặp thành công!", Toast.LENGTH_LONG).show();
-                // Fetch partner name and navigate
-                databaseManager.getCoupleByUserId(currentUserId, new DatabaseManager.DatabaseCallback<Couple>() {
-                    @Override
-                    public void onSuccess(Couple couple) {
-                        String partnerId = couple.getUser1Id().equals(currentUserId) ? couple.getUser2Id() : couple.getUser1Id();
-                        databaseManager.getUser(partnerId, new DatabaseManager.DatabaseCallback<User>() {
-                            @Override
-                            public void onSuccess(User partner) {
-                                navigateToChat(coupleId, partner != null && partner.getName() != null ? partner.getName() : "Đối phương");
-                            }
-
-                            @Override
-                            public void onError(String error) {
-                                navigateToChat(coupleId, "Đối phương");
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        navigateToChat(coupleId, "Đối phương");
-                    }
-                });
+                // Add a small delay to ensure Firestore has saved the data
+                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                    fetchPartnerInfoAndNavigate(coupleId);
+                }, 500); // 500ms delay
             }
 
             @Override
@@ -217,6 +217,57 @@ public class PairingActivity extends BaseActivity {
             }
         });
     }
+
+    private void fetchPartnerInfoAndNavigate(String coupleId) {
+        databaseManager.getCoupleByUserId(currentUserId, new DatabaseManager.DatabaseCallback<Couple>() {
+            @Override
+            public void onSuccess(Couple couple) {
+                if (couple == null) {
+                    Log.e(TAG, "Couple object is null");
+                    navigateToChat(coupleId, "Đối phương");
+                    return;
+                }
+
+                String user1Id = couple.getUser1Id();
+                String user2Id = couple.getUser2Id();
+
+                if (user1Id == null || user2Id == null) {
+                    Log.e(TAG, "User IDs are null in couple object");
+                    navigateToChat(coupleId, "Đối phương");
+                    return;
+                }
+
+                String partnerId = user1Id.equals(currentUserId) ? user2Id : user1Id;
+
+                databaseManager.getUser(partnerId, new DatabaseManager.DatabaseCallback<User>() {
+                    @Override
+                    public void onSuccess(User partner) {
+                        showLoading(false);
+                        String partnerName = (partner != null && partner.getName() != null)
+                            ? partner.getName()
+                            : "Đối phương";
+                        navigateToChat(coupleId, partnerName);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        showLoading(false);
+                        Log.e(TAG, "Error fetching partner: " + error);
+                        navigateToChat(coupleId, "Đối phương");
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                showLoading(false);
+                Log.e(TAG, "Error fetching couple: " + error);
+                // Still navigate even if we can't fetch couple info
+                navigateToChat(coupleId, "Đối phương");
+            }
+        });
+    }
+
 
     private void navigateToChat(String coupleId, String partnerName) {
         // Lưu trạng thái đăng nhập sau khi pairing thành công

@@ -33,7 +33,6 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
-
     // Google Play Services for Google Sign-In
     implementation(libs.play.services.auth)
 
@@ -41,6 +40,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.recyclerview)
     implementation(libs.cardview)
+    implementation(libs.firebase.messaging)
+    implementation("de.hdodenhof:circleimageview:3.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

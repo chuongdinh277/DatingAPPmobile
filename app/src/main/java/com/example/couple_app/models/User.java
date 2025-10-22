@@ -9,12 +9,16 @@ import androidx.annotation.Keep;
 public class User {
     private String userId;
     private String name;
+    private String dateOfBirth; // Changed from LocalDate to String (format: "yyyy-MM-dd")
     private String email;
     private String phoneNumber; // New field for phone number
     private String profilePicUrl;
     private String pinCode;
     private String partnerId;
     private Timestamp startLoveDate;
+    private String gender;
+
+    private String fcmToken; // Firebase Cloud Messaging token for push notifications
 
     // Default constructor required for Firebase
     public User() {}
@@ -29,6 +33,7 @@ public class User {
         this.pinCode = null;
         this.partnerId = null;
         this.startLoveDate = null;
+        this.dateOfBirth = null;
     }
 
     // Constructor for phone registration
@@ -41,7 +46,21 @@ public class User {
         this.pinCode = null;
         this.partnerId = null;
         this.startLoveDate = null;
+        this.dateOfBirth = null;
     }
+
+    public User(String userId, String name, String dateOfBirth, String email, String phoneNumber, String profilePicUrl, String pinCode, String partnerId, Timestamp startLoveDate) {
+        this.userId = userId;
+        this.name = name;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.profilePicUrl = profilePicUrl;
+        this.pinCode = pinCode;
+        this.partnerId = partnerId;
+        this.startLoveDate = startLoveDate;
+    }
+
 
     // Getters and Setters
     public String getUserId() { return userId; }
@@ -49,6 +68,9 @@ public class User {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
@@ -67,4 +89,10 @@ public class User {
 
     public Timestamp getStartLoveDate() { return startLoveDate; }
     public void setStartLoveDate(Timestamp startLoveDate) { this.startLoveDate = startLoveDate; }
+
+    public String getFcmToken() { return fcmToken; }
+    public void setFcmToken(String fcmToken) { this.fcmToken = fcmToken; }
+
+    public String getGender() { return gender;}
+    public void setGender(String gender) { this.gender = gender;}
 }
