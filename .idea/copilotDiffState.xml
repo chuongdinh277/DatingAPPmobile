@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/noti/test-local.bat">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/noti/test-local.bat" />
+              <option name="updatedContent" value="@echo off&#10;echo ============================================&#10;echo  TESTING BACKEND LOCAL&#10;echo ============================================&#10;echo.&#10;&#10;cd /d C:\Users\Anhnguyen\AndroidStudioProjects\CoupleApp\noti&#10;&#10;echo [1/3] Checking Node.js installation...&#10;node --version&#10;if %errorlevel% neq 0 (&#10;    echo ERROR: Node.js is not installed!&#10;    echo Please install Node.js from https://nodejs.org/&#10;    pause&#10;    exit /b 1&#10;)&#10;&#10;echo.&#10;echo [2/3] Installing dependencies...&#10;call npm install&#10;&#10;echo.&#10;echo [3/3] Starting local server...&#10;echo.&#10;echo ============================================&#10;echo  Server will start at http://localhost:3000&#10;echo ============================================&#10;echo.&#10;echo Press Ctrl+C to stop the server&#10;echo.&#10;&#10;node index.js&#10;&#10;pause&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/noti/test-vercel.bat">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/noti/test-vercel.bat" />
+              <option name="updatedContent" value="@echo off&#10;echo ============================================&#10;echo  TESTING VERCEL DEPLOYMENT&#10;echo ============================================&#10;echo.&#10;&#10;set URL=https://noti-colfwtzou-anh-nguyens-projects-df238e73.vercel.app&#10;&#10;echo Testing current URL: %URL%&#10;echo.&#10;&#10;echo [1/2] Testing Health Endpoint...&#10;curl -s %URL%/api/health&#10;echo.&#10;echo.&#10;&#10;echo [2/2] Testing Root Endpoint...&#10;curl -s %URL%/&#10;echo.&#10;echo.&#10;&#10;echo ============================================&#10;echo.&#10;echo If you see 404 errors above, you need to:&#10;echo 1. Get your new Vercel URL from dashboard&#10;echo 2. Update BASE_URL in NotificationAPI.java&#10;echo.&#10;echo To get new URL:&#10;echo - Go to https://vercel.com/dashboard&#10;echo - Find your 'noti' project&#10;echo - Copy the production URL&#10;echo.&#10;pause&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

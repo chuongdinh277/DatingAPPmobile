@@ -146,8 +146,8 @@ public class AvatarCache {
             try {
                 URL url = new URL(urlStr);
                 conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(15000);
-                conn.setReadTimeout(20000);
+                conn.setConnectTimeout(55000);
+                conn.setReadTimeout(40000);
                 conn.setInstanceFollowRedirects(true);
                 conn.connect();
                 int code = conn.getResponseCode();

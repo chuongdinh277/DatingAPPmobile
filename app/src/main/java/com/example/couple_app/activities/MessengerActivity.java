@@ -24,6 +24,7 @@ import com.example.couple_app.models.Message;
 import com.example.couple_app.models.Couple;
 import com.example.couple_app.models.User;
 import com.example.couple_app.utils.AvatarCache;
+import com.example.couple_app.utils.NotificationAPI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -39,6 +40,10 @@ import java.util.concurrent.Executors;
 
 public class MessengerActivity extends BaseActivity {
     private static final ExecutorService IMAGE_EXECUTOR = Executors.newFixedThreadPool(2);
+
+    // ✅ Static flag để track xem MessengerActivity có đang active không
+    private static boolean isMessengerActive = false;
+    private static String activeMessengerCoupleId = null;
 
     private RecyclerView rvMessages;
     private EditText etMessage;
@@ -132,8 +137,6 @@ public class MessengerActivity extends BaseActivity {
                 }
             });
         }
-
-
     }
 
     private void getIntentData() {
@@ -481,7 +484,7 @@ public class MessengerActivity extends BaseActivity {
         // Disable send button to prevent multiple sends
         btnSend.setEnabled(false);
 
-        // Send message using ChatManager
+        // Gửi tin nhắn qua ChatManager (Firebase)
         chatManager.sendMessage(coupleId, currentUserId, messageText, new ChatManager.ChatCallback() {
             @Override
             public void onMessagesReceived(List<ChatMessage> messages) {
@@ -490,19 +493,16 @@ public class MessengerActivity extends BaseActivity {
 
             @Override
             public void onMessageSent() {
-                // Clear input field and re-enable send button
                 runOnUiThread(() -> {
                     etMessage.setText("");
                     btnSend.setEnabled(true);
-                });
-                Log.d("MessengerActivity", "✅ Message sent successfully");
 
-                // ✅ CLOUD FUNCTION sẽ TỰ ĐỘNG gửi notification
-                // Khi message được lưu vào Firestore, Cloud Function sẽ:
-                // 1. Phát hiện message mới
-                // 2. Lấy FCM token của người nhận
-                // 3. Gửi notification qua FCM API v1
-                // KHÔNG CẦN code thêm gì ở đây!
+                    // ✅ SAU KHI GỬI TIN NHẮN THÀNH CÔNG, GỬI NOTIFICATION QUA BACKEND
+                    if (partnerId != null && !partnerId.isEmpty()) {
+                        sendNotificationToPartner(messageText);
+                    }
+                });
+                Log.d("MessengerActivity", "✅ Message sent via ChatManager");
             }
 
             @Override
@@ -514,6 +514,35 @@ public class MessengerActivity extends BaseActivity {
                 Log.e("MessengerActivity", "Error sending message: " + error);
             }
         });
+    }
+
+    /**
+     * Gửi notification đến partner qua backend API
+     */
+    private void sendNotificationToPartner(String messageText) {
+        String title = currentUserName != null ? currentUserName : "New Message";
+
+        NotificationAPI.sendNotification(
+            partnerId,
+            title,
+            messageText,
+            coupleId,
+            currentUserId,
+            currentUserName,
+            new NotificationAPI.NotificationCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    Log.d("MessengerActivity", "✅ Notification sent successfully: " + response);
+                }
+
+                @Override
+                public void onError(String error) {
+                    Log.e("MessengerActivity", "⚠️ Failed to send notification: " + error);
+                    // Không hiển thị lỗi cho user vì tin nhắn đã được gửi thành công
+                    // Notification chỉ là bonus feature
+                }
+            }
+        );
     }
 
     private void showLoading(boolean show) {
@@ -555,8 +584,65 @@ public class MessengerActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // ✅ Đánh dấu MessengerActivity đang active
+        isMessengerActive = true;
+        activeMessengerCoupleId = coupleId;
+
+        // ✅ Cập nhật trạng thái "đang xem chat" lên Firestore
+        updateChatViewingStatus(true);
+
+        Log.d("MessengerActivity", "🟢 Messenger is now ACTIVE - notifications will be suppressed");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // ✅ Đánh dấu MessengerActivity không còn active
+        isMessengerActive = false;
+        activeMessengerCoupleId = null;
+
+        // ✅ Cập nhật trạng thái "không xem chat" lên Firestore
+        updateChatViewingStatus(false);
+
+        Log.d("MessengerActivity", "🔴 Messenger is now INACTIVE - notifications will be shown");
+    }
+
+    /**
+     * ✅ Cập nhật trạng thái đang xem chat lên Firestore
+     */
+    private void updateChatViewingStatus(boolean isViewing) {
+        if (currentUserId != null && coupleId != null) {
+            databaseManager.updateUserChatViewingStatus(currentUserId, isViewing ? coupleId : null,
+                new DatabaseManager.DatabaseActionCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("MessengerActivity", "✅ Chat viewing status updated: " + isViewing);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Log.e("MessengerActivity", "❌ Failed to update chat viewing status: " + error);
+                    }
+                });
+        }
+    }
+
+    /**
+     * ✅ Kiểm tra xem user có đang xem chat với coupleId này không (static method)
+     */
+    public static boolean isViewingChat(String coupleId) {
+        return isMessengerActive && coupleId != null && coupleId.equals(activeMessengerCoupleId);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        // ✅ Clear trạng thái khi destroy
+        isMessengerActive = false;
+        activeMessengerCoupleId = null;
+
         // Remove real-time listener to prevent memory leaks
         if (messageListener != null && coupleId != null) {
             chatManager.removeChildMessageListener(coupleId, messageListener);

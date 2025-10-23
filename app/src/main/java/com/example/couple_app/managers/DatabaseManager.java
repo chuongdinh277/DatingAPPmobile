@@ -198,6 +198,30 @@ public class DatabaseManager {
             });
     }
 
+    /**
+     * ✅ Cập nhật trạng thái đang xem chat của user
+     * @param userId ID của user
+     * @param viewingCoupleId ID của couple đang xem (null nếu không xem)
+     * @param callback Callback kết quả
+     */
+    public void updateUserChatViewingStatus(String userId, String viewingCoupleId, DatabaseActionCallback callback) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("viewingCoupleId", viewingCoupleId != null ? viewingCoupleId : "");
+        updates.put("lastActiveAt", Timestamp.now());
+
+        db.collection(USERS_COLLECTION)
+            .document(userId)
+            .update(updates)
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Chat viewing status updated successfully");
+                if (callback != null) callback.onSuccess();
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "Error updating chat viewing status", e);
+                if (callback != null) callback.onError("Failed to update status: " + e.getMessage());
+            });
+    }
+
     // Generate and save PIN for user
     public void generateAndSavePinForUser(String userId, DatabaseCallback<String> callback) {
         generateAndSavePinRecursive(userId, callback, 5); // Thêm một giới hạn số lần thử, ví dụ 5 lần
