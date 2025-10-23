@@ -418,6 +418,9 @@ public class SettingProfileActivity extends BaseActivity {
     }
 
     private void handleSuccessfulUpdate(ProgressDialog dialog) {
+        // Clear old avatar cache before saving new one
+        AvatarCache.clearCache(getApplicationContext());
+
         if (newAvatarBitmap != null) {
             AvatarCache.saveBitmapToCache(getApplicationContext(), newAvatarBitmap);
         }

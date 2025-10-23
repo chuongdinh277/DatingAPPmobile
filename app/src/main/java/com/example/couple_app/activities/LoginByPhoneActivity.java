@@ -9,31 +9,21 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.TextView;
+import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AlertDialog;
 
 import com.example.couple_app.R;
+import com.example.couple_app.managers.AuthManager;
 import com.example.couple_app.utils.LoginPreferences;
-import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthOptions;
-import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.auth.FirebaseAuthSettings;
-import com.google.firebase.FirebaseTooManyRequestsException;
-
-import java.util.concurrent.TimeUnit;
 
 public class LoginByPhoneActivity extends AppCompatActivity {
-    private EditText etPhoneNumber, etVerificationCode;
-    private Button btnSendCode, btnVerifyCode, btnLogin;
-    private TextView tvQuotaError, tvAlternativeLogin;
+    private EditText etPhoneNumber, etPassword;
+    private Button btnLogin;
+    private TextView tvForgotPassword;
+    private ProgressBar progressBar;
     private FirebaseAuth mAuth;
-    private String mVerificationId;
-    private PhoneAuthProvider.ForceResendingToken mResendToken;
-    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
-    private boolean quotaExceeded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +32,6 @@ public class LoginByPhoneActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-        FirebaseAuthSettings authSettings = mAuth.getFirebaseAuthSettings();
-        // Only disable for testing - remove in production
-        authSettings.setAppVerificationDisabledForTesting(true);
 
         // Check if user is already logged in
         checkLoginState();
@@ -52,21 +39,10 @@ public class LoginByPhoneActivity extends AppCompatActivity {
         // Initialize views
         ImageButton btnBack = findViewById(R.id.welcomeBack);
         etPhoneNumber = findViewById(R.id.etPhoneNumber);
-        etVerificationCode = findViewById(R.id.etVerificationCode);
-        btnSendCode = findViewById(R.id.btnSendCode);
-        btnVerifyCode = findViewById(R.id.btnVerifyCode);
+        etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
-
-        // Add quota error text view (you'll need to add this to your layout)
-        tvQuotaError = findViewById(R.id.tvQuotaError);
-        tvAlternativeLogin = findViewById(R.id.tvAlternativeLogin);
-
-        // Initially hide verification code section and error messages
-        etVerificationCode.setVisibility(View.GONE);
-        btnVerifyCode.setVisibility(View.GONE);
-        btnLogin.setVisibility(View.GONE);
-        if (tvQuotaError != null) tvQuotaError.setVisibility(View.GONE);
-        if (tvAlternativeLogin != null) tvAlternativeLogin.setVisibility(View.GONE);
+        tvForgotPassword = findViewById(R.id.tvForgotPassword);
+        progressBar = findViewById(R.id.progressBar);
 
         // Back button click
         btnBack.setOnClickListener(view -> {
@@ -75,63 +51,14 @@ public class LoginByPhoneActivity extends AppCompatActivity {
             finish();
         });
 
-        // Send verification code
-        btnSendCode.setOnClickListener(view -> {
-            String phoneNumber = etPhoneNumber.getText().toString().trim();
-            if (TextUtils.isEmpty(phoneNumber)) {
-                Toast.makeText(this, "Please enter phone number", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        // Login button click
+        btnLogin.setOnClickListener(view -> handleLogin());
 
-            // Add country code if not present
-            if (!phoneNumber.startsWith("+")) {
-                phoneNumber = "+84" + phoneNumber; // Vietnam country code
-            }
-
-            // Check if phone number exists in database before sending verification code
-            final String finalPhoneNumber = phoneNumber;
-            com.example.couple_app.managers.DatabaseManager databaseManager =
-                com.example.couple_app.managers.DatabaseManager.getInstance();
-
-            databaseManager.checkPhoneNumberExists(finalPhoneNumber, new com.example.couple_app.managers.DatabaseManager.DatabaseCallback<Boolean>() {
-                @Override
-                public void onSuccess(Boolean exists) {
-                    if (exists) {
-                        // Phone number exists in database, proceed with verification
-                        sendVerificationCode(finalPhoneNumber);
-                    } else {
-                        // Phone number not found in database
-                        Toast.makeText(LoginByPhoneActivity.this, "Phone number not registered. Please sign up first.", Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onError(String error) {
-                    Toast.makeText(LoginByPhoneActivity.this, "Error checking phone number: " + error, Toast.LENGTH_LONG).show();
-                }
-            });
+        // Forgot password click
+        tvForgotPassword.setOnClickListener(view -> {
+            Intent intent = new Intent(LoginByPhoneActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
-
-        // Verify code
-        btnVerifyCode.setOnClickListener(view -> {
-            String code = etVerificationCode.getText().toString().trim();
-            if (TextUtils.isEmpty(code)) {
-                Toast.makeText(this, "Please enter verification code", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            verifyCode(code);
-        });
-
-        // Remove the direct navigation to PairingActivity - will be handled in signInWithPhoneAuthCredential
-        btnLogin.setOnClickListener(view -> {
-            FirebaseUser user = mAuth.getCurrentUser();
-            if (user != null) {
-                handleSuccessfulLogin(user);
-            }
-        });
-
-        // Initialize phone auth callbacks
-        initializePhoneAuthCallbacks();
     }
 
     private void checkLoginState() {
@@ -149,6 +76,44 @@ public class LoginByPhoneActivity extends AppCompatActivity {
         }
     }
 
+    private void handleLogin() {
+        String phoneNumber = etPhoneNumber.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+
+        if (TextUtils.isEmpty(phoneNumber)) {
+            Toast.makeText(this, "Vui lòng nhập số điện thoại", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(password)) {
+            Toast.makeText(this, "Vui lòng nhập mật khẩu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Add country code if not present
+        if (!phoneNumber.startsWith("+")) {
+            phoneNumber = "+84" + phoneNumber;
+        }
+
+        String finalPhoneNumber = phoneNumber;
+        showProgressBar();
+
+        // Sign in with phone number and password
+        AuthManager.getInstance().signInWithPhoneAndPassword(finalPhoneNumber, password, new AuthManager.AuthCallback() {
+            @Override
+            public void onSuccess(FirebaseUser user) {
+                hideProgressBar();
+                handleSuccessfulLogin(user);
+            }
+
+            @Override
+            public void onError(String error) {
+                hideProgressBar();
+                Toast.makeText(LoginByPhoneActivity.this, "Đăng nhập thất bại: " + error, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     private void handleSuccessfulLogin(FirebaseUser user) {
         // Save login state to SharedPreferences
         LoginPreferences.saveLoginState(
@@ -159,7 +124,7 @@ public class LoginByPhoneActivity extends AppCompatActivity {
             user.getUid()
         );
 
-        Toast.makeText(this, "Phone login successful!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 
         // Check pairing status before navigation
         checkPairingStatus(user);
@@ -193,119 +158,21 @@ public class LoginByPhoneActivity extends AppCompatActivity {
         });
     }
 
-    private void initializePhoneAuthCallbacks() {
-        mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-            @Override
-            public void onVerificationCompleted(PhoneAuthCredential credential) {
-                // Auto-verification completed
-                signInWithPhoneAuthCredential(credential);
-            }
-
-            @Override
-            public void onVerificationFailed(FirebaseException e) {
-                handleVerificationError(e);
-            }
-
-            @Override
-            public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token) {
-                mVerificationId = verificationId;
-                mResendToken = token;
-
-                // Show verification code input
-                etVerificationCode.setVisibility(View.VISIBLE);
-                btnVerifyCode.setVisibility(View.VISIBLE);
-                btnSendCode.setEnabled(false);
-
-                Toast.makeText(LoginByPhoneActivity.this, "Code sent to your phone", Toast.LENGTH_SHORT).show();
-            }
-        };
-    }
-
-    private void handleVerificationError(FirebaseException e) {
-        if (e instanceof FirebaseTooManyRequestsException) {
-            // SMS quota exceeded
-            quotaExceeded = true;
-            showQuotaExceededDialog();
-        } else if (e.getMessage() != null && (e.getMessage().contains("17052") || e.getMessage().contains("Exceeded quota"))) {
-            // Handle the specific error code 17052
-            quotaExceeded = true;
-            showQuotaExceededDialog();
-        } else {
-            Toast.makeText(LoginByPhoneActivity.this, "Verification failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+    private void showProgressBar() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+        if (btnLogin != null) {
+            btnLogin.setEnabled(false);
         }
     }
 
-    private void showQuotaExceededDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("SMS Verification Unavailable")
-                .setMessage("SMS verification is temporarily unavailable due to quota limits. Please try one of these alternatives:\n\n" +
-                        "1. Try again later (quota resets daily)\n" +
-                        "2. Use email login if available\n" +
-                        "3. Contact support for assistance")
-                .setPositiveButton("Try Email Login", (dialog, which) -> {
-                    // Navigate to email login or show email login option
-                    showEmailLoginOption();
-                })
-                .setNegativeButton("Try Later", (dialog, which) -> {
-                    dialog.dismiss();
-                    // Show quota error message
-                    if (tvQuotaError != null) {
-                        tvQuotaError.setText("SMS verification quota exceeded. Please try again later or use email login.");
-                        tvQuotaError.setVisibility(View.VISIBLE);
-                    }
-                })
-                .setNeutralButton("Back", (dialog, which) -> {
-                    finish();
-                })
-                .setCancelable(false)
-                .show();
-    }
-
-    private void showEmailLoginOption() {
-        // For now, navigate back to welcome screen to show other login options
-        // You can implement email login here if you have it
-        Toast.makeText(this, "Please use the Sign Up option to create an account with email", Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(LoginByPhoneActivity.this, WelcomeActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    private void sendVerificationCode(String phoneNumber) {
-        if (quotaExceeded) {
-            showQuotaExceededDialog();
-            return;
+    private void hideProgressBar() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
         }
-
-        try {
-            PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
-                    .setPhoneNumber(phoneNumber)
-                    .setTimeout(60L, TimeUnit.SECONDS)
-                    .setActivity(this)
-                    .setCallbacks(mCallbacks)
-                    .build();
-            PhoneAuthProvider.verifyPhoneNumber(options);
-        } catch (Exception e) {
-            handleVerificationError(new FirebaseException("Failed to send verification code: " + e.getMessage()));
+        if (btnLogin != null) {
+            btnLogin.setEnabled(true);
         }
-    }
-
-    private void verifyCode(String code) {
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
-        signInWithPhoneAuthCredential(credential);
-    }
-
-    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = task.getResult().getUser();
-                        if (user != null) {
-                            // Handle successful login with pairing check
-                            handleSuccessfulLogin(user);
-                        }
-                    } else {
-                        Toast.makeText(this, "Sign in failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
     }
 }

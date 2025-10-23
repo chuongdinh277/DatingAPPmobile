@@ -78,6 +78,13 @@
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- Forgot Password Activity -->
+        <activity
+            android:name=".activities.ForgotPasswordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- Main Application Activities -->
         <activity
             android:name=".activities.HomeMainActivity"

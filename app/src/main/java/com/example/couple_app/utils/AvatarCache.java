@@ -176,4 +176,28 @@ public class AvatarCache {
         getCachedFile(context).delete();
         getPartnerCachedFile(context).delete();
     }
+
+    public static void clearAllCache(Context context) {
+        // Delete avatar cache files
+        File userAvatar = getCachedFile(context);
+        File partnerAvatar = getPartnerCachedFile(context);
+
+        if (userAvatar.exists()) {
+            userAvatar.delete();
+            Log.d(TAG, "User avatar cache deleted");
+        }
+
+        if (partnerAvatar.exists()) {
+            partnerAvatar.delete();
+            Log.d(TAG, "Partner avatar cache deleted");
+        }
+
+        // Clear SharedPreferences (name cache, login state, etc.)
+        context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .apply();
+
+        Log.d(TAG, "All cache cleared");
+    }
 }

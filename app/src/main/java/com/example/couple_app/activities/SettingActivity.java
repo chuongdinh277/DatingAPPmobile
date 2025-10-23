@@ -400,11 +400,8 @@ public class SettingActivity extends BaseActivity {
         // Sign out from Firebase Authentication
         mAuth.signOut();
 
-        // Clear cached avatar
-        try {
-            java.io.File f = AvatarCache.getCachedFile(this);
-            if (f.exists()) f.delete();
-        } catch (Exception ignored) {}
+        // Clear all cached data (avatars and SharedPreferences)
+        AvatarCache.clearAllCache(this);
 
         // Navigate to welcome screen and clear all previous activities
         Intent intent = new Intent(this, WelcomeActivity.class);

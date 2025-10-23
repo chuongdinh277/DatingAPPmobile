@@ -123,32 +123,31 @@
             android:layout_marginStart="36dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="36dp"
-            android:background="@drawable/bg_btn_mail"
+            android:background="@drawable/bg_btn_phone"
             android:gravity="center_vertical"
-            android:hint="Mật khẩu"
+            android:hint="Mật khẩu (tối thiểu 6 ký tự)"
             android:inputType="textPassword"
             android:paddingStart="18dp"
             android:paddingEnd="18dp"
-            android:textColor="@android:color/white"
-            android:textColorHint="@android:color/white"
-            android:textSize="16sp"
-            android:visibility="gone" />
+            android:textColorHint="#800D42"
+            android:textSize="16sp" />
 
         <!-- Send Code Button -->
+
+        <!-- Verification Code Input (Initially Hidden) -->
         <Button
             android:id="@+id/btnSendCode"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginStart="36dp"
+            android:layout_marginStart="100dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="36dp"
+            android:layout_marginEnd="100dp"
             android:background="@drawable/bg_btn_mail"
             android:text="Gửi mã xác nhận"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <!-- Verification Code Input (Initially Hidden) -->
         <EditText
             android:id="@+id/etVerificationCode"
             android:layout_width="match_parent"
@@ -227,15 +226,7 @@
                 android:textSize="14sp"
                 android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/tvSwitchToEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đăng ký bằng Email"
-                android:textColor="#800D42"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:padding="8dp" />
+
 
         </LinearLayout>
 
