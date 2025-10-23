@@ -52,6 +52,12 @@ captures/
 .idea/deploymentTargetDropDown.xml
 .idea/vcs.xml
 
+# Sensitive data
+service-account-key.json
+serviceAccountKey.json
+service-account.json
+noti/service-account.json
+
 # Keystore files
 *.jks
 *.keystore
