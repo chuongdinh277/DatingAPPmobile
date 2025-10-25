@@ -8,6 +8,8 @@ public class ChatMessage {
     private String senderId;
     private String message;
     private Object timestamp; // Use Object to handle ServerValue.TIMESTAMP
+    private boolean read; // ✅ Thêm trường read
+    private Object readAt; // ✅ Thêm trường readAt
 
     public ChatMessage() {}
 
@@ -15,6 +17,8 @@ public class ChatMessage {
         this.senderId = senderId;
         this.message = message;
         this.timestamp = ServerValue.TIMESTAMP;
+        this.read = false; // Mặc định chưa đọc
+        this.readAt = null;
     }
 
     // Getters and Setters
@@ -29,4 +33,10 @@ public class ChatMessage {
 
     public Object getTimestamp() { return timestamp; }
     public void setTimestamp(Object timestamp) { this.timestamp = timestamp; }
+
+    public boolean isRead() { return read; }
+    public void setRead(boolean read) { this.read = read; }
+
+    public Object getReadAt() { return readAt; }
+    public void setReadAt(Object readAt) { this.readAt = readAt; }
 }

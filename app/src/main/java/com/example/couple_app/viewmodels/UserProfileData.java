@@ -55,6 +55,11 @@ public class UserProfileData {
         isLoaded = false;
     }
 
+    // Alias for clear() to match naming convention
+    public void clearAll() {
+        clear();
+    }
+
     // Getters and Setters for current user
     public String getCurrentUserId() { return currentUserId; }
     public void setCurrentUserId(String currentUserId) { this.currentUserId = currentUserId; }

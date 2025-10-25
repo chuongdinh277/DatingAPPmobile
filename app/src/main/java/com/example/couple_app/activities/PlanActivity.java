@@ -16,10 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.couple_app.R;
 import com.example.couple_app.adapters.ScheduleAdapter;
+import com.example.couple_app.managers.PlanRepository;
+import com.example.couple_app.models.Plan;
 import com.example.couple_app.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,10 +41,11 @@ public class PlanActivity extends BaseActivity {
     private EditText etNewPlan;
     private Button btnSavePlan;
 
+    private PlanRepository planRepository;
     private User currentUser;
     private Calendar selectedDate;
 
-    private ScheduleAdapter.ScheduleItem editingItem = null;
+    private Plan editingPlan = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +65,26 @@ public class PlanActivity extends BaseActivity {
         scheduleAdapter = new ScheduleAdapter();
         rvSchedule.setAdapter(scheduleAdapter);
 
-        scheduleAdapter.setOnItemClickListener(item -> {
-            editingItem = item;
+        planRepository = new PlanRepository();
+
+        // Set listener để edit plan
+        scheduleAdapter.setOnItemClickListener(plan -> {
+            editingPlan = plan;
             llAddPlan.setVisibility(View.VISIBLE);
-            etNewPlan.setText(item.getContent());
+            etNewPlan.setText(plan.getContent());
             etNewPlan.requestFocus();
+        });
+
+        // Set listener để delete plan
+        scheduleAdapter.setOnDeleteClickListener((plan, position) -> {
+            planRepository.deletePlan(plan.getId())
+                    .addOnSuccessListener(aVoid -> {
+                        scheduleAdapter.removePlan(position);
+                        Toast.makeText(this, "Đã xóa kế hoạch", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e ->
+                        Toast.makeText(this, "Xóa thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
         });
 
         selectedDate = Calendar.getInstance();
@@ -99,7 +116,7 @@ public class PlanActivity extends BaseActivity {
         fabAddPlan.setOnClickListener(v -> {
             if (llAddPlan.getVisibility() == View.VISIBLE) {
                 llAddPlan.setVisibility(View.GONE);
-                editingItem = null;
+                editingPlan = null;
                 etNewPlan.setText("");
             } else {
                 llAddPlan.setVisibility(View.VISIBLE);
@@ -153,26 +170,23 @@ public class PlanActivity extends BaseActivity {
 
         String dateStr = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, day);
 
-        FirebaseFirestore.getInstance()
-                .collection("couple_plans")
-                .whereEqualTo("coupleId", coupleId)
-                .whereEqualTo("date", dateStr)
-                .get()
+        planRepository.getPlansByDate(coupleId, dateStr)
                 .addOnSuccessListener(querySnapshot -> {
-                    List<ScheduleAdapter.ScheduleItem> dayPlans = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : querySnapshot) {
-                        String content = doc.getString("content");
-                        if (content != null) {
-                            dayPlans.add(new ScheduleAdapter.ScheduleItem(doc.getId(), content));
-                        }
-                    }
-                    scheduleAdapter.setSchedules(dayPlans);
+                    List<Plan> plans = PlanRepository.convertToPlanList(querySnapshot);
+                    scheduleAdapter.setSchedules(plans);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    scheduleAdapter.setSchedules(new ArrayList<>());
                 });
     }
 
     private void savePlan() {
         String content = etNewPlan.getText().toString().trim();
-        if (content.isEmpty()) return;
+        if (content.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập nội dung", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         String coupleId = getCoupleId();
         if (coupleId == null) return;
@@ -182,52 +196,44 @@ public class PlanActivity extends BaseActivity {
                 selectedDate.get(Calendar.MONTH) + 1,
                 selectedDate.get(Calendar.DAY_OF_MONTH));
 
-        if (editingItem != null) {
-            FirebaseFirestore.getInstance()
-                    .collection("couple_plans")
-                    .document(editingItem.getId())
-                    .update("content", content)
+        // Nếu đang edit plan có sẵn
+        if (editingPlan != null) {
+            planRepository.updatePlanContent(editingPlan.getId(), content)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(this, "Đã cập nhật kế hoạch", Toast.LENGTH_SHORT).show();
-                        etNewPlan.setText("");
-                        editingItem = null;
-                        llAddPlan.setVisibility(View.GONE);
+                        resetPlanForm();
                         loadPlansForDate(selectedDate.get(Calendar.YEAR),
                                 selectedDate.get(Calendar.MONTH),
                                 selectedDate.get(Calendar.DAY_OF_MONTH));
                     })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
-        } else {
-            FirebaseFirestore.getInstance()
-                    .collection("couple_plans")
-                    .add(new PlanItem(coupleId, dateStr, content))
+                    .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
+        }
+        // Nếu thêm mới plan
+        else {
+            Plan newPlan = new Plan(coupleId, dateStr, content);
+            planRepository.addPlan(newPlan)
                     .addOnSuccessListener(docRef -> {
                         Toast.makeText(this, "Đã thêm kế hoạch", Toast.LENGTH_SHORT).show();
-                        etNewPlan.setText("");
-                        llAddPlan.setVisibility(View.GONE);
+                        resetPlanForm();
                         loadPlansForDate(selectedDate.get(Calendar.YEAR),
                                 selectedDate.get(Calendar.MONTH),
                                 selectedDate.get(Calendar.DAY_OF_MONTH));
                     })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi thêm: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi thêm: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
         }
     }
 
-    public static class PlanItem {
-        private String coupleId;
-        private String date;
-        private String content;
-
-        public PlanItem() {}
-        public PlanItem(String coupleId, String date, String content) {
-            this.coupleId = coupleId;
-            this.date = date;
-            this.content = content;
-        }
-
-        public String getCoupleId() { return coupleId; }
-        public String getDate() { return date; }
-        public String getContent() { return content; }
+    /**
+     * Reset form nhập plan
+     */
+    private void resetPlanForm() {
+        etNewPlan.setText("");
+        editingPlan = null;
+        llAddPlan.setVisibility(View.GONE);
     }
 
     @Override

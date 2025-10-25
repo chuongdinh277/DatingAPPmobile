@@ -3,6 +3,7 @@ package com.example.couple_app.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -75,17 +76,35 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     class SentMessageViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage, tvTime;
+        ImageView ivReadStatus;
 
         SentMessageViewHolder(View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tv_message_sent);
             tvTime = itemView.findViewById(R.id.tv_time_sent);
+            ivReadStatus = itemView.findViewById(R.id.iv_read_status);
         }
 
         void bind(Message message) {
             tvMessage.setText(message.getMessage());
             if (message.getTimestamp() != null) {
                 tvTime.setText(formatTime(message.getTimestamp()));
+            }
+
+            // ✅ Chỉ hiển thị tick đôi khi người nhận ĐÃ ĐỌC tin nhắn
+            if (ivReadStatus != null) {
+                if (message.isRead()) {
+                    // Người nhận đã xem -> Hiển thị tick đôi màu xanh
+                    ivReadStatus.setVisibility(View.VISIBLE);
+                    ivReadStatus.setImageResource(R.drawable.ic_check_double);
+                    // Có thể đổi màu thành xanh để dễ nhận biết
+                    ivReadStatus.setColorFilter(0xFF4FC3F7); // Màu xanh nhạt
+                } else {
+                    // Tin nhắn đã gửi nhưng chưa được đọc -> Hiển thị tick đơn màu trắng
+                    ivReadStatus.setVisibility(View.VISIBLE);
+                    ivReadStatus.setImageResource(R.drawable.ic_check_single);
+                    ivReadStatus.setColorFilter(0xFFE8E8E8); // Màu trắng/xám nhạt
+                }
             }
         }
     }

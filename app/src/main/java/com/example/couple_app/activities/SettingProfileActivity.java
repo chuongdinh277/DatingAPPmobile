@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -27,25 +26,24 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.couple_app.R;
 import com.example.couple_app.managers.AuthManager;
 import com.example.couple_app.managers.DatabaseManager;
+import com.example.couple_app.managers.StorageManager;
 import com.example.couple_app.models.User;
 import com.example.couple_app.utils.AvatarCache;
+import com.example.couple_app.viewmodels.AvatarViewModel;
+import com.example.couple_app.viewmodels.UserProfileData;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -78,6 +76,7 @@ public class SettingProfileActivity extends BaseActivity {
     private AuthManager authManager;
     private FirebaseUser currentUser;
     private User currentUserData;
+    private AvatarViewModel avatarViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,6 +85,9 @@ public class SettingProfileActivity extends BaseActivity {
 
         initViews();
         initManagers();
+
+        // Initialize ViewModel
+        avatarViewModel = new ViewModelProvider(this).get(AvatarViewModel.class);
 
         currentUser = authManager.getCurrentUser();
         if (currentUser == null) {
@@ -236,44 +238,23 @@ public class SettingProfileActivity extends BaseActivity {
     }
 
     private void loadAvatar() {
+        String userId = currentUser.getUid();
+
+        // Observe avatar from ViewModel
+        avatarViewModel.getAvatar(userId).observe(this, bitmap -> {
+            if (bitmap != null) {
+                ivUserImage.setImageBitmap(bitmap);
+            }
+        });
+
+        // Load avatar if not cached in ViewModel
+        avatarViewModel.loadAvatar(userId);
+
+        // Fallback to old cache if ViewModel doesn't have it yet
         Bitmap cachedAvatar = AvatarCache.getCachedBitmap(this);
         if (cachedAvatar != null) {
             ivUserImage.setImageBitmap(cachedAvatar);
-        } else {
-            dbManager.getUser(currentUser.getUid(), new DatabaseManager.DatabaseCallback<User>() {
-                @Override
-                public void onSuccess(User user) {
-                    if (user != null && !TextUtils.isEmpty(user.getProfilePicUrl())) {
-                        loadImageFromUrl(user.getProfilePicUrl());
-                    } else if (currentUser.getPhotoUrl() != null) {
-                        loadImageFromUrl(currentUser.getPhotoUrl().toString());
-                    }
-                }
-                @Override
-                public void onError(String error) {
-                    Log.w(TAG, "Failed to get user data for avatar: " + error);
-                }
-            });
         }
-    }
-
-    private void loadImageFromUrl(String urlStr) {
-        ioExecutor.execute(() -> {
-            try {
-                URL url = new URL(urlStr);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                Bitmap bmp = BitmapFactory.decodeStream(input);
-                if (bmp != null) {
-                    AvatarCache.saveBitmapToCache(getApplicationContext(), bmp);
-                    mainHandler.post(() -> ivUserImage.setImageBitmap(bmp));
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error loading image from URL", e);
-            }
-        });
     }
 
     private void saveProfileChanges() {
@@ -308,41 +289,29 @@ public class SettingProfileActivity extends BaseActivity {
     }
 
     private void uploadAvatarAndThenUpdateAllData(ProgressDialog dialog, String username, String dob, String startLoveDate, String gender) {
-        String apiKey = getString(R.string.imgbb_api_key);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        newAvatarBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
-        String base64Image = Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
+        // Upload to Firebase Storage instead of imgbb
+        StorageManager.getInstance().uploadAvatar(newAvatarBitmap, currentUser.getUid(), new StorageManager.UploadCallback() {
+            @Override
+            public void onSuccess(String downloadUrl) {
+                mainHandler.post(() -> {
+                    Log.d(TAG, "Avatar uploaded to Firebase Storage: " + downloadUrl);
+                    updateAllData(dialog, username, dob, startLoveDate, gender, downloadUrl);
+                });
+            }
 
-        ioExecutor.execute(() -> {
-            try {
-                URL url = new URL("https://api.imgbb.com/1/upload?key=" + apiKey);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setDoOutput(true);
-                String body = "image=" + URLEncoder.encode(base64Image, "UTF-8");
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(body.getBytes());
-                }
-
-                InputStream is = conn.getResponseCode() == 200 ? conn.getInputStream() : conn.getErrorStream();
-                ByteArrayOutputStream result = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = is.read(buffer)) != -1) result.write(buffer, 0, length);
-                String responseStr = result.toString("UTF-8");
-
-                if (conn.getResponseCode() == 200) {
-                    String imageUrl = new JSONObject(responseStr).getJSONObject("data").getString("url");
-                    updateAllData(dialog, username, dob, startLoveDate, gender, imageUrl);
-                } else {
-                    throw new Exception("Upload failed: " + responseStr);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Avatar upload failed", e);
+            @Override
+            public void onError(String error) {
                 mainHandler.post(() -> {
                     dialog.dismiss();
-                    Toast.makeText(this, "Avatar upload failed.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SettingProfileActivity.this, "Avatar upload failed: " + error, Toast.LENGTH_LONG).show();
                     setEditingState(true);
+                });
+            }
+
+            @Override
+            public void onProgress(int progress) {
+                mainHandler.post(() -> {
+                    dialog.setMessage("Uploading avatar... " + progress + "%");
                 });
             }
         });
@@ -422,11 +391,26 @@ public class SettingProfileActivity extends BaseActivity {
         AvatarCache.clearCache(getApplicationContext());
 
         if (newAvatarBitmap != null) {
+            // Save to AvatarCache
             AvatarCache.saveBitmapToCache(getApplicationContext(), newAvatarBitmap);
+
+            // Update UserProfileData shared cache for HomeMain fragments
+            UserProfileData profileData = UserProfileData.getInstance();
+            profileData.setCurrentUserAvatar(newAvatarBitmap);
+
+            // Update AvatarViewModel cache
+            String avatarUrl = currentUserData != null ? currentUserData.getProfilePicUrl() : null;
+            avatarViewModel.updateAvatar(currentUser.getUid(), newAvatarBitmap, avatarUrl);
+
+            Log.d(TAG, "Avatar cache, UserProfileData, and AvatarViewModel updated successfully");
         }
+
         dialog.dismiss();
         Toast.makeText(SettingProfileActivity.this, "Profile updated successfully!", Toast.LENGTH_SHORT).show();
         setEditingState(false);
+
+        // Set result to notify calling activity to refresh
+        setResult(RESULT_OK);
     }
 
     @Override

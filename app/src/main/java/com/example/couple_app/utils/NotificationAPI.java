@@ -20,7 +20,9 @@ import java.util.concurrent.Executors;
 /**
  * Utility class để gửi notification qua backend API
  * Thay thế Socket.IO vì Vercel không hỗ trợ WebSocket
+ * github backend: https://github.com/Anhnguyen0812/noti_android
  */
+
 public class NotificationAPI {
     private static final String TAG = "NotificationAPI";
 

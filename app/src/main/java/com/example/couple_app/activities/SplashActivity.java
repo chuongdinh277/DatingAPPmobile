@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.couple_app.R;
 import com.example.couple_app.managers.DatabaseManager;
 import com.example.couple_app.models.Couple;
-import com.example.couple_app.utils.LoginPreferences;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -46,11 +45,9 @@ public class SplashActivity extends AppCompatActivity {
      * - Nếu đã đăng nhập và đã có couple -> HomeMainActivity
      */
     private void checkUserStatus() {
-        // Kiểm tra SharedPreferences và Firebase Auth
-        boolean isLoggedIn = LoginPreferences.isLoggedIn(this);
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if (!isLoggedIn || currentUser == null) {
+        if (currentUser == null) {
             // Người dùng chưa đăng nhập -> chuyển đến WelcomeActivity
             Log.d(TAG, "User not logged in, navigating to WelcomeActivity");
             MapToAuth();

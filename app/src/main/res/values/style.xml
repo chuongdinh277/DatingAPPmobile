@@ -23,10 +23,7 @@
         <item name="android:textColor">#333333</item>
     </style>
 
-    <style name="RoundedImageView">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">20dp</item>
-    </style>
+
 
     <style name="ProfileLabel" parent="Widget.AppCompat.TextView">
         <item name="android:layout_width">wrap_content</item>

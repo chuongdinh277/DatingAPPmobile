@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -340,8 +342,12 @@ public class MessengerActivity extends BaseActivity {
         btnSend.setOnClickListener(v -> sendMessage());
 
         etMessage.setOnEditorActionListener((v, actionId, event) -> {
-            sendMessage();
-            return true;
+            // Kiểm tra xem có phải là sự kiện gửi tin nhắn không
+            if (actionId == EditorInfo.IME_ACTION_SEND || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                sendMessage();
+                return true;
+            }
+            return false;
         });
     }
 
@@ -407,6 +413,11 @@ public class MessengerActivity extends BaseActivity {
                 messageList.add(message);
                 messageAdapter.updateMessages(messageList);
                 rvMessages.smoothScrollToPosition(messageList.size() - 1);
+
+                // ✅ Nếu tin nhắn từ người khác và Activity đang active → Đánh dấu đã đọc ngay lập tức
+                if (!chatMessage.getSenderId().equals(currentUserId) && isMessengerActive) {
+                    markMessageAsReadImmediately(chatMessage.getMessageId());
+                }
             }
 
             @Override
@@ -414,6 +425,36 @@ public class MessengerActivity extends BaseActivity {
                 Log.e("MessengerActivity", "Error listening for new messages: " + error);
             }
         });
+
+        // ✅ Thêm listener để cập nhật trạng thái đã đọc real-time
+        setupReadStatusListener();
+    }
+
+    /**
+     * ✅ Đánh dấu tin nhắn đã đọc ngay lập tức khi nhận được (nếu đang mở chat)
+     */
+    private void markMessageAsReadImmediately(String messageId) {
+        if (coupleId != null && messageId != null) {
+            chatManager.markMessageAsRead(coupleId, messageId, new ChatManager.MessageReadCallback() {
+                @Override
+                public void onSuccess() {
+                    Log.d("MessengerActivity", "✅ Message marked as read immediately: " + messageId);
+                    // Cập nhật trong danh sách local
+                    for (Message msg : messageList) {
+                        if (msg.getMessageId().equals(messageId)) {
+                            msg.setRead(true);
+                            msg.setReadAt(System.currentTimeMillis());
+                            break;
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+                    Log.e("MessengerActivity", "❌ Failed to mark message as read: " + error);
+                }
+            });
+        }
     }
 
     /**
@@ -448,7 +489,10 @@ public class MessengerActivity extends BaseActivity {
         }
 
         message.setMessageType("text");
-        message.setRead(false);
+
+        // ✅ Đọc trạng thái đã đọc trực tiếp từ ChatMessage (Firebase đã parse sẵn)
+        message.setRead(chatMessage.isRead());
+        message.setReadAt(chatMessage.getReadAt());
 
         return message;
     }
@@ -593,7 +637,50 @@ public class MessengerActivity extends BaseActivity {
         // ✅ Cập nhật trạng thái "đang xem chat" lên Firestore
         updateChatViewingStatus(true);
 
+        // ✅ Đánh dấu tất cả tin nhắn chưa đọc là đã đọc
+        markAllMessagesAsReadInView();
+
         Log.d("MessengerActivity", "🟢 Messenger is now ACTIVE - notifications will be suppressed");
+    }
+
+    /**
+     * ✅ Đánh dấu tất cả tin nhắn chưa đọc là đã đọc khi xem chat
+     */
+    private void markAllMessagesAsReadInView() {
+        if (coupleId != null && currentUserId != null) {
+            chatManager.markAllMessagesAsRead(coupleId, currentUserId, new ChatManager.MessageReadCallback() {
+                @Override
+                public void onSuccess() {
+                    Log.d("MessengerActivity", "✅ All unread messages marked as read");
+                    // Cập nhật UI để hiển thị trạng thái đã đọc
+                    updateMessageReadStatusInList();
+                }
+
+                @Override
+                public void onError(String error) {
+                    Log.e("MessengerActivity", "❌ Failed to mark messages as read: " + error);
+                }
+            });
+        }
+    }
+
+    /**
+     * ✅ Cập nhật trạng thái đã đọc trong danh sách tin nhắn
+     */
+    private void updateMessageReadStatusInList() {
+        boolean updated = false;
+        for (Message message : messageList) {
+            // Chỉ cập nhật tin nhắn từ người khác
+            if (!message.getSenderId().equals(currentUserId) && !message.isRead()) {
+                message.setRead(true);
+                message.setReadAt(System.currentTimeMillis());
+                updated = true;
+            }
+        }
+
+        if (updated) {
+            runOnUiThread(() -> messageAdapter.notifyDataSetChanged());
+        }
     }
 
     @Override
@@ -647,5 +734,42 @@ public class MessengerActivity extends BaseActivity {
         if (messageListener != null && coupleId != null) {
             chatManager.removeChildMessageListener(coupleId, messageListener);
         }
+    }
+
+    /**
+     * ✅ Lắng nghe thay đổi trạng thái đã đọc của tất cả tin nhắn
+     */
+    private void setupReadStatusListener() {
+        chatManager.listenForReadStatusChanges(coupleId, currentUserId, new ChatManager.ReadStatusChangeListener() {
+            @Override
+            public void onReadStatusChanged(String messageId, boolean isRead, Object readAt) {
+                Log.d("MessengerActivity", "🟢 Received read status change: messageId=" + messageId + ", isRead=" + isRead);
+
+                // Tìm và cập nhật tin nhắn trong danh sách
+                runOnUiThread(() -> {
+                    boolean found = false;
+                    for (int i = 0; i < messageList.size(); i++) {
+                        Message msg = messageList.get(i);
+                        if (msg.getMessageId() != null && msg.getMessageId().equals(messageId)) {
+                            Log.d("MessengerActivity", "🔵 Found message at position " + i + ", updating read status from " + msg.isRead() + " to " + isRead);
+                            msg.setRead(isRead);
+                            msg.setReadAt(readAt);
+                            messageAdapter.notifyItemChanged(i);
+                            found = true;
+                            Log.d("MessengerActivity", "✅ Updated read status for message: " + messageId + " isRead=" + isRead);
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        Log.w("MessengerActivity", "⚠️ Message not found in list: " + messageId);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e("MessengerActivity", "❌ Error listening for read status changes: " + error);
+            }
+        });
     }
 }

@@ -30,7 +30,7 @@ public class LoginPreferences {
         editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_PHONE, phone);
         editor.putString(KEY_LOGIN_TYPE, loginType);
-        editor.apply();
+        editor.commit(); // use commit for immediate persistence
     }
 
     public boolean isLoggedIn() {
@@ -67,7 +67,7 @@ public class LoginPreferences {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.clear();
-        editor.apply();
+        editor.commit(); // ensure immediate clear
     }
 
     // Static methods (for backward compatibility with other activities)
@@ -78,7 +78,7 @@ public class LoginPreferences {
         editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_NAME, name);
         editor.putString(KEY_USER_ID, userId);
-        editor.apply();
+        editor.commit(); // use commit to avoid race with immediate navigation
     }
 
     public static boolean isLoggedIn(Context context) {
@@ -109,6 +109,6 @@ public class LoginPreferences {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.clear();
-        editor.apply();
+        editor.commit(); // ensure immediate clear
     }
 }

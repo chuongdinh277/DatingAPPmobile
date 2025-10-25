@@ -8,11 +8,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.example.couple_app.models.ChatMessage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChatManager {
     private static final String TAG = "ChatManager";
@@ -54,6 +57,11 @@ public class ChatManager {
 
     public interface MessageListener {
         void onNewMessage(ChatMessage message);
+        void onError(String error);
+    }
+
+    public interface MessageReadCallback {
+        void onSuccess();
         void onError(String error);
     }
 
@@ -183,5 +191,180 @@ public class ChatManager {
             DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
             chatRef.removeEventListener(listener);
         }
+    }
+
+    /**
+     * Đánh dấu tin nhắn đã đọc
+     */
+    public void markMessageAsRead(String coupleId, String messageId, MessageReadCallback callback) {
+        if (coupleId == null || messageId == null) {
+            if (callback != null) callback.onError("Invalid coupleId or messageId");
+            return;
+        }
+
+        DatabaseReference messageRef = database.child(CHATS_PATH).child(coupleId).child(messageId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("read", true);
+        updates.put("readAt", ServerValue.TIMESTAMP);
+
+        messageRef.updateChildren(updates)
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Message marked as read: " + messageId);
+                if (callback != null) callback.onSuccess();
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "Error marking message as read", e);
+                if (callback != null) callback.onError(e.getMessage());
+            });
+    }
+
+    /**
+     * Đánh dấu tất cả tin nhắn chưa đọc của một cuộc trò chuyện là đã đọc
+     */
+    public void markAllMessagesAsRead(String coupleId, String currentUserId, MessageReadCallback callback) {
+        if (coupleId == null || currentUserId == null) {
+            if (callback != null) callback.onError("Invalid parameters");
+            return;
+        }
+
+        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+
+        chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> updates = new HashMap<>();
+                final int[] updateCount = {0}; // Use array to make it effectively final
+
+                for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                    String messageId = messageSnapshot.getKey();
+                    String senderId = messageSnapshot.child("senderId").getValue(String.class);
+                    Boolean isRead = messageSnapshot.child("read").getValue(Boolean.class);
+
+                    // Chỉ đánh dấu tin nhắn từ người khác và chưa đọc
+                    if (senderId != null && !senderId.equals(currentUserId) &&
+                        (isRead == null || !isRead)) {
+                        updates.put(messageId + "/read", true);
+                        updates.put(messageId + "/readAt", ServerValue.TIMESTAMP);
+                        updateCount[0]++;
+                    }
+                }
+
+                if (updateCount[0] > 0) {
+                    chatRef.updateChildren(updates)
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d(TAG, "Marked " + updateCount[0] + " messages as read");
+                            if (callback != null) callback.onSuccess();
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Error marking messages as read", e);
+                            if (callback != null) callback.onError(e.getMessage());
+                        });
+                } else {
+                    Log.d(TAG, "No unread messages to mark");
+                    if (callback != null) callback.onSuccess();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.e(TAG, "Error fetching messages to mark as read", error.toException());
+                if (callback != null) callback.onError(error.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Lắng nghe thay đổi trạng thái đã đọc của tin nhắn
+     */
+    public ValueEventListener listenForMessageReadStatus(String coupleId, String messageId, MessageReadStatusListener listener) {
+        if (coupleId == null || messageId == null) {
+            listener.onError("Invalid parameters");
+            return null;
+        }
+
+        DatabaseReference messageRef = database.child(CHATS_PATH).child(coupleId).child(messageId);
+
+        ValueEventListener valueListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Boolean isRead = snapshot.child("read").getValue(Boolean.class);
+                Object readAt = snapshot.child("readAt").getValue();
+
+                if (isRead != null && isRead) {
+                    listener.onMessageRead(readAt);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.e(TAG, "Error listening for read status", error.toException());
+                listener.onError(error.getMessage());
+            }
+        };
+
+        messageRef.addValueEventListener(valueListener);
+        return valueListener;
+    }
+
+    public interface MessageReadStatusListener {
+        void onMessageRead(Object readAt);
+        void onError(String error);
+    }
+
+    public interface ReadStatusChangeListener {
+        void onReadStatusChanged(String messageId, boolean isRead, Object readAt);
+        void onError(String error);
+    }
+
+    /**
+     * ✅ Lắng nghe thay đổi trạng thái đã đọc của tin nhắn của user hiện tại
+     */
+    public void listenForReadStatusChanges(String coupleId, String currentUserId, ReadStatusChangeListener listener) {
+        if (coupleId == null || currentUserId == null) {
+            listener.onError("Invalid parameters");
+            return;
+        }
+
+        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+
+        Log.d(TAG, "🔵 Setting up read status listener for coupleId: " + coupleId + ", userId: " + currentUserId);
+
+        // Lắng nghe thay đổi trên tất cả tin nhắn
+        chatRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
+                // Không xử lý ở đây, chỉ xử lý khi có thay đổi
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
+                String messageId = snapshot.getKey();
+                String senderId = snapshot.child("senderId").getValue(String.class);
+                Boolean isRead = snapshot.child("read").getValue(Boolean.class);
+                Object readAt = snapshot.child("readAt").getValue();
+
+                Log.d(TAG, "🟡 Message changed: " + messageId + ", senderId: " + senderId +
+                          ", isRead: " + isRead + ", currentUserId: " + currentUserId);
+
+                // Chỉ thông báo khi tin nhắn của user hiện tại được đọc
+                if (senderId != null && senderId.equals(currentUserId)) {
+                    Log.d(TAG, "✅ Read status changed for user's message: " + messageId + " -> " + isRead);
+                    listener.onReadStatusChanged(messageId, isRead != null && isRead, readAt);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot snapshot) {}
+
+            @Override
+            public void onChildMoved(DataSnapshot snapshot, String previousChildName) {}
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.e(TAG, "Error listening for read status changes", error.toException());
+                listener.onError(error.getMessage());
+            }
+        });
     }
 }

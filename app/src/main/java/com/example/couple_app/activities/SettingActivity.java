@@ -5,11 +5,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.button.MaterialButton;
 import com.example.couple_app.R;
 import com.example.couple_app.managers.AuthManager;
 import com.example.couple_app.managers.DatabaseManager;
 import com.example.couple_app.utils.AvatarCache;
+import com.example.couple_app.viewmodels.AvatarViewModel;
+import com.example.couple_app.viewmodels.ImageViewModel;
+import com.example.couple_app.viewmodels.UserProfileData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -397,11 +401,56 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void performLogout() {
-        // Sign out from Firebase Authentication
-        mAuth.signOut();
+        Log.d(TAG, "Performing logout - clearing all caches");
 
-        // Clear all cached data (avatars and SharedPreferences)
+        // Sign out from Firebase Authentication FIRST
+        mAuth.signOut();
+        Log.d(TAG, "Firebase Auth signed out");
+
+        // ⭐ CRITICAL: Clear LoginPreferences with commit() for immediate write
+        android.content.SharedPreferences loginPrefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+        loginPrefs.edit()
+            .putBoolean("isLoggedIn", false)
+            .putString("userEmail", "")
+            .putString("userName", "")
+            .putString("userId", "")
+            .putBoolean("isPaired", false)
+            .putString("coupleId", "")
+            .putString("partnerName", "")
+            .commit(); // ← Use commit() instead of apply() for immediate write
+        Log.d(TAG, "LoginPreferences cleared (with commit)");
+
+        // Clear ViewModel caches (shared across app)
+        try {
+            AvatarViewModel avatarViewModel = new ViewModelProvider(this).get(AvatarViewModel.class);
+            avatarViewModel.clearCache();
+            Log.d(TAG, "AvatarViewModel cache cleared");
+        } catch (Exception e) {
+            Log.e(TAG, "Error clearing AvatarViewModel: " + e.getMessage());
+        }
+
+        try {
+            ImageViewModel imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class);
+            // ImageViewModel will be cleared automatically when Activity is destroyed
+            Log.d(TAG, "ImageViewModel will be cleared");
+        } catch (Exception e) {
+            Log.e(TAG, "Error accessing ImageViewModel: " + e.getMessage());
+        }
+
+        // Clear UserProfileData singleton
+        UserProfileData.getInstance().clearAll();
+        Log.d(TAG, "UserProfileData cache cleared");
+
+        // ⭐ Clear last user ID to force cache clear on next login
+        android.content.SharedPreferences userSessionPrefs = getSharedPreferences("UserSession", MODE_PRIVATE);
+        userSessionPrefs.edit()
+            .remove("last_user_id")
+            .commit(); // ← Use commit() for immediate write
+        Log.d(TAG, "Last user ID cleared from UserSession");
+
+        // Clear all cached data (avatars)
         AvatarCache.clearAllCache(this);
+        Log.d(TAG, "AvatarCache cleared");
 
         // Navigate to welcome screen and clear all previous activities
         Intent intent = new Intent(this, WelcomeActivity.class);

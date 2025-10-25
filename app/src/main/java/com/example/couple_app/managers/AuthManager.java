@@ -24,7 +24,6 @@ public class AuthManager {
 
     private AuthManager() {
         mAuth = FirebaseAuth.getInstance();
-        mAuth.getFirebaseAuthSettings().setAppVerificationDisabledForTesting(true);
     }
 
     public static synchronized AuthManager getInstance() {

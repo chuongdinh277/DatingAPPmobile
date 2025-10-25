@@ -6,8 +6,18 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Camera permissions -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
     <!-- Phone permission for phone login -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- SMS permissions for automatic code retrieval -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="com.google.android.gms.permission.READ_PHONE_STATE" />
 
     <!-- Notification permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -74,6 +84,17 @@
 
         <activity
             android:name=".activities.SignUpActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.ImageActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".activities.showImageActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustResize" />
@@ -147,6 +168,17 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="couple_app_messages" />
+
+        <!-- FileProvider for camera and file sharing -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

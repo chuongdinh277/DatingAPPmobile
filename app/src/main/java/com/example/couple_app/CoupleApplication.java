@@ -7,6 +7,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.example.couple_app.utils.AvatarCache;
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory;
 
 public class CoupleApplication extends Application {
     private static final String TAG = "CoupleApplication";
@@ -19,6 +21,13 @@ public class CoupleApplication extends Application {
         try {
             // Initialize Firebase
             FirebaseApp.initializeApp(this);
+
+            // Initialize Firebase App Check with Play Integrity (FIX for error 17093)
+            FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
+            firebaseAppCheck.installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance()
+            );
+            Log.d(TAG, "Firebase App Check initialized with Play Integrity");
 
             // Configure Firebase Realtime Database
             FirebaseDatabase database = FirebaseDatabase.getInstance();

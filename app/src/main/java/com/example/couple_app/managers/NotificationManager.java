@@ -1,22 +1,26 @@
 package com.example.couple_app.managers;
 
 import android.util.Log;
-import com.example.couple_app.models.User;
-import com.example.couple_app.utils.FCMNotificationSender;
-import com.google.firebase.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
-/**
- * Manager để xử lý thông báo
- * GỬI TRỰC TIẾP từ app qua FCM API (không cần Cloud Functions)
- */
+import androidx.annotation.NonNull;
+
+import com.example.couple_app.models.Notification;
+import com.google.firebase.database.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class NotificationManager {
     private static final String TAG = "NotificationManager";
     private static NotificationManager instance;
-    private static final String NOTIFICATIONS_COLLECTION = "notifications";
+    private final DatabaseReference rootRef;
 
-    private NotificationManager() {}
+    private static final String NOTIFICATION_PATH = "notifications";
+
+    private NotificationManager() {
+        String url = "https://couples-app-b83be-default-rtdb.firebaseio.com/";
+        rootRef = FirebaseDatabase.getInstance(url).getReference();
+    }
 
     public static synchronized NotificationManager getInstance() {
         if (instance == null) {
@@ -25,146 +29,102 @@ public class NotificationManager {
         return instance;
     }
 
-    /**
-     * Gửi thông báo tin nhắn mới TRỰC TIẾP đến đối phương
-     * Sử dụng FCM API để gửi notification ngay lập tức
-     */
-    public void sendMessageNotification(String recipientUserId, String senderName, String messageText, String coupleId, String senderId) {
-        // Lấy FCM token của người nhận
-        DatabaseManager.getInstance().getUser(recipientUserId, new DatabaseManager.DatabaseCallback<User>() {
+    public interface NotificationCallback {
+        void onSuccess();
+        void onError(String error);
+    }
+
+    public interface NotificationListCallback {
+        void onSuccess(List<Notification> notifications);
+        void onError(String error);
+    }
+
+    public interface NotificationSingleCallback {
+        void onSuccess(Notification notification);
+        void onError(String error);
+    }
+
+    public void createNotification(String senderId, String receiverId, String message, NotificationCallback callback) {
+        DatabaseReference receiverRef = rootRef.child(NOTIFICATION_PATH).child(receiverId);
+        String notificationId = receiverRef.push().getKey();
+
+        if (notificationId == null) {
+            callback.onError("Không thể tạo ID cho thông báo");
+            return;
+        }
+
+        Notification notification = new Notification(senderId, receiverId, message);
+
+        receiverRef.child(notificationId)
+                .setValue(notification)
+                // Lấy notificationId vừa tạo cập nhật vào bên trong thuộc tính của của đối tượng notification cho đồng bộ
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Tạo notification thành công");
+                    receiverRef.child(notificationId).child("notificationId")
+                            .setValue(notificationId)
+                            .addOnSuccessListener(unused -> Log.d(TAG, "Cập nhật notificationId thành công"))
+                            .addOnFailureListener(e -> Log.e(TAG, "Lỗi khi cập nhật notificationId", e));
+                    callback.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Lỗi khi tạo notification", e);
+                    callback.onError(e.getMessage());
+                });
+    }
+
+    public void getListNotifications(String receiverId, NotificationListCallback callback) {
+        DatabaseReference receiverRef = rootRef.child(NOTIFICATION_PATH).child(receiverId);
+        receiverRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onSuccess(User recipient) {
-                String fcmToken = recipient.getFcmToken();
-                if (fcmToken != null && !fcmToken.isEmpty()) {
-                    // Gửi notification TRỰC TIẾP qua FCM API
-                    sendDirectNotification(fcmToken, senderName, messageText, coupleId, senderId, recipientUserId);
-                } else {
-                    Log.w(TAG, "Recipient doesn't have FCM token");
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Notification> list = new ArrayList<>();
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    Notification n = child.getValue(Notification.class);
+                    if (n != null) {
+                        list.add(n);
+                    }
                 }
+                callback.onSuccess(list);
             }
 
             @Override
-            public void onError(String error) {
-                Log.e(TAG, "Error getting recipient user: " + error);
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.getMessage());
             }
         });
     }
 
-    /**
-     * Gửi notification trực tiếp qua FCM API
-     */
-    private void sendDirectNotification(String fcmToken, String senderName, String messageText,
-                                       String coupleId, String senderId, String recipientUserId) {
-        // Truncate message nếu quá dài
-        String displayMessage = messageText.length() > 100
-            ? messageText.substring(0, 97) + "..."
-            : messageText;
-
-        FCMNotificationSender.sendNotification(
-            fcmToken,
-            senderName,
-            displayMessage,
-            coupleId,
-            senderId,
-            senderName,
-            new FCMNotificationSender.NotificationCallback() {
-                @Override
-                public void onSuccess(String response) {
-                    Log.d(TAG, "✅ Notification sent successfully to " + recipientUserId);
-                    // Optional: Lưu log vào Firestore để tracking
-                    saveNotificationLog(recipientUserId, senderId, senderName, messageText, true, null);
-                }
-
-                @Override
-                public void onError(String error) {
-                    Log.e(TAG, "❌ Failed to send notification: " + error);
-                    // Optional: Lưu log lỗi
-                    saveNotificationLog(recipientUserId, senderId, senderName, messageText, false, error);
-
-                    // Fallback: Tạo notification document cho Cloud Function xử lý (nếu có)
-                    createNotificationDocumentFallback(recipientUserId, senderName, messageText, coupleId, senderId, fcmToken);
+    public void getNotification(String receiverId, String notificationId, NotificationSingleCallback callback) {
+        DatabaseReference notiRef = rootRef.child(NOTIFICATION_PATH).child(receiverId).child(notificationId);
+        notiRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Notification n = snapshot.getValue(Notification.class);
+                if (n != null) {
+                    callback.onSuccess(n);
+                } else {
+                    callback.onError("Không tìm thấy thông báo");
                 }
             }
-        );
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.getMessage());
+            }
+        });
     }
 
-    /**
-     * Lưu log notification (optional - để tracking và debug)
-     */
-    private void saveNotificationLog(String recipientId, String senderId, String senderName,
-                                     String messageText, boolean success, String error) {
-        Map<String, Object> log = new HashMap<>();
-        log.put("recipientId", recipientId);
-        log.put("senderId", senderId);
-        log.put("senderName", senderName);
-        log.put("messageText", messageText);
-        log.put("success", success);
-        log.put("timestamp", Timestamp.now());
-
-        if (error != null) {
-            log.put("error", error);
-        }
-
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-            .collection("notification_logs")
-            .add(log)
-            .addOnSuccessListener(ref -> Log.d(TAG, "Notification log saved"))
-            .addOnFailureListener(e -> Log.e(TAG, "Error saving notification log", e));
+    public void deleteNotification(String receiverId, String notificationId, NotificationCallback callback) {
+        DatabaseReference notiRef = rootRef.child(NOTIFICATION_PATH).child(receiverId).child(notificationId);
+        notiRef.removeValue()
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    /**
-     * Tạo notification document làm fallback (nếu gửi trực tiếp thất bại)
-     * Cloud Function sẽ xử lý nếu có
-     */
-    private void createNotificationDocumentFallback(String recipientUserId, String senderName, String messageText,
-                                                   String coupleId, String senderId, String fcmToken) {
-        Map<String, Object> notification = new HashMap<>();
-        notification.put("recipientUserId", recipientUserId);
-        notification.put("fcmToken", fcmToken);
-        notification.put("title", senderName);
-        notification.put("body", messageText);
-        notification.put("coupleId", coupleId);
-        notification.put("senderId", senderId);
-        notification.put("senderName", senderName);
-        notification.put("type", "message");
-        notification.put("timestamp", Timestamp.now());
-        notification.put("sent", false);
-        notification.put("isFallback", true);
-
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-            .collection(NOTIFICATIONS_COLLECTION)
-            .add(notification)
-            .addOnSuccessListener(ref -> Log.d(TAG, "Fallback notification document created"))
-            .addOnFailureListener(e -> Log.e(TAG, "Error creating fallback notification", e));
-    }
-
-    /**
-     * LEGACY METHOD - Tạo notification document trong Firestore
-     * Giữ lại để tương thích với Cloud Function (nếu có)
-     */
-    @Deprecated
-    private void createNotificationDocument(String recipientUserId, String senderName, String messageText,
-                                           String coupleId, String senderId, String fcmToken) {
-        Map<String, Object> notification = new HashMap<>();
-        notification.put("recipientUserId", recipientUserId);
-        notification.put("fcmToken", fcmToken);
-        notification.put("title", senderName);
-        notification.put("body", messageText);
-        notification.put("coupleId", coupleId);
-        notification.put("senderId", senderId);
-        notification.put("senderName", senderName);
-        notification.put("type", "message");
-        notification.put("timestamp", Timestamp.now());
-        notification.put("sent", false);
-
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-            .collection(NOTIFICATIONS_COLLECTION)
-            .add(notification)
-            .addOnSuccessListener(documentReference -> {
-                Log.d(TAG, "Notification document created: " + documentReference.getId());
-            })
-            .addOnFailureListener(e -> {
-                Log.e(TAG, "Error creating notification document", e);
-            });
+    public void deleteAllNotifications(String receiverId, NotificationCallback callback) {
+        DatabaseReference receiverRef = rootRef.child(NOTIFICATION_PATH).child(receiverId);
+        receiverRef.removeValue()
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 }

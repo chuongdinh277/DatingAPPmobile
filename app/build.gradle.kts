@@ -33,16 +33,31 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
-    // Google Play Services for Google Sign-In
+    implementation(libs.firebase.messaging)
+
+    // Firebase App Check (IMPORTANT for fixing error 17093)
+    implementation("com.google.firebase:firebase-appcheck-playintegrity:19.0.1")
+
+    // Google Play Services for Phone Auth (REQUIRED for SMS verification)
     implementation(libs.play.services.auth)
+    implementation("com.google.android.gms:play-services-auth-api-phone:18.3.0")
+
+    // Play Integrity API (replaces deprecated SafetyNet)
+    implementation("com.google.android.play:integrity:1.5.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.recyclerview)
     implementation(libs.cardview)
-    implementation(libs.firebase.messaging)
     implementation("de.hdodenhof:circleimageview:3.1.0")
-    
+    implementation(libs.firebase.storage)
+
+    // Lifecycle components (ViewModel & LiveData)
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

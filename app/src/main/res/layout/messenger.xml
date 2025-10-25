@@ -6,12 +6,6 @@
     android:layout_height="match_parent"
     android:background="#FCC9E0">
 
-    <include
-        android:id="@+id/header"
-        layout="@layout/layout_header"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Nút back riêng cho màn hình Message -->
     <ImageButton
@@ -25,7 +19,7 @@
         android:src="@drawable/left_arrow"
         android:scaleType="fitCenter"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/iv_messenger_avatar"
@@ -39,7 +33,7 @@
         android:clipToOutline="true"
         android:outlineProvider="background"
         app:layout_constraintStart_toEndOf="@id/btn_back_messenger"
-        app:layout_constraintTop_toBottomOf="@id/header" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_messenger"
@@ -52,7 +46,7 @@
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/btn_back_messenger"
-        app:layout_constraintTop_toBottomOf="@id/header" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/llayout_chat"

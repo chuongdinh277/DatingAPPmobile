@@ -9,6 +9,7 @@ public class Message extends ChatMessage {
     private String senderName;
     private String messageType; // "text", "image", "emoji"
     private boolean isRead;
+    private Object readAt; // Timestamp when message was read
 
     // Default constructor required for Firebase
     public Message() {
@@ -21,6 +22,7 @@ public class Message extends ChatMessage {
         this.senderName = senderName;
         this.messageType = "text";
         this.isRead = false;
+        this.readAt = null;
     }
 
     // Additional getters and setters for new fields
@@ -38,4 +40,7 @@ public class Message extends ChatMessage {
 
     public boolean isRead() { return isRead; }
     public void setRead(boolean read) { isRead = read; }
+
+    public Object getReadAt() { return readAt; }
+    public void setReadAt(Object readAt) { this.readAt = readAt; }
 }

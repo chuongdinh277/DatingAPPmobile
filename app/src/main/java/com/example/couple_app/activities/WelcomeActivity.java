@@ -26,10 +26,15 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 public class WelcomeActivity extends AppCompatActivity {
+    private static final String TAG = "WelcomeActivity";
+
     @SuppressWarnings("deprecation")
     private GoogleSignInClient mGoogleSignInClient;
     private ActivityResultLauncher<Intent> googleSignInLauncher;
     private FirebaseAuth mAuth;
+
+    private boolean isNavigating = false; // Prevent multiple navigations
+    private boolean isSigningIn = false; // Avoid premature state checks during sign-in
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,14 +64,19 @@ public class WelcomeActivity extends AppCompatActivity {
             googleSignInLauncher = registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     result -> {
-                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        // If user cancelled or no data, end signing state
+                        if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+                            isSigningIn = false;
+                            return;
+                        }
+                        try {
                             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                            try {
-                                GoogleSignInAccount account = task.getResult(ApiException.class);
-                                firebaseAuthWithGoogle(account.getIdToken());
-                            } catch (ApiException e) {
-                                Toast.makeText(this, "Google sign in failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            GoogleSignInAccount account = task.getResult(ApiException.class);
+                            // Keep isSigningIn = true until Firebase auth completes
+                            firebaseAuthWithGoogle(account.getIdToken());
+                        } catch (ApiException e) {
+                            isSigningIn = false;
+                            Toast.makeText(this, "Google sign in failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -135,51 +145,69 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Chỉ check login state khi activity đã được resume hoàn toàn
-        checkLoginState();
+        // Only check login state if not already navigating or in the middle of sign-in flow
+        if (!isNavigating && !isSigningIn) {
+            checkLoginState();
+        }
     }
 
     private void checkLoginState() {
         // Đảm bảo activity không bị destroyed
-        if (isDestroyed() || isFinishing()) {
+        if (isDestroyed() || isFinishing() || isNavigating) {
             return;
         }
 
         try {
-            // Check SharedPreferences first
-            if (LoginPreferences.isLoggedIn(this)) {
-                // Also check Firebase Auth state
-                FirebaseUser currentUser = mAuth.getCurrentUser();
-                if (currentUser != null) {
-                    // Kiểm tra xem user đã paired chưa
-                    android.content.SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
-                    boolean isPaired = prefs.getBoolean("isPaired", false);
-                    String coupleId = prefs.getString("coupleId", "");
-                    String partnerName = prefs.getString("partnerName", "");
+            android.util.Log.d(TAG, "Checking login state...");
 
-                    if (isPaired && !coupleId.isEmpty()) {
-                        // User đã paired, chuyển thẳng vào HomeMainActivity
-                        android.util.Log.d("WelcomeActivity", "User already paired, navigating to HomeMainActivity");
-                        navigateToHome(coupleId, partnerName);
-                    } else {
-                        // User đã đăng nhập nhưng chưa paired, chuyển vào PairingActivity
-                        android.util.Log.d("WelcomeActivity", "User logged in but not paired, navigating to PairingActivity");
-                        navigateToPairing();
-                    }
+            // Use FirebaseAuth as the source of truth
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if (currentUser != null) {
+                android.util.Log.d(TAG, "Firebase user present: " + currentUser.getEmail());
+
+                // Ensure SharedPreferences reflect current state
+                if (!LoginPreferences.isLoggedIn(this)) {
+                    LoginPreferences.saveLoginState(
+                        this,
+                        true,
+                        currentUser.getEmail() != null ? currentUser.getEmail() : "",
+                        currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "",
+                        currentUser.getUid()
+                    );
+                }
+
+                // Check cached pairing info first
+                android.content.SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+                boolean isPaired = prefs.getBoolean("isPaired", false);
+                String coupleId = prefs.getString("coupleId", "");
+                String partnerName = prefs.getString("partnerName", "");
+
+                if (isPaired && !coupleId.isEmpty()) {
+                    android.util.Log.d(TAG, "Cached pairing found, navigating to HomeMainActivity");
+                    navigateToHomeMain(coupleId, partnerName);
                 } else {
-                    // Firebase user is null, clear login state
-                    LoginPreferences.saveLoginState(this, false, "", "", "");
-                    android.util.Log.d("WelcomeActivity", "Firebase user is null, staying on welcome screen");
+                    android.util.Log.d(TAG, "Pairing info not cached, checking database...");
+                    checkPairingStatus(currentUser);
                 }
             } else {
-                android.util.Log.d("WelcomeActivity", "User not logged in, staying on welcome screen");
+                android.util.Log.d(TAG, "No Firebase user, staying on welcome screen");
+                isNavigating = false; // Reset navigation flag
             }
         } catch (Exception e) {
-            android.util.Log.e("WelcomeActivity", "Error checking login state", e);
+            android.util.Log.e(TAG, "Error checking login state", e);
+            isNavigating = false; // Reset on error
         }
     }
 
-    private void navigateToHome(String coupleId, String partnerName) {
+    private void navigateToHomeMain(String coupleId, String partnerName) {
+        if (isNavigating) {
+            android.util.Log.d(TAG, "Already navigating, skipping...");
+            return;
+        }
+
+        isNavigating = true;
+        android.util.Log.d(TAG, "Navigating to HomeMainActivity with coupleId: " + coupleId);
+
         Intent intent = new Intent(this, HomeMainActivity.class);
         intent.putExtra("coupleId", coupleId);
         intent.putExtra("partnerName", partnerName);
@@ -189,6 +217,14 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void navigateToPairing() {
+        if (isNavigating) {
+            android.util.Log.d(TAG, "Already navigating, skipping...");
+            return;
+        }
+
+        isNavigating = true;
+        android.util.Log.d(TAG, "Navigating to PairingActivity");
+
         Intent intent = new Intent(this, PairingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -197,9 +233,11 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void navigateToHome(FirebaseUser user) {
         // Đảm bảo activity không bị destroyed trước khi navigate
-        if (isDestroyed() || isFinishing()) {
+        if (isDestroyed() || isFinishing() || isNavigating) {
             return;
         }
+
+        android.util.Log.d(TAG, "navigateToHome called for user: " + user.getEmail());
 
         // First check if user needs pairing
         checkPairingStatus(user);
@@ -207,9 +245,11 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void checkPairingStatus(FirebaseUser user) {
         // Đảm bảo activity không bị destroyed
-        if (isDestroyed() || isFinishing()) {
+        if (isDestroyed() || isFinishing() || isNavigating) {
             return;
         }
+
+        android.util.Log.d(TAG, "Checking pairing status for user: " + user.getUid());
 
         try {
             // Check if user is already paired before going to HomeMainActivity
@@ -220,9 +260,21 @@ public class WelcomeActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(com.example.couple_app.models.Couple couple) {
                     // Kiểm tra lại activity state trước khi navigate
-                    if (isDestroyed() || isFinishing()) {
+                    if (isDestroyed() || isFinishing() || isNavigating) {
                         return;
                     }
+
+                    android.util.Log.d(TAG, "User is paired with couple: " + couple.getCoupleId());
+
+                    // Save pairing info to SharedPreferences
+                    android.content.SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+                    prefs.edit()
+                        .putBoolean("isPaired", true)
+                        .putString("coupleId", couple.getCoupleId())
+                        .putString("partnerName", "Partner") // You may want to fetch actual partner name
+                        .apply();
+
+                    isNavigating = true;
 
                     // User is already paired, go to HomeMainActivity
                     Intent intent = new Intent(WelcomeActivity.this, HomeMainActivity.class);
@@ -232,34 +284,51 @@ public class WelcomeActivity extends AppCompatActivity {
                         intent.putExtra("user_id", user.getUid());
                         intent.putExtra("coupleId", couple.getCoupleId());
                     }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                     try {
                         startActivity(intent);
                         finish();
                     } catch (Exception e) {
-                        android.util.Log.e("WelcomeActivity", "Error starting HomeMainActivity", e);
+                        android.util.Log.e(TAG, "Error starting HomeMainActivity", e);
+                        isNavigating = false;
                     }
                 }
 
                 @Override
                 public void onError(String error) {
                     // Kiểm tra lại activity state trước khi navigate
-                    if (isDestroyed() || isFinishing()) {
+                    if (isDestroyed() || isFinishing() || isNavigating) {
                         return;
                     }
 
+                    android.util.Log.d(TAG, "User is not paired: " + error);
+
+                    // Save pairing info to SharedPreferences
+                    android.content.SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+                    prefs.edit()
+                        .putBoolean("isPaired", false)
+                        .putString("coupleId", "")
+                        .putString("partnerName", "")
+                        .apply();
+
+                    isNavigating = true;
+
                     // User is not paired yet, go to PairingActivity
                     Intent intent = new Intent(WelcomeActivity.this, PairingActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     try {
                         startActivity(intent);
                         finish();
                     } catch (Exception e) {
-                        android.util.Log.e("WelcomeActivity", "Error starting PairingActivity", e);
+                        android.util.Log.e(TAG, "Error starting PairingActivity", e);
+                        isNavigating = false;
                     }
                 }
             });
         } catch (Exception e) {
-            android.util.Log.e("WelcomeActivity", "Error in checkPairingStatus", e);
+            android.util.Log.e(TAG, "Error in checkPairingStatus", e);
+            isNavigating = false;
         }
     }
 
@@ -293,15 +362,6 @@ public class WelcomeActivity extends AppCompatActivity {
         }
     }
 
-    private void signInWithGoogle() {
-        // Clear any existing Google sign-in to force account selection
-        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
-            // After signing out, start the sign-in process which will show account picker
-            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-            googleSignInLauncher.launch(signInIntent);
-        });
-    }
-
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
 
@@ -321,12 +381,14 @@ public class WelcomeActivity extends AppCompatActivity {
                             proceedWithGoogleLogin(credential);
                         } else {
                             // Email not found in database
+                            isSigningIn = false; // release sign-in state
                             showAccountNotFoundDialog(googleEmail);
                         }
                     }
 
                     @Override
                     public void onError(String error) {
+                        isSigningIn = false; // release sign-in state on error
                         Toast.makeText(WelcomeActivity.this,
                             "Lỗi kiểm tra tài khoản: " + error, Toast.LENGTH_LONG).show();
                     }
@@ -342,6 +404,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
+                    // Clear signing state regardless of success to allow onResume checks
+                    isSigningIn = false;
+
                     if (task.isSuccessful()) {
                         // Sign in success
                         FirebaseUser user = mAuth.getCurrentUser();
@@ -372,13 +437,13 @@ public class WelcomeActivity extends AppCompatActivity {
                 .setMessage("Email " + email + " chưa được đăng ký trong hệ thống.\n\n" +
                            "Bạn cần tạo tài khoản trước khi đăng nhập bằng Google.")
                 .setPositiveButton("Đăng ký ngay", (dialog, which) -> {
-                    // Navigate to sign up screen
+                    isSigningIn = false; // user leaves to sign up
                     Intent intent = new Intent(WelcomeActivity.this, SignUpActivity.class);
                     intent.putExtra("google_email", email); // Pass Google email to pre-fill
                     startActivity(intent);
                 })
                 .setNegativeButton("Đóng", (dialog, which) -> {
-                    // Sign out from Google to clear selection
+                    isSigningIn = false; // cancel sign in
                     mGoogleSignInClient.signOut();
                 })
                 .setCancelable(false)
@@ -386,10 +451,14 @@ public class WelcomeActivity extends AppCompatActivity {
                 .show();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Check login state every time the activity starts
-        checkLoginState();
+    private void signInWithGoogle() {
+        // Mark as signing in to prevent premature state checks
+        isSigningIn = true;
+        // Clear any existing Google sign-in to force account selection
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            // After signing out, start the sign-in process which will show account picker
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            googleSignInLauncher.launch(signInIntent);
+        });
     }
 }

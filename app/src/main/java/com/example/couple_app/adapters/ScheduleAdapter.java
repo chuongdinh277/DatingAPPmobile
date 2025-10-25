@@ -5,33 +5,58 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.couple_app.R;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.couple_app.models.Plan;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter hiển thị danh sách kế hoạch trong RecyclerView
+ * Trách nhiệm: Chỉ hiển thị dữ liệu và xử lý sự kiện UI
+ */
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder> {
 
-    private List<ScheduleItem> schedules = new ArrayList<>();
-    private OnItemClickListener listener;
+    private List<Plan> schedules = new ArrayList<>();
+    private OnItemClickListener onItemClickListener;
+    private OnDeleteClickListener onDeleteClickListener;
 
+    /**
+     * Interface để xử lý sự kiện click vào item
+     */
     public interface OnItemClickListener {
-        void onItemClick(ScheduleItem item);
+        void onItemClick(Plan plan);
+    }
+
+    /**
+     * Interface để xử lý sự kiện click nút xóa
+     */
+    public interface OnDeleteClickListener {
+        void onDeleteClick(Plan plan, int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+        this.onItemClickListener = listener;
     }
 
-    public void setSchedules(List<ScheduleItem> schedules) {
-        this.schedules = schedules;
+    public void setOnDeleteClickListener(OnDeleteClickListener listener) {
+        this.onDeleteClickListener = listener;
+    }
+
+    public void setSchedules(List<Plan> schedules) {
+        this.schedules = schedules != null ? schedules : new ArrayList<>();
         notifyDataSetChanged();
+    }
+
+    public void removePlan(int position) {
+        if (position >= 0 && position < schedules.size()) {
+            schedules.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
     @NonNull
@@ -44,26 +69,22 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
 
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
-        ScheduleItem item = schedules.get(position);
-        holder.tvContent.setText(item.getContent());
+        Plan plan = schedules.get(position);
+        holder.tvContent.setText(plan.getContent());
 
+        // Xử lý click vào item để chỉnh sửa
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onItemClick(item);
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(plan);
+            }
         });
 
+        // Xử lý click nút xóa
         holder.btnDelete.setOnClickListener(v -> {
             int pos = holder.getBindingAdapterPosition();
-            if (pos == RecyclerView.NO_POSITION) return;
-            ScheduleItem current = schedules.get(pos);
-            FirebaseFirestore.getInstance()
-                    .collection("couple_plans")
-                    .document(current.getId())
-                    .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        schedules.remove(pos);
-                        notifyItemRemoved(pos);
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(v.getContext(), "Xóa thất bại", Toast.LENGTH_SHORT).show());
+            if (pos != RecyclerView.NO_POSITION && onDeleteClickListener != null) {
+                onDeleteClickListener.onDeleteClick(plan, pos);
+            }
         });
     }
 
@@ -72,6 +93,9 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         return schedules.size();
     }
 
+    /**
+     * ViewHolder chứa các view trong mỗi item
+     */
     static class ScheduleViewHolder extends RecyclerView.ViewHolder {
         TextView tvContent;
         ImageButton btnDelete;
@@ -81,18 +105,5 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
             tvContent = itemView.findViewById(R.id.tvContent);
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
-    }
-
-    public static class ScheduleItem {
-        private String id;
-        private String content;
-
-        public ScheduleItem(String id, String content) {
-            this.id = id;
-            this.content = content;
-        }
-
-        public String getId() { return id; }
-        public String getContent() { return content; }
     }
 }

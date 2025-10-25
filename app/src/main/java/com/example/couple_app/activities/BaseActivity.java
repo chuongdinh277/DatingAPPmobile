@@ -18,6 +18,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     // Khai báo các biến của bạn
     private LinearLayout llPlan, llGallery, llHome, llGame, llSettings;
     private ImageView btnPlan, btnGallery, btnHome, btnGame, btnSettings;
+    private ImageView btnHeaderGallery; // Icon gallery trong header
+    private ImageView btnNotification; // Icon notification trong header
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +52,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         btnHome = findViewById(R.id.btnHome);
         btnGame = findViewById(R.id.btnGame);
         btnSettings = findViewById(R.id.btnSettings);
+
+        // Khởi tạo header gallery button với ID riêng biệt
+        btnHeaderGallery = findViewById(R.id.btnHeaderGallery);
+        if (btnHeaderGallery != null) {
+            btnHeaderGallery.setOnClickListener(v -> openImageActivity());
+        }
+
+        // Khởi tạo header notification button
+        btnNotification = findViewById(R.id.btnNotification);
+        if (btnNotification != null) {
+            btnNotification.setOnClickListener(v -> openImageActivity());
+        }
     }
 
     protected void setupBottomBar() {
@@ -58,6 +72,16 @@ public abstract class BaseActivity extends AppCompatActivity {
         llHome.setOnClickListener(v -> navigate(v, HomeMainActivity.class));
         llGame.setOnClickListener(v -> navigate(v, GameListActivity.class));
         llSettings.setOnClickListener(v -> navigate(v, SettingActivity.class));
+    }
+
+    /**
+     * Mở ImageActivity khi click icon gallery trong header
+     */
+    private void openImageActivity() {
+        if (!this.getClass().equals(ImageActivity.class)) {
+            startActivity(new Intent(this, ImageActivity.class));
+            overridePendingTransition(0, 0);
+        }
     }
 
     private void navigate(View clickedView, Class<?> targetActivity) {

@@ -2,8 +2,10 @@ package com.example.couple_app.activities;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -12,7 +14,10 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.couple_app.R;
 import com.example.couple_app.managers.DatabaseManager;
@@ -75,8 +80,14 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void initializeFirebaseAuth() {
         mAuth = FirebaseAuth.getInstance();
+
+        // FOR DEVELOPMENT: Enable test mode to bypass device blocking
+        // This allows using test phone numbers without SMS
+        // TODO: Remove or comment out before production release
         FirebaseAuthSettings firebaseAuthSettings = mAuth.getFirebaseAuthSettings();
         firebaseAuthSettings.setAppVerificationDisabledForTesting(true);
+
+        Log.d("SignUpActivity", "Firebase Auth initialized in TEST MODE - Use test phone numbers");
     }
 
     private void initializePhoneAuthCallbacks() {

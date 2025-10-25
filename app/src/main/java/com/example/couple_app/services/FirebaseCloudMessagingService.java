@@ -122,7 +122,7 @@ public class FirebaseCloudMessagingService extends FirebaseMessagingService {
         Uri soundUri = getNotificationSoundUri();
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification) // Đảm bảo icon này tồn tại
+            .setSmallIcon(R.drawable.ic_app) // Đảm bảo icon này tồn tại
             .setContentTitle(title)
             .setContentText(messageBody)
             .setAutoCancel(true)

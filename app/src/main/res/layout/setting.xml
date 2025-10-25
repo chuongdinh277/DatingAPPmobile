@@ -6,12 +6,6 @@
     android:layout_height="match_parent"
     android:background="#FCC9E0">
 
-    <include
-        android:id="@+id/header"
-        layout="@layout/layout_header"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
         android:id="@+id/layout_buttons"
@@ -24,7 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/bt_profile"
