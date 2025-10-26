@@ -1,5 +1,6 @@
 package com.example.btl_mobileapp.activities;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
@@ -8,18 +9,16 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.btl_mobileapp.R;
 import com.example.btl_mobileapp.adapters.AIChatAdapter;
 import com.example.btl_mobileapp.managers.AIChatManager;
-import com.example.btl_mobileapp.managers.ChatMemoryManager;
 import com.example.btl_mobileapp.models.MessageChatBot;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class AiChatActivity extends AppCompatActivity {
 
@@ -29,9 +28,9 @@ public class AiChatActivity extends AppCompatActivity {
     private ImageButton btnSend;
 
     private AIChatAdapter adapter;
-    private List<MessageChatBot> messages;
     private String currentUserId = "user";
-    private String chatId = "ai_chat_session";
+    private String chatId = "AI";
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,9 +40,9 @@ public class AiChatActivity extends AppCompatActivity {
         rcChatAI = findViewById(R.id.rv_chatAI);
         edtMessage = findViewById(R.id.et_messenger);
         btnSend = findViewById(R.id.bt_sendMessage);
+        edtMessage.setText("Bạn cần tôi giúp gì không ?");
 
-        messages = new ArrayList<>(ChatMemoryManager.getInstance().getMessages(chatId));
-        adapter = new AIChatAdapter(messages, currentUserId);
+        adapter = new AIChatAdapter();
 
         rcChatAI.setLayoutManager(new LinearLayoutManager(this));
         rcChatAI.setAdapter(adapter);
@@ -55,18 +54,19 @@ public class AiChatActivity extends AppCompatActivity {
         String text = edtMessage.getText().toString().trim();
         if (text.isEmpty()) return;
 
-        // Tạo tin nhắn của user
+        //Thay đổi hiệu ứng sau khi nhấn gửi và trong thời gian chờ AI trả lời
+        edtMessage.setText("AI đang suy nghĩ trả lời câu hỏi ....");
+        edtMessage.setFocusable(false);
+        btnSend.setImageDrawable(getResources().getDrawable(R.drawable.ic_stop));
+
         MessageChatBot userMsg = new MessageChatBot(
                 currentUserId,
                 text,
                 new Date().getTime()
         );
 
-        // Cập nhật UI và lưu bộ nhớ
-        adapter.addMessage(userMsg);
-        ChatMemoryManager.getInstance().addMessage(chatId, userMsg);
+        adapter.addMessageUser(userMsg);
         rcChatAI.scrollToPosition(adapter.getItemCount() - 1);
-        edtMessage.setText("");
 
         // Gửi lên AI
         AIChatManager.sendMessageToAI(text, new AIChatManager.AICallback() {
@@ -78,8 +78,7 @@ public class AiChatActivity extends AppCompatActivity {
                             aiResponse,
                             new Date().getTime()
                     );
-                    adapter.addMessage(aiMsg);
-                    ChatMemoryManager.getInstance().addMessage(chatId, aiMsg);
+                    adapter.addMessageAI(aiMsg);
                     rcChatAI.scrollToPosition(adapter.getItemCount() - 1);
                 });
             }
@@ -92,5 +91,12 @@ public class AiChatActivity extends AppCompatActivity {
                 Log.e(TAG, "AI Error: " + error);
             }
         });
+
+        //Sau khi AI trả lời và render xong thì khôi phục lại hiệu ứng như cũ
+        edtMessage.setText("Bạn cần tôi giúp gì không ?");
+        edtMessage.setFocusable(true);
+        btnSend.setImageDrawable(getResources().getDrawable(R.drawable.ic_send));
+        ImageViewCompat.setImageTintList(btnSend, ColorStateList.valueOf(ContextCompat.getColor(this, R.color.btSend_color)));
+
     }
 }

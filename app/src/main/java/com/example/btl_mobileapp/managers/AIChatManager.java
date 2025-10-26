@@ -2,6 +2,7 @@ package com.example.btl_mobileapp.managers;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,8 +25,21 @@ public class AIChatManager {
     public static void sendMessageToAI(String userMessage, AICallback callback) {
         new Thread(() -> {
             try {
+                ChatMemoryManager memory = ChatMemoryManager.getInstance();
                 JSONObject jsonBody = new JSONObject();
-                jsonBody.put("message", userMessage);
+                JSONArray jsonHistory = new JSONArray();
+                jsonBody.put("question", userMessage);
+
+                // Biến value để lấy giá trị index min của i bởi vì hệ thống AI sẽ chỉ lấy và nhớ 5 lần trò chuyện của người dùng và AI
+                int value = (memory.getMessages("AI").size() > 5) ? memory.getMessages("AI").size() - 5 : 0;
+                for (int i = memory.getMessages("AI").size() - 1; i >= value; i--) {
+                    JSONObject jsonMessage = new JSONObject();
+                    jsonMessage.put("user", memory.getMessages("user").get(i).getContent());
+                    jsonMessage.put("AI", memory.getMessages("AI").get(i).getContent());
+                    jsonHistory.put(jsonMessage);
+                }
+
+                jsonBody.put("History", jsonHistory);
 
                 URL url = new URL(API_URL);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -51,7 +65,7 @@ public class AIChatManager {
                 }
 
                 JSONObject responseJson = new JSONObject(response.toString());
-                String aiReply = responseJson.optString("reply", "Xin lỗi, Câu hỏi của bạn nằm ngoài phạm vi của tôi.");
+                String aiReply = responseJson.optString("answer", "Xin lỗi, Câu hỏi của bạn nằm ngoài phạm vi của tôi.");
 
                 callback.onSuccess(aiReply);
 

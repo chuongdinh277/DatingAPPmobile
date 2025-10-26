@@ -85,4 +85,5 @@
     <color name="primary_text">#333333</color>
     <color name="secondary_text">#757575</color>
     <color name="accent_color">#E91E63</color>
+    <color name="btSend_color">#007AFF</color>
 </resources>

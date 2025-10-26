@@ -9,11 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.btl_mobileapp.R;
-import com.example.btl_mobileapp.models.Message;
+import com.example.btl_mobileapp.managers.ChatMemoryManager;
 import com.example.btl_mobileapp.models.MessageChatBot;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Locale;
 
 public class AIChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -21,21 +20,19 @@ public class AIChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int VIEW_TYPE_USER = 1;
     private static final int VIEW_TYPE_AI = 2;
 
-    private List<MessageChatBot> messages;
-    private String currentUserId;
-    private final SimpleDateFormat timeFormat;
+    private final ChatMemoryManager memory;
 
-    public AIChatAdapter(List<MessageChatBot> messages, String currentUserId) {
-        this.messages = messages;
-        this.currentUserId = currentUserId;
-        this.timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    public AIChatAdapter() {
+        this.memory = ChatMemoryManager.getInstance();
     }
+
 
     @Override
     public int getItemViewType(int position) {
-        MessageChatBot message = messages.get(position);
-        return message.getSenderId().equals(currentUserId) ? VIEW_TYPE_USER : VIEW_TYPE_AI;
+        return position % 2 == 0 ? VIEW_TYPE_USER : VIEW_TYPE_AI;
     }
+    // Bởi vì là trong đoạn chat Ai và người dùng thì người dùng hỏi 1 câu thì Ai phải trả lời xong đã người dùng mới hỏi tiếp
+
 
     @NonNull
     @Override
@@ -53,28 +50,38 @@ public class AIChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        MessageChatBot message = messages.get(position);
+        int index = position / 2;
 
-        if (holder instanceof UserMessageViewHolder) {
-            ((UserMessageViewHolder) holder).bind(message);
-        } else if (holder instanceof AIMessageViewHolder) {
-            ((AIMessageViewHolder) holder).bind(message);
+        if (getItemViewType(position) == VIEW_TYPE_USER) {
+            if (index < memory.getMessages("user").size()) {
+                MessageChatBot message = memory.getMessages("user").get(index);
+                ((UserMessageViewHolder) holder).bind(message);
+            }
+        } else {
+            if (index < memory.getMessages("AI").size()) {
+                MessageChatBot message = memory.getMessages("AI").get(index);
+                ((AIMessageViewHolder) holder).bind(message);
+            }
         }
     }
 
+
     @Override
     public int getItemCount() {
-        return messages.size();
+        int userSize = memory.getMessages("user").size();
+        int aiSize = memory.getMessages("AI").size();
+        return Math.max(userSize, aiSize) * 2;
     }
 
-    public void addMessage(MessageChatBot newMessage) {
-        messages.add(newMessage);
-        notifyItemInserted(messages.size() - 1);
+
+    public void addMessageUser(MessageChatBot newMessage) {
+        memory.getMessages("user").add(newMessage);
+        notifyItemInserted(memory.getMessages("user").size() - 1);
     }
 
-    public void updateMessages(List<MessageChatBot> newMessages) {
-        this.messages = newMessages;
-        notifyDataSetChanged();
+    public void addMessageAI(MessageChatBot newMessage) {
+        memory.getMessages("AI").add(newMessage);
+        notifyItemInserted(memory.getMessages("AI").size() - 1);
     }
 
     // --- ViewHolder cho User ---
@@ -106,7 +113,7 @@ public class AIChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         void bind(MessageChatBot message) {
             tvMessage.setText(message.getContent());
-            tvSenderName.setText("AI Assistant");
+            tvSenderName.setText("Chat-bot AI");
             tvTime.setText(formatTime(message.getTimestamp()));
         }
     }
