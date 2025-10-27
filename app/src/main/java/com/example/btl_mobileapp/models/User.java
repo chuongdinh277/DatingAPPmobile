@@ -4,9 +4,11 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.IgnoreExtraProperties;
 import androidx.annotation.Keep;
 
+import java.io.Serializable;
+
 @Keep
 @IgnoreExtraProperties
-public class User {
+public class User implements Serializable {
     private String userId;
     private String name;
     private String dateOfBirth; // Changed from LocalDate to String (format: "yyyy-MM-dd")
