@@ -1,14 +1,19 @@
 package com.example.btl_mobileapp.adapters;
 
+import android.content.Context; // <-- BỔ SUNG
+import android.graphics.Bitmap; // <-- BỔ SUNG
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.btl_mobileapp.R;
 import com.example.btl_mobileapp.models.Message;
+import com.example.btl_mobileapp.utils.AvatarCache; // <-- BỔ SUNG
 import com.google.firebase.auth.FirebaseAuth;
+import de.hdodenhof.circleimageview.CircleImageView; // <-- BỔ SUNG
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -21,9 +26,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<Message> messages;
     private String currentUserId;
     private SimpleDateFormat timeFormat;
+    private Context context; // <-- BỔ SUNG
 
-    public MessageAdapter(List<Message> messages) {
+    // ✅ SỬA Constructor: Thêm Context để lấy AvatarCache
+    public MessageAdapter(List<Message> messages, Context context) {
         this.messages = messages;
+        this.context = context; // <-- BỔ SUNG
         this.currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         this.timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
     }
@@ -73,6 +81,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
+    // --- ViewHolder cho tin nhắn GỬI (Không đổi) ---
     class SentMessageViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage, tvTime;
 
@@ -90,14 +99,17 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    // --- ViewHolder cho tin nhắn NHẬN (Đã sửa) ---
     class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage, tvTime, tvSenderName;
+        CircleImageView ivAvatar; // <-- BỔ SUNG: Thêm ImageView cho avatar
 
         ReceivedMessageViewHolder(View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tv_message_received);
             tvTime = itemView.findViewById(R.id.tv_time_received);
             tvSenderName = itemView.findViewById(R.id.tv_sender_name);
+            ivAvatar = itemView.findViewById(R.id.iv_avatar_received); // <-- BỔ SUNG: Tìm ID của avatar
         }
 
         void bind(Message message) {
@@ -106,9 +118,21 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if (message.getTimestamp() != null) {
                 tvTime.setText(formatTime(message.getTimestamp()));
             }
+
+            // <-- BỔ SUNG: Logic load avatar từ cache -->
+            if (ivAvatar != null) {
+                Bitmap partnerAvatar = AvatarCache.getPartnerCachedBitmap(context);
+                if (partnerAvatar != null) {
+                    ivAvatar.setImageBitmap(partnerAvatar);
+                } else {
+                    // Nếu cache rỗng, dùng ảnh mặc định từ XML
+                    ivAvatar.setImageResource(R.drawable.ic_default_avatar);
+                }
+            }
         }
     }
 
+    // --- Các hàm helper (Không đổi) ---
     private String formatTime(Object timestampObj) {
         long millis = coerceToMillis(timestampObj);
         return timeFormat.format(new java.util.Date(millis));

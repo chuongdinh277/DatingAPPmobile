@@ -51,7 +51,6 @@ public class PlanActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.plan);
 
-        // --- Khởi tạo Views (không thay đổi) ---
         calendarView = findViewById(R.id.calendarView);
         tvMonthYear = findViewById(R.id.tvMonthYear);
         tvTodayTitle = findViewById(R.id.tvTodayTitle);
@@ -62,10 +61,7 @@ public class PlanActivity extends BaseActivity {
         btnSavePlan = findViewById(R.id.btnSavePlan);
 
         rvSchedule.setLayoutManager(new LinearLayoutManager(this));
-
-        // SỬA LỖI: Thay đổi dòng này để sử dụng hàm khởi tạo mặc định (không có tham số)
         scheduleAdapter = new ScheduleAdapter();
-
         rvSchedule.setAdapter(scheduleAdapter);
 
         scheduleAdapter.setOnItemClickListener(item -> {
@@ -104,7 +100,7 @@ public class PlanActivity extends BaseActivity {
         fabAddPlan.setOnClickListener(v -> {
             if (llAddPlan.getVisibility() == View.VISIBLE) {
                 llAddPlan.setVisibility(View.GONE);
-                editingItem = null; // Đảm bảo reset trạng thái edit khi đóng
+                editingItem = null;
                 etNewPlan.setText("");
             } else {
                 llAddPlan.setVisibility(View.VISIBLE);
@@ -121,10 +117,7 @@ public class PlanActivity extends BaseActivity {
 
     private void loadCurrentUser() {
         String userId = getUserId(this);
-        if (userId == null) {
-            Toast.makeText(this, "Không tìm thấy User ID. Vui lòng đăng nhập lại.", Toast.LENGTH_LONG).show();
-            return;
-        }
+        if (userId == null) return;
 
         FirebaseFirestore.getInstance()
                 .collection("users")
@@ -133,20 +126,18 @@ public class PlanActivity extends BaseActivity {
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         currentUser = doc.toObject(User.class);
-                        // Chỉ load lịch hôm nay sau khi đã có thông tin currentUser
+
+                        // ✅ Chỉ load lịch hôm nay sau khi có currentUser
                         loadPlansForDate(selectedDate.get(Calendar.YEAR),
                                 selectedDate.get(Calendar.MONTH),
                                 selectedDate.get(Calendar.DAY_OF_MONTH));
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi tải thông tin người dùng.", Toast.LENGTH_SHORT).show();
                 });
     }
 
     private String getCoupleId() {
-        if (currentUser == null || currentUser.getPartnerId() == null || currentUser.getPartnerId().isEmpty()) {
-            Toast.makeText(this, "Bạn chưa kết đôi.", Toast.LENGTH_SHORT).show();
+        if (currentUser == null || currentUser.getPartnerId() == null) {
+            Toast.makeText(this, "Chưa có partner", Toast.LENGTH_SHORT).show();
             return null;
         }
         List<String> ids = Arrays.asList(currentUser.getUserId(), currentUser.getPartnerId());
@@ -155,15 +146,9 @@ public class PlanActivity extends BaseActivity {
     }
 
     private void loadPlansForDate(int year, int month, int day) {
-        // CẢI THIỆN: Thêm kiểm tra currentUser để tránh lỗi khi người dùng thao tác nhanh
-        if (currentUser == null) {
-            // Dữ liệu người dùng chưa tải xong, không làm gì cả
-            return;
-        }
-
         String coupleId = getCoupleId();
         if (coupleId == null) {
-            scheduleAdapter.setSchedules(new ArrayList<>()); // Xóa danh sách cũ nếu không có coupleId
+            scheduleAdapter.setSchedules(new ArrayList<>());
             return;
         }
 
@@ -183,24 +168,12 @@ public class PlanActivity extends BaseActivity {
                         }
                     }
                     scheduleAdapter.setSchedules(dayPlans);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi tải kế hoạch.", Toast.LENGTH_SHORT).show();
                 });
     }
 
     private void savePlan() {
         String content = etNewPlan.getText().toString().trim();
-        if (content.isEmpty()) {
-            Toast.makeText(this, "Nội dung không được để trống", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // CẢI THIỆN: Thêm kiểm tra currentUser
-        if (currentUser == null) {
-            Toast.makeText(this, "Thông tin người dùng chưa sẵn sàng", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (content.isEmpty()) return;
 
         String coupleId = getCoupleId();
         if (coupleId == null) return;
@@ -211,42 +184,36 @@ public class PlanActivity extends BaseActivity {
                 selectedDate.get(Calendar.DAY_OF_MONTH));
 
         if (editingItem != null) {
-            // --- Chế độ cập nhật ---
             FirebaseFirestore.getInstance()
                     .collection("couple_plans")
                     .document(editingItem.getId())
                     .update("content", content)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(this, "Đã cập nhật kế hoạch", Toast.LENGTH_SHORT).show();
-                        // TỐI ƯU: Cập nhật trực tiếp trên adapter thay vì load lại từ server
-                        scheduleAdapter.updateItem(editingItem, content);
-                        resetInputForm();
+                        etNewPlan.setText("");
+                        editingItem = null;
+                        llAddPlan.setVisibility(View.GONE);
+                        loadPlansForDate(selectedDate.get(Calendar.YEAR),
+                                selectedDate.get(Calendar.MONTH),
+                                selectedDate.get(Calendar.DAY_OF_MONTH));
                     })
                     .addOnFailureListener(e -> Toast.makeText(this, "Lỗi cập nhật", Toast.LENGTH_SHORT).show());
         } else {
-            // --- Chế độ thêm mới ---
-            PlanItem newPlan = new PlanItem(coupleId, dateStr, content);
             FirebaseFirestore.getInstance()
                     .collection("couple_plans")
-                    .add(newPlan)
+                    .add(new PlanItem(coupleId, dateStr, content))
                     .addOnSuccessListener(docRef -> {
                         Toast.makeText(this, "Đã thêm kế hoạch", Toast.LENGTH_SHORT).show();
-                        // TỐI ƯU: Thêm trực tiếp vào adapter thay vì load lại từ server
-                        scheduleAdapter.addItem(new ScheduleAdapter.ScheduleItem(docRef.getId(), content));
-                        resetInputForm();
+                        etNewPlan.setText("");
+                        llAddPlan.setVisibility(View.GONE);
+                        loadPlansForDate(selectedDate.get(Calendar.YEAR),
+                                selectedDate.get(Calendar.MONTH),
+                                selectedDate.get(Calendar.DAY_OF_MONTH));
                     })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi thêm mới: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi thêm: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         }
     }
 
-    // TỐI ƯU: Tách hàm để reset form nhập liệu
-    private void resetInputForm() {
-        etNewPlan.setText("");
-        editingItem = null;
-        llAddPlan.setVisibility(View.GONE);
-    }
-
-    // --- Định nghĩa lớp PlanItem (không thay đổi) ---
     public static class PlanItem {
         private String coupleId;
         private String date;
@@ -264,6 +231,15 @@ public class PlanActivity extends BaseActivity {
         public String getContent() { return content; }
     }
 
-    // --- Override các phương thức của BaseActivity (không thay đổi) ---
+    @Override
+    protected boolean shouldUseEdgeToEdge() {
+        // Đồng bộ với Home/Settings để bottom bar không bị đẩy lên
+        return true;
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
 }

@@ -1,18 +1,17 @@
 package com.example.btl_mobileapp.activities;
 
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-
+import android.widget.FrameLayout;
+import android.view.View;
 import com.example.btl_mobileapp.R;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.PorterDuff;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -26,6 +25,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.setContentView(R.layout.menu_button);
         initViews();
         setupBottomBar();
+
+        // Ẩn header và bottom bar nếu activity yêu cầu
+        updateUIVisibility();
     }
 
     @Override
@@ -33,6 +35,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         FrameLayout contentFrame = findViewById(R.id.baseContent);
         getLayoutInflater().inflate(layoutResID, contentFrame, true);
         updateButtonState();
+        updateUIVisibility();
     }
 
     private void initViews() {
@@ -60,7 +63,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     private void navigate(View clickedView, Class<?> targetActivity) {
         if (!this.getClass().equals(targetActivity)) {
             startActivity(new Intent(this, targetActivity));
+            overridePendingTransition(0, 0); // Tắt hiệu ứng chuyển tab
             finish();
+            overridePendingTransition(0, 0); // Tắt hiệu ứng khi finish
         }
     }
 
@@ -103,6 +108,16 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    // Cho phép activity con quyết định có hiển thị bottom bar hay không (mặc định: có)
+    protected boolean shouldShowBottomBar() { return true; }
+
+    // Cho phép activity con quyết định có hiển thị header hay không (mặc định: có)
+    protected boolean shouldShowHeader() { return true; }
+
+    // Cho phép activity con bật/tắt edge-to-edge. Mặc định: bật để đẹp, nhưng
+    // với màn hình cần adjustResize (vd. Messenger) nên tắt để bàn phím đẩy nội dung lên.
+    protected boolean shouldUseEdgeToEdge() { return true; }
+
     // Phương thức mới để thay đổi màu thanh bottom bar và giữ bo góc
     protected void setBottomBarColor(int colorResId) {
         LinearLayout bottomBar = findViewById(R.id.bottomBar);
@@ -113,12 +128,27 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+
     // Phương thức giúp tạo một GradientDrawable với màu và bán kính bo góc
     private GradientDrawable getRoundedDrawable(int colorResId, float radius) {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(ContextCompat.getColor(this, colorResId));
         drawable.setCornerRadius(radius);
         return drawable;
+    }
+
+    // Phương thức cập nhật hiển thị header và bottom bar
+    private void updateUIVisibility() {
+        View header = findViewById(R.id.header);
+        LinearLayout bottomBar = findViewById(R.id.bottomBar);
+
+        if (header != null) {
+            header.setVisibility(shouldShowHeader() ? View.VISIBLE : View.GONE);
+        }
+
+        if (bottomBar != null) {
+            bottomBar.setVisibility(shouldShowBottomBar() ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override

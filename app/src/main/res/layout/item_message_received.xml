@@ -1,48 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="start"
+    xmlns:androidList="http://schemas.android.com/tools"
+    android:gravity="start|bottom"
     android:padding="8dp"
     android:orientation="horizontal">
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_avatar_received"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_default_avatar"
+
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FFFFFF" />
     <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="48dp"
+    android:background="@drawable/bg_message_received"
+    android:orientation="vertical"
+    android:padding="12dp"
+    >
+
+    <TextView
+        android:id="@+id/tv_sender_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="48dp"
-        android:background="@drawable/bg_message_received"
-        android:orientation="vertical"
-        android:padding="12dp"
-        >
+        androidList:text="Partner"
+        android:textColor="#E91E63"
+        android:textSize="12sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tv_sender_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Partner"
-            android:textColor="#E91E63"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/tv_message_received"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Partner's message here"
+        android:textColor="#333333"
+        android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/tv_message_received"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Partner's message here"
-            android:textColor="#333333"
-            android:textSize="16sp" />
+    <TextView
+        android:id="@+id/tv_time_received"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity=""
+        android:layout_marginTop="4dp"
+        android:text="12:00"
+        android:textColor="#888888"
+        android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/tv_time_received"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="4dp"
-            android:text="12:00"
-            android:textColor="#888888"
-            android:textSize="12sp" />
-
-    </LinearLayout>
+</LinearLayout>
 
 </LinearLayout>

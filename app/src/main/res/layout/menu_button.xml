@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
 
-        android:paddingBottom="1dp"
+        android:paddingBottom="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -37,7 +37,7 @@
             android:elevation="8dp"
             android:gravity="center"
             android:orientation="horizontal"
-            android:paddingHorizontal="1dp">
+            android:paddingHorizontal="0dp">
 
             <LinearLayout
                 android:id="@+id/llPlan"

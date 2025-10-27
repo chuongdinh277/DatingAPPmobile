@@ -16,8 +16,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class AuthManager {
     private static final String TAG = "AuthManager";
@@ -220,7 +218,7 @@ public class AuthManager {
                 profileBuilder.setDisplayName(name);
             }
 
-            if (photoUrl != null) { // Allow empty string to clear photo
+            if (photoUrl != null && !photoUrl.isEmpty()) {
                 profileBuilder.setPhotoUri(android.net.Uri.parse(photoUrl));
             }
 
@@ -229,16 +227,7 @@ public class AuthManager {
             user.updateProfile(profileUpdates)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            // Create a Map to hold updates for Firestore
-                            Map<String, Object> dbUpdates = new HashMap<>();
-                            if (name != null) {
-                                dbUpdates.put("name", name);
-                            }
-                            if (photoUrl != null) {
-                                dbUpdates.put("profilePicUrl", photoUrl);
-                            }
-                            // Call the updated method in DatabaseManager
-                            DatabaseManager.getInstance().updateUserProfile(user.getUid(), dbUpdates, callback);
+                            DatabaseManager.getInstance().updateUserProfile(user.getUid(), name, photoUrl, callback);
                         } else {
                             String errorMessage = task.getException() != null ?
                                     task.getException().getMessage() : "Profile update failed";
@@ -249,7 +238,6 @@ public class AuthManager {
             callback.onError("No user signed in");
         }
     }
-
 
     public void changePassword(String newPassword, AuthActionCallback callback) {
         FirebaseUser user = mAuth.getCurrentUser();
@@ -481,5 +469,117 @@ public class AuthManager {
         } else {
             callback.onError("No user signed in");
         }
+    }
+
+    // Sign up with phone number and password (creates fake email)
+    public void signUpWithPhoneAndPassword(String phoneNumber, String password, String name, PhoneAuthCredential phoneCredential, AuthCallback callback) {
+        // First authenticate with phone
+        mAuth.signInWithCredential(phoneCredential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser phoneUser = mAuth.getCurrentUser();
+                        if (phoneUser != null) {
+                            // Generate fake email from phone number
+                            String fakeEmail = generateFakeEmail(phoneNumber);
+
+                            // Create email/password credential
+                            AuthCredential emailCredential = EmailAuthProvider.getCredential(fakeEmail, password);
+
+                            // Link email/password to phone auth
+                            phoneUser.linkWithCredential(emailCredential)
+                                    .addOnCompleteListener(linkTask -> {
+                                        if (linkTask.isSuccessful()) {
+                                            Log.d(TAG, "Email/password linked to phone auth successfully");
+                                            // Update display name
+                                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                                    .setDisplayName(name)
+                                                    .build();
+
+                                            phoneUser.updateProfile(profileUpdates)
+                                                    .addOnCompleteListener(profileTask -> {
+                                                        if (profileTask.isSuccessful()) {
+                                                            callback.onSuccess(mAuth.getCurrentUser());
+                                                        } else {
+                                                            callback.onError("Failed to update profile: " + profileTask.getException().getMessage());
+                                                        }
+                                                    });
+                                        } else {
+                                            String errorMessage = linkTask.getException() != null ?
+                                                    linkTask.getException().getMessage() : "Failed to link email/password";
+                                            Log.e(TAG, "Failed to link email/password: " + errorMessage);
+                                            callback.onError(errorMessage);
+                                        }
+                                    });
+                        }
+                    } else {
+                        String errorMessage = task.getException() != null ?
+                                task.getException().getMessage() : "Phone authentication failed";
+                        callback.onError(errorMessage);
+                    }
+                });
+    }
+
+    // Sign in with phone number and password (using fake email)
+    public void signInWithPhoneAndPassword(String phoneNumber, String password, AuthCallback callback) {
+        String fakeEmail = generateFakeEmail(phoneNumber);
+        signIn(fakeEmail, password, callback);
+    }
+
+    // Reset password after phone verification
+    public void resetPasswordWithPhone(String phoneNumber, String newPassword, PhoneAuthCredential phoneCredential, AuthActionCallback callback) {
+        // First authenticate with phone
+        mAuth.signInWithCredential(phoneCredential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            // Update password
+                            user.updatePassword(newPassword)
+                                    .addOnCompleteListener(updateTask -> {
+                                        if (updateTask.isSuccessful()) {
+                                            Log.d(TAG, "Password reset successfully");
+                                            callback.onSuccess();
+                                        } else {
+                                            String errorMessage = updateTask.getException() != null ?
+                                                    updateTask.getException().getMessage() : "Password reset failed";
+                                            callback.onError(errorMessage);
+                                        }
+                                    });
+                        } else {
+                            callback.onError("User not found");
+                        }
+                    } else {
+                        String errorMessage = task.getException() != null ?
+                                task.getException().getMessage() : "Phone authentication failed";
+                        callback.onError(errorMessage);
+                    }
+                });
+    }
+
+    // Generate fake email from phone number
+    private String generateFakeEmail(String phoneNumber) {
+        // Remove + and spaces from phone number
+        String cleanPhone = phoneNumber.replace("+", "").replace(" ", "").replace("-", "");
+        return cleanPhone + "@coupleapp.com";
+    }
+
+    // Check if phone number is registered
+    public void checkPhoneNumberRegistered(String phoneNumber, DatabaseCallback<Boolean> callback) {
+        String fakeEmail = generateFakeEmail(phoneNumber);
+        mAuth.fetchSignInMethodsForEmail(fakeEmail)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<String> signInMethods = task.getResult().getSignInMethods();
+                        boolean isRegistered = signInMethods != null && !signInMethods.isEmpty();
+                        callback.onSuccess(isRegistered);
+                    } else {
+                        callback.onError("Failed to check phone number: " + task.getException().getMessage());
+                    }
+                });
+    }
+
+    public interface DatabaseCallback<T> {
+        void onSuccess(T result);
+        void onError(String error);
     }
 }
