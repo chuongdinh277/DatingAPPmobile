@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FCC9E0">
+    android:background="@color/couple_pink_bg">
     <!-- FrameLayout chứa nội dung từng màn hình -->
     <FrameLayout
         android:id="@+id/baseContent"

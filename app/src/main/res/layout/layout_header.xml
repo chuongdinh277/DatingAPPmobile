@@ -4,7 +4,7 @@
     android:id="@+id/headerLayout"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="#FF90B1"
+    android:background="@color/bg_layer_header"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="10dp">
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="ForLove"
-        android:textColor="#800D42"
+        android:textColor="@color/name_layout"
         android:textSize="28sp"
         android:textStyle="bold"
         android:ellipsize="none"
@@ -29,7 +29,7 @@
         android:layout_height="25dp"
         android:layout_marginEnd="12dp"
         android:src="@drawable/ic_gallery"
-        app:tint="#800D42" />
+        app:tint="@color/name_layout" />
 
     <!-- Icon chuông -->
     <ImageView
@@ -37,6 +37,6 @@
         android:layout_width="25dp"
         android:layout_height="40dp"
         android:src="@drawable/ic_notification"
-        app:tint="#800D42" />
+        app:tint="@color/name_layout" />
 
 </LinearLayout>

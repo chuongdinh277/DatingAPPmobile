@@ -1,10 +1,13 @@
 package com.example.btl_mobileapp.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences; // <-- THÊM IMPORT NÀY
+import android.content.res.Configuration; // <-- THÊM IMPORT NÀY
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate; // <-- THÊM IMPORT NÀY
 import com.google.android.material.button.MaterialButton;
 import com.example.btl_mobileapp.R;
 import com.example.btl_mobileapp.managers.AuthManager;
@@ -22,6 +25,8 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.List;
 import com.google.firebase.auth.FirebaseAuthSettings;
+import com.example.btl_mobileapp.CoupleApplication;
+import com.google.android.material.switchmaterial.SwitchMaterial; // <-- Import Switch
 
 public class SettingActivity extends BaseActivity {
     private static final String TAG = "SettingActivity";
@@ -32,10 +37,15 @@ public class SettingActivity extends BaseActivity {
     private GoogleSignInClient googleSignInClient;
     private MaterialButton btLinkGoogle;
 
+    // --- THÊM 2 BIẾN NÀY ---
+    private SwitchMaterial switchTheme;
+    private SharedPreferences prefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.setting);
+        // Chú ý: Đảm bảo tên layout là chính xác
+        setContentView(R.layout.setting); // Tên file XML của bạn, có thể là R.layout.setting
 
 
 
@@ -50,13 +60,30 @@ public class SettingActivity extends BaseActivity {
 
         // Ánh xạ các button
         MaterialButton btProfile = findViewById(R.id.bt_profile);
-        //MaterialButton btNotification = findViewById(R.id.bt_notification);
-        //MaterialButton btPrivacy = findViewById(R.id.bt_privacy);
         MaterialButton btAbout = findViewById(R.id.bt_about);
         btLinkGoogle = findViewById(R.id.bt_link_google);
         MaterialButton btLogout = findViewById(R.id.bt_logout);
 
-        // Update UI based on current linked providers
+        // --- BẮT ĐẦU KHỐI CODE THÊM MỚI ---
+        // Khởi tạo Switch và SharedPreferences
+        switchTheme = findViewById(R.id.switch_theme);
+        prefs = getSharedPreferences(CoupleApplication.PREFS_NAME, MODE_PRIVATE);
+
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        switchTheme.setChecked(currentNightMode == Configuration.UI_MODE_NIGHT_YES);
+
+        switchTheme.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            int newMode;
+            if (isChecked) {
+                newMode = AppCompatDelegate.MODE_NIGHT_YES;
+            } else {
+                newMode = AppCompatDelegate.MODE_NIGHT_NO;
+            }
+
+            AppCompatDelegate.setDefaultNightMode(newMode);
+
+            prefs.edit().putInt(CoupleApplication.KEY_NIGHT_MODE, newMode).apply();
+        });
         updateLinkGoogleButton();
 
         // Profile
@@ -81,6 +108,9 @@ public class SettingActivity extends BaseActivity {
             showLogoutDialog();
         });
     }
+
+    // ... (Tất cả các hàm khác của bạn như setupGoogleSignIn, updateLinkGoogleButton, v.v... giữ nguyên ở đây) ...
+    // ... (Không cần dán lại, chỉ cần biết là chúng vẫn ở đây) ...
 
     private void setupGoogleSignIn() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -147,7 +177,8 @@ public class SettingActivity extends BaseActivity {
     private void showUnlinkGoogleDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Hủy liên kết Google")
-                .setMessage("Bạn có chắc chắn muốn hủy liên kết tài khoản Google?\n\nLưu ý: Bạn phải có ít nhất một phương thức đăng nhập.")
+                .setMessage("Bạn có chắc chắn muốn hủy liên kết tài khoản Google?" +
+                        "Lưu ý: Bạn phải có ít nhất một phương thức đăng nhập.")
                 .setPositiveButton("Hủy liên kết", (dialog, which) -> {
                     authManager.unlinkGoogleAccount(new AuthManager.AuthActionCallback() {
                         @Override

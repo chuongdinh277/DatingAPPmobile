@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="@color/bg_homelist"
     android:fillViewport="true">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/bg_homelist">
 
         <include
             android:id="@+id/header"
@@ -38,9 +39,9 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:layout_width="match_parent"
-                android:layout_height="202dp"
-                android:layout_marginTop="8dp"
+                android:layout_height="215dp"
                 android:layout_marginStart="2dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="2dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/garticio"
@@ -72,9 +73,9 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:layout_width="match_parent"
-                android:layout_height="202dp"
-                android:layout_marginTop="8dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="2dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/caro"

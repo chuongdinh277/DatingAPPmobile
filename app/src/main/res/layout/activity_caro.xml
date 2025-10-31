@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_game_caro"
+    android:background="@color/background_primary"
     android:padding="16dp">
 
     <LinearLayout
@@ -24,7 +24,7 @@
             android:text="Caro Online"
             android:textSize="36sp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:fontFamily="@font/pacifico"/>
 
         <TextView
@@ -32,12 +32,12 @@
             android:layout_width="226dp"
             android:layout_height="61dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/bg_score_display"
+            android:background="@color/surface_color"
             android:elevation="4dp"
             android:gravity="center"
             android:paddingHorizontal="24dp"
             android:text="Bạn 0 - 0 Đối thủ"
-            android:textColor="#FFEB3B"
+            android:textColor="@color/accent_color"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:text="Đang chờ..."
             android:textSize="20sp"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_secondary"
             android:textStyle="italic"
             android:layout_marginTop="4dp"/>
     </LinearLayout>
@@ -84,8 +84,8 @@
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Chơi lại"
-            android:backgroundTint="#FF69B4"
-            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/pill_maroon"
+            android:textColor="@color/button_text"
             android:textSize="18sp"
             android:paddingVertical="12dp"
             android:textStyle="bold"
@@ -97,8 +97,8 @@
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Thoát"
-            android:backgroundTint="#F44336"
-            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/pill_maroon"
+            android:textColor="@color/button_text"
             android:textSize="18sp"
             android:paddingVertical="12dp"
             android:textStyle="bold"

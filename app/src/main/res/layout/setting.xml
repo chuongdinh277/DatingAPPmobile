@@ -4,12 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_pink"
+    android:background="@color/bg_app"
     tools:context=".activities.SettingActivity">
-
-    <!-- Header Section -->
-
-    <!-- Settings Options -->
 
     <TextView
         android:id="@+id/tv_settings_title"
@@ -42,7 +38,7 @@
         android:textColor="@android:color/white"
         android:textSize="18sp"
         app:backgroundTint="#FE6CA9"
-        app:cornerRadius="24dp"
+        app:cornerRadius="10dp"
         app:icon="@drawable/user_icon"
         app:iconPadding="16dp"
         app:iconTint="@android:color/white"
@@ -82,7 +78,7 @@
         android:textColor="@android:color/white"
         android:textSize="18sp"
         app:backgroundTint="#FE6CA9"
-        app:cornerRadius="24dp"
+        app:cornerRadius="10dp"
         app:icon="@drawable/about_icon"
         app:iconPadding="16dp"
         app:iconTint="@android:color/white"
@@ -120,15 +116,15 @@
         android:textColor="@android:color/white"
         android:textSize="18sp"
         app:backgroundTint="#FE6CA9"
-        app:cornerRadius="24dp"
+        app:cornerRadius="10dp"
         app:icon="@drawable/ic_google"
         app:iconPadding="16dp"
         app:iconTint="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/bt_logout"
         app:layout_constraintEnd_toEndOf="@+id/bt_profile"
         app:layout_constraintStart_toStartOf="@+id/bt_profile"
         app:layout_constraintTop_toBottomOf="@+id/bt_about"
-        app:strokeWidth="0dp" />
+
+        app:layout_constraintBottom_toTopOf="@+id/switch_theme" />
 
     <ImageView
         android:layout_width="24dp"
@@ -142,12 +138,32 @@
         tools:ignore="ContentDescription" />
 
 
-    <!-- Logout Button -->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_theme"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_pink_rounded"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center_vertical|start"
+        android:paddingLeft="20dp"
+        android:paddingTop="12dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="12dp"
+        android:text="Chế độ Tối"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/bt_profile"
+        app:layout_constraintStart_toStartOf="@+id/bt_profile"
+        app:layout_constraintTop_toBottomOf="@+id/bt_link_google"
+        app:layout_constraintBottom_toTopOf="@+id/bt_logout" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/bt_logout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="112dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="sans-serif-medium"
         android:paddingTop="12dp"
         android:paddingBottom="12dp"
@@ -156,13 +172,15 @@
         android:textColor="@android:color/white"
         android:textSize="18sp"
         app:backgroundTint="#FE6CA9"
-        app:cornerRadius="24dp"
+        app:cornerRadius="10dp"
         app:iconTint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/bt_profile"
+
         app:layout_constraintHorizontal_bias="0.294"
         app:layout_constraintStart_toStartOf="@+id/bt_profile"
+        app:layout_constraintTop_toBottomOf="@+id/switch_theme"
+        app:layout_constraintVertical_bias="0.0"
         app:strokeWidth="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

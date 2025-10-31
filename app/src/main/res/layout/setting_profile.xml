@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_pink"
+    android:background="@color/bg_app"
     tools:context=".activities.SettingProfileActivity">
 
     <!-- Header -->
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:text="Edit Profile"
             android:textSize="22sp"
-            android:textColor="#E91E63"
+            android:textColor="@color/brown"
             android:textStyle="bold"
             android:layout_centerInParent="true" />
 
@@ -47,7 +47,7 @@
             android:contentDescription="Edit"
             android:padding="16dp"
             android:src="@drawable/ic_edit"
-            app:tint="#E91E63" />
+            app:tint="@color/brown" />
     </RelativeLayout>
 
     <!-- Avatar Section -->
@@ -101,7 +101,8 @@
             <!-- Username -->
             <TextView
                 style="@style/ProfileLabel"
-                android:text="Biệt danh" />
+                android:text="Biệt danh"
+                android:textColor="@color/brown"/>
 
             <EditText
                 android:id="@+id/et_username"
@@ -111,7 +112,8 @@
             <!-- Date of Birth -->
             <TextView
                 style="@style/ProfileLabel"
-                android:text="Ngày sinh nhật của bạn" />
+                android:text="Ngày sinh nhật của bạn"
+                android:textColor="@color/brown"/>
 
             <EditText
                 android:id="@+id/et_dob"
@@ -121,7 +123,8 @@
             <!-- Gender -->
             <TextView
                 style="@style/ProfileLabel"
-                android:text="Giới tính" />
+                android:text="Giới tính"
+                android:textColor="@color/brown"/>
 
             <RadioGroup
                 android:id="@+id/rg_gender"
@@ -137,27 +140,31 @@
                     android:id="@+id/rb_male"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nam" />
+                    android:text="Nam"
+                    android:textColor="@color/brown"/>
 
                 <RadioButton
                     android:id="@+id/rb_female"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
-                    android:text="Nữ" />
+                    android:text="Nữ"
+                    android:textColor="@color/brown"/>
 
                 <RadioButton
                     android:id="@+id/rb_other"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
-                    android:text="Khác" />
+                    android:text="Khác"
+                    android:textColor="@color/brown"/>
             </RadioGroup>
 
             <!-- Start Love Date -->
             <TextView
                 style="@style/ProfileLabel"
-                android:text="Ngày bắt đầu yêu" />
+                android:text="Ngày bắt đầu yêu"
+                android:textColor="@color/brown"/>
 
             <EditText
                 android:id="@+id/et_start_love_date"
@@ -167,17 +174,20 @@
             <!-- Email (Display Only) -->
             <TextView
                 style="@style/ProfileLabel"
-                android:text="Email" />
+                android:text="Email"
+                android:textColor="@color/brown"/>
 
             <EditText
                 android:id="@+id/et_email"
                 style="@style/ProfileEditText.Disabled"
-                android:hint="Your email" />
+                android:hint="Your email"
+                />
 
             <!-- Phone Number (Display Only) -->
             <TextView
                 style="@style/ProfileLabel"
-                android:text="Số điện thoại" />
+                android:text="Số điện thoại"
+                android:textColor="@color/brown"/>
 
             <EditText
                 android:id="@+id/et_phone"

@@ -18,7 +18,7 @@ import com.example.btl_mobileapp.models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import android.widget.Toast;
-import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.GradientDrawable; // <-- SẼ BỊ XÓA
 import android.graphics.PorterDuff;
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -103,38 +103,40 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private void resetButton(LinearLayout layout, ImageView icon) {
         layout.setBackground(null);
-        icon.setColorFilter(ContextCompat.getColor(this, R.color.default_button_color), PorterDuff.Mode.SRC_IN);
+        // SỬA DÒNG NÀY: Dùng màu Sáng/Tối bạn đã định nghĩa
+        icon.setColorFilter(ContextCompat.getColor(this, R.color.bottom_nav_item_tint), PorterDuff.Mode.SRC_IN);
     }
 
     private void setActiveButton(LinearLayout layout, ImageView icon) {
         layout.setBackgroundResource(R.drawable.rounded_button);
-        icon.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_IN);
+        // SỬA DÒNG NÀY: Dùng màu Sáng/Tối bạn đã định nghĩa
+        icon.setColorFilter(ContextCompat.getColor(this, R.color.button_text), PorterDuff.Mode.SRC_IN);
     }
 
-    // ... (Các hàm setHeaderColor, shouldShowBottomBar, ... giữ nguyên) ...
+    // ... (Các hàm setHeaderColor, ... giữ nguyên) ...
 
     protected void setHeaderColor(int colorResId) {
         LinearLayout header = findViewById(R.id.headerLayout);
         if (header != null) {
-            header.setBackground(getRoundedDrawable(colorResId, 0));
+            // Cảnh báo: Hàm này cũng đang ghi đè màu Header
+            // Bạn nên sửa file XML của header thay vì dùng hàm này
+            // Tạm thời giữ lại code cũ của bạn
+            GradientDrawable drawable = new GradientDrawable();
+            drawable.setColor(ContextCompat.getColor(this, colorResId));
+            drawable.setCornerRadius(0); // Bán kính 0
+            header.setBackground(drawable);
         }
     }
     protected boolean shouldShowBottomBar() { return true; }
     protected boolean shouldShowHeader() { return true; }
     protected boolean shouldUseEdgeToEdge() { return true; }
-    protected void setBottomBarColor(int colorResId) {
-        LinearLayout bottomBar = findViewById(R.id.bottomBar);
-        if (bottomBar != null) {
-            float radius = 0;
-            bottomBar.setBackground(getRoundedDrawable(colorResId, radius));
-        }
-    }
-    private GradientDrawable getRoundedDrawable(int colorResId, float radius) {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setColor(ContextCompat.getColor(this, colorResId));
-        drawable.setCornerRadius(radius);
-        return drawable;
-    }
+
+    // --- CÁC HÀM GÂY LỖI ĐÃ BỊ XÓA ---
+    // protected void setBottomBarColor(int colorResId) { ... }
+    // private GradientDrawable getRoundedDrawable(int colorResId, float radius) { ... }
+    // --- KẾT THÚC XÓA ---
+
+
     private void updateUIVisibility() {
         View header = findViewById(R.id.header);
         LinearLayout bottomBar = findViewById(R.id.bottomBar);
@@ -147,7 +149,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
 
-    // *** HÀM QUAN TRỌNG NHẤT - ĐÃ SỬA LẠI LOGIC ***
+    // *** HÀM showMessengerSheet GIỮ NGUYÊN ***
     private void showMessengerSheet() {
         FirebaseUser currentUserAuth = mAuth.getCurrentUser();
         if (currentUserAuth == null) {

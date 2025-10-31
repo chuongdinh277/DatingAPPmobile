@@ -8,13 +8,11 @@
     android:background="@drawable/bg_bottom_sheet_rounded"
     tools:context=".activities.ChatBottomSheetFragment">
 
-    <!-- Tay cầm để kéo (Drag Handle) - Giúp người dùng biết đây là BottomSheet -->
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
         android:id="@+id/drag_handle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- Thanh thông tin người nhận (Lấy từ messenger.xml) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +22,6 @@
         android:paddingEnd="16dp"
         android:paddingBottom="8dp">
 
-        <!-- Đổi ID từ iv_messenger_avatar để tránh nhầm lẫn -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_chat_avatar"
             android:layout_width="40dp"
@@ -32,25 +29,22 @@
             android:scaleType="centerCrop"
             tools:src="@drawable/ic_default_avatar" />
 
-        <!-- Đổi ID từ tv_messenger -->
         <TextView
             android:id="@+id/tv_chat_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:textColor="#111111"
+            android:textColor="@color/chat_primary_text"
             android:textSize="20sp"
             android:textStyle="bold"
             tools:text="Tên người nhận" />
     </LinearLayout>
 
-    <!-- Vạch ngăn cách mờ -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#20000000" />
+        android:background="@color/chat_divider" />
 
-    <!-- RecyclerView để hiển thị tin nhắn (QUAN TRỌNG) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_chat_messages"
         android:layout_width="match_parent"
@@ -62,19 +56,17 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:stackFromEnd="true" />
 
-    <!-- Khung nhập liệu và gửi tin nhắn (Lấy từ messenger.xml) -->
     <LinearLayout
         android:id="@+id/llayout_chat_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#F5F5F5"
+        android:background="@color/chat_input_bar_bg"
         android:elevation="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="8dp"
         android:paddingVertical="8dp">
 
-        <!-- Đổi ID từ et_messenger -->
         <EditText
             android:id="@+id/et_chat_message"
             android:layout_width="0dp"
@@ -87,10 +79,10 @@
             android:minHeight="48dp"
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"
-            android:textColor="@color/black"
+            android:textColor="@color/chat_primary_text"
+            android:textColorHint="@color/chat_secondary_text"
             android:textSize="16sp" />
 
-        <!-- Đổi ID từ bt_sendMessage -->
         <ImageButton
             android:id="@+id/btn_chat_send"
             android:layout_width="48dp"
@@ -100,9 +92,7 @@
             android:contentDescription="@string/send"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_send"
-            app:tint="#800D42" />
+            app:tint="@color/brandAccent" />
     </LinearLayout>
-
-    <!-- Bạn có thể thêm FrameLayout loading_overlay vào đây nếu cần -->
 
 </LinearLayout>

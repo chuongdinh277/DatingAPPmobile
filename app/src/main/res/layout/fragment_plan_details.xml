@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_rounded"
+    android:orientation="vertical"
+    android:paddingBottom="24dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+            android:id="@+id/drag_handle"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
+
+        <ImageView
+            android:id="@+id/btn_close"
+            android:layout_width="24dp"
+            android:layout_height="29dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_close"
+            app:tint="@color/primary_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Lập kế hoạch"
+            android:textColor="@color/primary_text"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="Tiêu đề"
+        android:textColor="@color/secondary_text"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/etPlanTitle"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_edittext_rounded"
+        android:hint="Picnicccc"
+        android:inputType="textCapSentences"
+        android:padding="14dp"
+        android:textColor="@color/edit_plan_text"
+        android:textColorHint="@color/edit_plan_text"
+        tools:text="Picnicccc" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:text="Thời gian"
+        android:textColor="@color/secondary_text"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/etPlanTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_edittext_rounded"
+            android:hint="Giờ"
+            android:inputType="time"
+            android:padding="14dp"
+            android:textColor="@color/edit_plan_text"
+            android:textColorHint="@color/edit_plan_text" />
+
+        <EditText
+            android:id="@+id/etPlanDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="2"
+            android:background="@drawable/bg_edittext_rounded"
+            android:hint="dd/mm/yy"
+            android:inputType="date"
+            android:padding="14dp"
+            android:textColor="@color/edit_plan_text"
+            android:textColorHint="@color/edit_plan_text" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:text="Chi tiết"
+        android:textColor="@color/secondary_text"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/etPlanDetails"
+        android:layout_width="match_parent"
+        android:layout_height="212dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_edittext_rounded"
+        android:gravity="top"
+        android:hint="18h00: Chuẩn bị đồ..."
+        android:inputType="textMultiLine"
+        android:lines="5"
+        android:padding="14dp"
+        android:textColor="@color/edit_plan_text"
+        android:textColorHint="@color/edit_plan_text"
+        tools:text="18h00: Chuẩn bị đồ&#10;4h00: Xuất phát..." />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif-medium"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="Lưu"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:backgroundTint="@color/accent_color"
+        app:cornerRadius="24dp" />
+
+</LinearLayout>

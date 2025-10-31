@@ -78,7 +78,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/app_name"
                         android:src="@drawable/ic_heart_outline"
-                        app:tint="#FFFFFF" />
+                        app:tint="@color/text_home" />
 
                     <TextView
                         android:id="@+id/txtYears"
@@ -86,7 +86,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:text="-"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_home"
                         android:textSize="20sp"
                         android:textStyle="bold" />
                 </FrameLayout>
@@ -97,7 +97,7 @@
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/pacifico"
                     android:text="năm"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_home"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -118,7 +118,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/app_name"
                         android:src="@drawable/ic_heart_outline"
-                        app:tint="#FFFFFF" />
+                        app:tint="@color/text_home" />
 
                     <TextView
                         android:id="@+id/txtMonths"
@@ -126,7 +126,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:text="-"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_home"
                         android:textSize="20sp"
                         android:textStyle="bold" />
                 </FrameLayout>
@@ -137,7 +137,7 @@
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/pacifico"
                     android:text="tháng"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_home"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -158,7 +158,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/app_name"
                         android:src="@drawable/ic_heart_outline"
-                        app:tint="#FFFFFF" />
+                        app:tint="@color/text_home" />
 
                     <TextView
                         android:id="@+id/txtWeeks"
@@ -166,7 +166,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:text="-"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_home"
                         android:textSize="20sp"
                         android:textStyle="bold" />
                 </FrameLayout>
@@ -177,7 +177,7 @@
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/pacifico"
                     android:text="tuần"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_home"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -198,7 +198,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/app_name"
                         android:src="@drawable/ic_heart_outline"
-                        app:tint="#FFFFFF" />
+                        app:tint="@color/text_home" />
 
                     <TextView
                         android:id="@+id/txtDays"
@@ -206,7 +206,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:text="-"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_home"
                         android:textSize="22sp"
                         android:textStyle="bold" />
                 </FrameLayout>
@@ -217,7 +217,7 @@
                     android:layout_marginTop="0dp"
                     android:fontFamily="@font/pacifico"
                     android:text="ngày"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_home"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -231,7 +231,7 @@
             android:layout_marginBottom="25dp"
             android:fontFamily="@font/pacifico"
             android:text="--:--:--"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_home"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -246,7 +246,7 @@
             android:gravity="start"
             android:text="..."
             android:textAlignment="textStart"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_home"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
