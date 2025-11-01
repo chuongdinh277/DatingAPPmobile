@@ -78,4 +78,5 @@
     <color name="plan_title_text">#FFFFFF</color>
     <color name="plan_detail_text">#B3B3B3</color>
     <color name="delete_button_tint">#FFFFFF</color>
+    <color name="chat_input_field_bg">#ffffff</color>
 </resources>

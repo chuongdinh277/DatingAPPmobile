@@ -29,15 +29,44 @@
             android:scaleType="centerCrop"
             tools:src="@drawable/ic_default_avatar" />
 
-        <TextView
-            android:id="@+id/tv_chat_name"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:textColor="@color/chat_primary_text"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            tools:text="Tên người nhận" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_chat_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/chat_primary_text"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Tên người nhận" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <View
+                    android:id="@+id/view_online_indicator"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_online_dot"
+                    android:layout_marginEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/tv_partner_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/chat_secondary_text"
+                    android:textSize="14sp"
+                    tools:text="Online" />
+
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <View
@@ -60,12 +89,13 @@
         android:id="@+id/llayout_chat_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/chat_input_bar_bg"
+        android:background="@drawable/bg_chat_input_rounded"
         android:elevation="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="8dp"
-        android:paddingVertical="8dp">
+        android:paddingVertical="8dp"
+       >
 
         <EditText
             android:id="@+id/et_chat_message"

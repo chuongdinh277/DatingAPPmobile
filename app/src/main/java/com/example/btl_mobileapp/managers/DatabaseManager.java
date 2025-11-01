@@ -683,4 +683,67 @@ public class DatabaseManager {
                     }
                 });
     }
+
+    // Trong class DatabaseManager
+
+// ... (các phương thức khác)
+
+    /**
+     * ✅ Cập nhật trạng thái online và thời gian hoạt động gần nhất của user.
+     * @param userId ID của user
+     * @param isOnline Trạng thái online (true/false)
+     * @param callback Callback kết quả
+     */
+    public void updateUserOnlineStatus(String userId, boolean isOnline, DatabaseActionCallback callback) {
+        if (userId == null || userId.isEmpty()) {
+            if (callback != null) callback.onError("User ID is null or empty");
+            return;
+        }
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("isOnline", isOnline);
+        updates.put("lastActiveAt", Timestamp.now());
+        // Nếu offline, có thể lưu thời gian offline để hiển thị "hoạt động X phút trước"
+
+        db.collection(USERS_COLLECTION)
+                .document(userId)
+                .update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "User online status updated: " + (isOnline ? "ONLINE" : "OFFLINE"));
+                    if (callback != null) callback.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Error updating user online status", e);
+                    if (callback != null) callback.onError("Failed to update online status: " + e.getMessage());
+                });
+    }
+
+    public com.google.firebase.firestore.ListenerRegistration listenForUserOnlineStatus(
+            String userId, DatabaseCallback<Boolean> callback) {
+
+        if (userId == null || userId.isEmpty()) {
+            callback.onError("User ID is null or empty");
+            return null;
+        }
+        return db.collection(USERS_COLLECTION)
+                .document(userId)
+                .addSnapshotListener((documentSnapshot, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "Listen for online status failed: " + e.getMessage(), e);
+                        callback.onError("Failed to listen for status: " + e.getMessage());
+                        return;
+                    }
+
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        Boolean isOnline = documentSnapshot.getBoolean("isOnline");
+                        if (isOnline == null) {
+                            isOnline = false;
+                        }
+                        callback.onSuccess(isOnline);
+                    } else {
+                        callback.onError("Partner user document not found");
+                    }
+                });
+    }
+
 }

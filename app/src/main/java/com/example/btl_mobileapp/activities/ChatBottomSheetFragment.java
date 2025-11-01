@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff; // ✅ Thêm import
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat; // ✅ Thêm import
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,6 +38,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.firestore.ListenerRegistration; // ✅ Thêm import
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.InputStream;
@@ -47,14 +50,13 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import de.hdodenhof.circleimageview.CircleImageView; // Thêm import này
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
 
     private static final String TAG = "ChatBottomSheet";
     private static final ExecutorService IMAGE_EXECUTOR = Executors.newFixedThreadPool(2);
 
-    // ✅ Static flag để track xem Chat có đang active không
     private static boolean isChatActive = false;
     private static String activeChatCoupleId = null;
 
@@ -64,7 +66,12 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
     private ImageButton btnSend;
     private TextView tvPartnerName;
     private View loadingOverlay;
-    private CircleImageView ivPartnerAvatar; // Đổi tên từ ivMessageAvatar
+    private CircleImageView ivPartnerAvatar;
+
+    // ✅ View và Listener cho trạng thái Online/Offline
+    private TextView tvPartnerStatus;
+    private View viewOnlineIndicator;
+    private ListenerRegistration partnerStatusRegistration;
 
     // --- Các Manager và Dữ liệu ---
     private MessageAdapter messageAdapter;
@@ -80,90 +87,71 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
     private String partnerName;
     private String currentUserId;
     private String currentUserName;
-    private User partner; // Đối tượng User của partner
+    private User partner;
 
-    // --- Constructor để truyền dữ liệu (Giống code cũ của bạn) ---
     public static ChatBottomSheetFragment newInstance(String coupleId, String partnerId, String partnerName, User partner) {
         ChatBottomSheetFragment fragment = new ChatBottomSheetFragment();
         Bundle args = new Bundle();
         args.putString("coupleId", coupleId);
         args.putString("partnerId", partnerId);
         args.putString("partnerName", partnerName);
-        args.putSerializable("partner", partner); // Truyền đối tượng User
+        args.putSerializable("partner", partner);
         fragment.setArguments(args);
         return fragment;
     }
 
-    // (TÙY CHỌN) Thêm style để có bo góc
     @Override
     public int getTheme() {
-        return R.style.BottomSheetDialogTheme; // Cần định nghĩa style này trong themes.xml
+        return R.style.BottomSheetDialogTheme;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // --- THAY THẾ CHO getIntentData() ---
-        // Lấy dữ liệu từ Arguments
         if (getArguments() != null) {
             coupleId = getArguments().getString("coupleId");
             partnerId = getArguments().getString("partnerId");
             partnerName = getArguments().getString("partnerName");
             partner = (User) getArguments().getSerializable("partner");
         } else {
-            // Nếu không có arguments, đóng fragment
             Toast.makeText(getContext(), "Lỗi: Không có dữ liệu chat.", Toast.LENGTH_SHORT).show();
             dismiss();
         }
-
-        // Khởi tạo các manager và list (Giống hệt MessengerActivity)
         initManagersAndData();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Sử dụng layout XML của fragment
         return inflater.inflate(R.layout.fragment_chat_bottom_sheet, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // --- Đây là nơi logic của Activity.onCreate() được chuyển đến ---
         initViews(view);
         setupRecyclerView();
         setupClickListeners();
-
-        // Lấy và lưu FCM token (Giống hệt)
         registerFCMToken();
-
-        // --- LOGIC MỚI (ĐƠN GIẢN HƠN) ---
-        // Không cần ensureCoupleThenLoadMessages() nữa
-        // vì chúng ta đã có đủ dữ liệu từ Arguments
         showLoading(true);
-        loadReceiverDetails(); // Hiển thị tên và avatar
-        loadMessages(); // Tải tin nhắn
+        loadReceiverDetails();
+        loadMessages();
     }
 
-    // --- TOÀN BỘ LOGIC BÊN DƯỚI LÀ COPY TỪ MESSENGERACTIVITY VÀ SỬA LẠI ---
-
-    // SỬA LẠI: Dùng 'view.findViewById'
+    // SỬA LẠI: Dùng 'view.findViewById' và ánh xạ View mới
     private void initViews(View view) {
-        // Sử dụng ID từ file 'fragment_chat_bottom_sheet.xml'
         rvMessages = view.findViewById(R.id.rv_chat_messages);
         etMessage = view.findViewById(R.id.et_chat_message);
         btnSend = view.findViewById(R.id.btn_chat_send);
         tvPartnerName = view.findViewById(R.id.tv_chat_name);
         ivPartnerAvatar = view.findViewById(R.id.iv_chat_avatar);
-        loadingOverlay = view.findViewById(R.id.loading_overlay); // Cần thêm ID này vào XML
+        loadingOverlay = view.findViewById(R.id.loading_overlay);
 
-
+        // ✅ Ánh xạ View mới
+        tvPartnerStatus = view.findViewById(R.id.tv_partner_status);
+        viewOnlineIndicator = view.findViewById(R.id.view_online_indicator);
     }
 
-    // Giữ nguyên từ MessengerActivity
     private void initManagersAndData() {
         chatManager = ChatManager.getInstance();
         databaseManager = DatabaseManager.getInstance();
@@ -173,39 +161,26 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             currentUserId = currentUser.getUid();
-            // Lấy tên người dùng hiện tại
             databaseManager.getUser(currentUserId, new DatabaseManager.DatabaseCallback<>() {
-                @Override
-                public void onSuccess(User user) {
-                    currentUserName = user.getName() != null ? user.getName() : "You";
-                }
-                @Override
-                public void onError(String error) {
-                    currentUserName = "You";
-                }
+                @Override public void onSuccess(User user) { currentUserName = user.getName() != null ? user.getName() : "You"; }
+                @Override public void onError(String error) { currentUserName = "You"; }
             });
         }
     }
 
-    // HÀM MỚI: (Tách ra từ ensureCouple...)
     private void loadReceiverDetails() {
-        // Hiển thị tên
         if (tvPartnerName != null && partnerName != null) {
             tvPartnerName.setText(partnerName);
         }
-
-        // Load ảnh đại diện
         loadPartnerAvatar(partner);
     }
 
-    // SỬA LẠI: Dùng requireContext()
     private void loadPartnerAvatar(User partner) {
         if (partner == null || ivPartnerAvatar == null) {
             setDefaultAvatar();
             return;
         }
 
-        // Thử load từ cache trước
         Bitmap cachedPartnerAvatar = AvatarCache.getPartnerCachedBitmap(requireContext());
         if (cachedPartnerAvatar != null) {
             ivPartnerAvatar.setImageBitmap(cachedPartnerAvatar);
@@ -213,13 +188,11 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
             return;
         }
 
-        // Nếu không có cache, load từ URL
         String profilePicUrl = partner.getProfilePicUrl();
         if (!TextUtils.isEmpty(profilePicUrl)) {
             loadImageAsync(profilePicUrl, bmp -> {
                 if (bmp != null && ivPartnerAvatar != null) {
                     ivPartnerAvatar.setImageBitmap(bmp);
-                    // Lưu vào cache
                     AvatarCache.savePartnerBitmapToCache(requireContext(), bmp);
                     if (messageAdapter != null) messageAdapter.notifyDataSetChanged();
                 } else {
@@ -231,14 +204,12 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         }
     }
 
-    // Giữ nguyên
     private void setDefaultAvatar() {
         if (ivPartnerAvatar != null) {
             ivPartnerAvatar.setImageResource(R.drawable.ic_default_avatar);
         }
     }
 
-    // SỬA LẠI: Dùng getActivity().runOnUiThread()
     private void loadImageAsync(String urlStr, BitmapCallback callback) {
         if (TextUtils.isEmpty(urlStr)) {
             if (callback != null) callback.onBitmap(null);
@@ -247,19 +218,28 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
 
         IMAGE_EXECUTOR.execute(() -> {
             Bitmap bmp = null;
-            // ... (Logic tải ảnh y hệt) ...
+            HttpURLConnection conn = null;
             try {
                 URL url = new URL(urlStr);
-                // ...
-                try (InputStream is = ((HttpURLConnection) url.openConnection()).getInputStream()) {
-                    bmp = BitmapFactory.decodeStream(is);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(15000);
+                conn.setReadTimeout(20000);
+                conn.setInstanceFollowRedirects(true);
+                conn.connect();
+                int code = conn.getResponseCode();
+                if (code >= 200 && code < 300) {
+                    try (InputStream is = conn.getInputStream()) {
+                        bmp = BitmapFactory.decodeStream(is);
+                    }
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error loading image: " + e.getMessage());
+            } finally {
+                if (conn != null) conn.disconnect();
             }
 
             final Bitmap result = bmp;
-            if (getActivity() != null) { // <-- Sửa lại
+            if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
                     if (callback != null) callback.onBitmap(result);
                 });
@@ -267,12 +247,10 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         });
     }
 
-    // Giữ nguyên
     private interface BitmapCallback {
         void onBitmap(Bitmap bmp);
     }
 
-    // SỬA LẠI: Dùng requireContext()
     private void setupRecyclerView() {
         messageAdapter = new MessageAdapter(messageList, requireContext());
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -281,13 +259,10 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         rvMessages.setAdapter(messageAdapter);
     }
 
-    // Giữ nguyên
     private void setupClickListeners() {
         btnSend.setOnClickListener(v -> sendMessage());
-        // (Không cần onEditorActionListener cho BottomSheet)
     }
 
-    // SỬA LẠI: Dùng getContext()
     private void loadMessages() {
         if (coupleId == null || coupleId.isEmpty()) {
             Toast.makeText(getContext(), "Error: Couple ID not found", Toast.LENGTH_SHORT).show();
@@ -295,9 +270,6 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
             return;
         }
 
-        // showLoading(true) đã được gọi ở onViewCreated
-
-        // Load chat history
         chatManager.getChatHistory(coupleId, 50, new ChatManager.ChatCallback() {
             @Override
             public void onMessagesReceived(List<ChatMessage> chatMessages) {
@@ -312,12 +284,10 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
                     rvMessages.smoothScrollToPosition(messageList.size() - 1);
                 }
 
-                // Setup real-time listener
                 setupRealTimeListener();
                 showLoading(false);
             }
-            @Override
-            public void onMessageSent() {}
+            @Override public void onMessageSent() {}
             @Override
             public void onError(String error) {
                 Log.e(TAG, "Error loading chat history: " + error);
@@ -327,7 +297,6 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         });
     }
 
-    // Giữ nguyên
     private void setupRealTimeListener() {
         long lastTimestamp = messageList.isEmpty() ? 0 :
                 getTimestampFromMessage(messageList.get(messageList.size() - 1));
@@ -341,14 +310,10 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
                 messageAdapter.updateMessages(messageList);
                 rvMessages.smoothScrollToPosition(messageList.size() - 1);
             }
-            @Override
-            public void onError(String error) {
-                Log.e(TAG, "Error listening for new messages: " + error);
-            }
+            @Override public void onError(String error) { Log.e(TAG, "Error listening for new messages: " + error); }
         });
     }
 
-    // Giữ nguyên
     private boolean isMessageAlreadyExists(String messageId) {
         if (messageId == null) return false;
         for (Message msg : messageList) {
@@ -357,10 +322,8 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         return false;
     }
 
-    // Giữ nguyên
     private Message convertChatMessageToMessage(ChatMessage chatMessage) {
         Message message = new Message();
-        // ... (Logic y hệt) ...
         message.setMessageId(chatMessage.getMessageId());
         message.setSenderId(chatMessage.getSenderId());
         message.setMessage(chatMessage.getMessage());
@@ -371,7 +334,6 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         return message;
     }
 
-    // Giữ nguyên
     private long getTimestampFromMessage(Message message) {
         Object timestamp = message.getTimestamp();
         if (timestamp instanceof Long) return (Long) timestamp;
@@ -379,7 +341,6 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         return 0L;
     }
 
-    // SỬA LẠI: Dùng getContext() và getActivity().runOnUiThread()
     private void sendMessage() {
         String messageText = etMessage.getText().toString().trim();
         if (TextUtils.isEmpty(messageText)) {
@@ -396,7 +357,7 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
             @Override
             public void onMessageSent() {
                 if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> { // <-- Sửa lại
+                    getActivity().runOnUiThread(() -> {
                         etMessage.setText("");
                         btnSend.setEnabled(true);
                         if (partnerId != null) {
@@ -405,11 +366,10 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
                     });
                 }
             }
-            @Override
-            public void onMessagesReceived(List<ChatMessage> messages) {}
+            @Override public void onMessagesReceived(List<ChatMessage> messages) {}
             @Override
             public void onError(String error) {
-                if (getActivity() != null) { // <-- Sửa lại
+                if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         Toast.makeText(getContext(), "Failed to send message: " + error, Toast.LENGTH_SHORT).show();
                         btnSend.setEnabled(true);
@@ -419,7 +379,6 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         });
     }
 
-    // Giữ nguyên
     private void sendNotificationToPartner(String messageText) {
         String title = currentUserName != null ? currentUserName : "New Message";
         NotificationAPI.sendNotification(
@@ -431,14 +390,12 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         );
     }
 
-    // Giữ nguyên
     private void showLoading(boolean show) {
         if (loadingOverlay != null) {
             loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 
-    // Giữ nguyên
     private void registerFCMToken() {
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(task -> {
@@ -457,7 +414,7 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
                 });
     }
 
-    // --- CÁC PHƯƠNG THỨC LIFECYCLE VÀ STATIC (Giữ nguyên) ---
+    // --- CÁC PHƯƠNG THỨC LIFECYCLE VÀ LOGIC ONLINE/OFFLINE MỚI ---
 
     @Override
     public void onResume() {
@@ -465,6 +422,13 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         isChatActive = true;
         activeChatCoupleId = coupleId;
         updateChatViewingStatus(true);
+
+        // ✅ Cập nhật trạng thái online của mình
+        updateUserOnlineStatus(true);
+
+        // ✅ Bắt đầu lắng nghe trạng thái của partner
+        startListeningForPartnerStatus();
+
         Log.d(TAG, "🟢 Chat Fragment is now ACTIVE");
     }
 
@@ -474,10 +438,16 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         isChatActive = false;
         activeChatCoupleId = null;
         updateChatViewingStatus(false);
+
+        // ✅ Cập nhật trạng thái offline của mình
+        updateUserOnlineStatus(false);
+
+        // ✅ Ngừng lắng nghe trạng thái của partner
+        stopListeningForPartnerStatus();
+
         Log.d(TAG, "🔴 Chat Fragment is now INACTIVE");
     }
 
-    // Giữ nguyên
     private void updateChatViewingStatus(boolean isViewing) {
         if (currentUserId != null && coupleId != null) {
             databaseManager.updateUserChatViewingStatus(currentUserId, isViewing ? coupleId : null,
@@ -488,23 +458,88 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
         }
     }
 
-    // Đổi tên cho nhất quán (từ isViewingChat)
     public static boolean isChatFragmentActive(String coupleId) {
         return isChatActive && coupleId != null && coupleId.equals(activeChatCoupleId);
     }
 
-    // Đổi sang onDestroyView() để dọn dẹp view
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Gỡ bỏ listener khi view bị hủy
         if (messageListener != null && coupleId != null) {
             chatManager.removeChildMessageListener(coupleId, messageListener);
             messageListener = null;
         }
+        // ✅ Đảm bảo listener online được gỡ bỏ
+        stopListeningForPartnerStatus();
     }
 
-    // Giữ nguyên code để kiểm soát chiều cao BottomSheet (từ file cũ của bạn)
+    // ✅ PHƯƠNG THỨC ONLINE/OFFLINE
+
+    private void updateUserOnlineStatus(boolean isOnline) {
+        if (currentUserId != null) {
+            databaseManager.updateUserOnlineStatus(currentUserId, isOnline,
+                    new DatabaseManager.DatabaseActionCallback() {
+                        @Override public void onSuccess() { Log.d(TAG, "✅ User status updated: " + (isOnline ? "ONLINE" : "OFFLINE")); }
+                        @Override public void onError(String error) { Log.e(TAG, "❌ Failed to update user status: " + error); }
+                    });
+        }
+    }
+
+    private void startListeningForPartnerStatus() {
+        if (partnerId != null && !partnerId.isEmpty() && tvPartnerStatus != null && viewOnlineIndicator != null) {
+            // Sử dụng phương thức của DatabaseManager (Firestore)
+            partnerStatusRegistration = databaseManager.listenForUserOnlineStatus(
+                    partnerId,
+                    new DatabaseManager.DatabaseCallback<Boolean>() {
+                        @Override
+                        public void onSuccess(Boolean isOnline) {
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> updatePartnerStatusUI(isOnline));
+                            }
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            Log.e(TAG, "Database error listening for partner status: " + error);
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(() -> updatePartnerStatusUI(false)); // Giả định offline nếu có lỗi
+                            }
+                        }
+                    }
+            );
+        }
+    }
+
+    private void stopListeningForPartnerStatus() {
+        if (partnerStatusRegistration != null) {
+            partnerStatusRegistration.remove();
+            partnerStatusRegistration = null;
+        }
+    }
+
+    private void updatePartnerStatusUI(Boolean isOnline) {
+        if (tvPartnerStatus == null || viewOnlineIndicator == null || getContext() == null) return;
+
+        int dotColor;
+        String statusText;
+
+        if (isOnline != null && isOnline) {
+            dotColor = ContextCompat.getColor(getContext(), R.color.green);
+            statusText = "Online";
+        } else {
+            dotColor = ContextCompat.getColor(getContext(), R.color.gray_dark);
+            statusText = "Offline";
+        }
+
+        tvPartnerStatus.setText(statusText);
+
+        // Cập nhật màu nền cho View chấm tròn
+        if (viewOnlineIndicator.getBackground() != null) {
+            viewOnlineIndicator.getBackground().setColorFilter(dotColor, PorterDuff.Mode.SRC_ATOP);
+        }
+    }
+
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -514,13 +549,13 @@ public class ChatBottomSheetFragment extends BottomSheetDialogFragment {
             FrameLayout bottomSheet = bottomSheetDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
             if (bottomSheet != null) {
                 int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-                int desiredHeight = (int) (screenHeight * 0.85); // Cao 85%
+                int desiredHeight = (int) (screenHeight * 0.85);
                 ViewGroup.LayoutParams layoutParams = bottomSheet.getLayoutParams();
                 layoutParams.height = desiredHeight;
                 bottomSheet.setLayoutParams(layoutParams);
                 BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(bottomSheet);
                 behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                behavior.setDraggable(true); // Cho phép kéo
+                behavior.setDraggable(true);
             }
         });
         return dialog;
