@@ -90,13 +90,11 @@ public class WaitingRoomGarticActivity extends AppCompatActivity {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                // Đọc dữ liệu hiện tại từ Firebase
                 String hostId = currentData.child("hostId").getValue(String.class);
                 String status = currentData.child("status").getValue(String.class);
                 MutableData playersNode = currentData.child("players");
 
                 // === LOGIC TẠO PHÒNG HOẶC SỬA PHÒNG LỖI ===
-                // Nếu phòng chưa tồn tại HOẶC tồn tại nhưng không có chủ phòng
                 if (currentData.getValue() == null || hostId == null) {
                     Map<String, Object> playerMap = new HashMap<>();
                     playerMap.put(userId, true);
@@ -109,13 +107,10 @@ public class WaitingRoomGarticActivity extends AppCompatActivity {
                 }
 
                 // === LOGIC VÀO PHÒNG ĐÃ TỒN TẠI ===
-                // Nếu phòng đang chơi, không cho vào
                 if ("playing".equals(status)) return Transaction.abort();
 
-                // Nếu người chơi đã có trong phòng, không cần làm gì thêm
                 if (playersNode.hasChild(userId)) return Transaction.success(currentData);
 
-                // Nếu phòng đã đủ 2 người, không cho vào
                 if (playersNode.getChildrenCount() >= 2) return Transaction.abort();
 
                 // Thêm người chơi mới vào phòng
@@ -138,7 +133,7 @@ public class WaitingRoomGarticActivity extends AppCompatActivity {
                 }
 
                 Log.d(TAG, "Vào phòng thành công!");
-                // Thiết lập an toàn khi mất kết nối: chỉ xóa người chơi này
+                // Thiết lập an toàn khi mất kết nối
                 roomRef.child("players").child(userId).onDisconnect().removeValue();
 
                 // Bắt đầu lắng nghe các thay đổi trong phòng
@@ -155,7 +150,12 @@ public class WaitingRoomGarticActivity extends AppCompatActivity {
         playersListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) return; // Phòng đã bị hủy
+                if (!snapshot.exists()) {
+                    // Phòng đã bị xóa hoàn toàn (do người cuối cùng thoát)
+                    Toast.makeText(WaitingRoomGarticActivity.this, "Phòng đã bị hủy!", Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
 
                 currentPlayerCount = snapshot.getChildrenCount();
                 List<String> playerIds = new ArrayList<>();
@@ -164,18 +164,9 @@ public class WaitingRoomGarticActivity extends AppCompatActivity {
                 }
                 updatePlayerListUI(playerIds);
 
-                // Kiểm tra xem chủ phòng cũ có còn trong phòng không
+                // ✅ Lấy HostId và cập nhật trạng thái Host (Đã tối giản, vì logic chuyển host nằm trong Transaction)
                 roomRef.child("hostId").get().addOnSuccessListener(hostSnapshot -> {
                     currentHostId = hostSnapshot.getValue(String.class);
-                    // Nếu chủ phòng cũ đã thoát
-                    if (currentHostId != null && !playerIds.contains(currentHostId)) {
-                        // Người còn lại sẽ trở thành chủ phòng mới
-                        String newHostId = playerIds.isEmpty() ? null : playerIds.get(0);
-                        if (newHostId != null) {
-                            roomRef.child("hostId").setValue(newHostId);
-                            currentHostId = newHostId;
-                        }
-                    }
                     isHost = userId.equals(currentHostId);
                     updateStatusUI();
                 });
@@ -238,15 +229,15 @@ public class WaitingRoomGarticActivity extends AppCompatActivity {
         // Chủ phòng sẽ reset dữ liệu game cũ và đổi trạng thái sang "playing"
         Map<String, Object> gameData = new HashMap<>();
         gameData.put("status", "playing");
-        gameData.put("scores", null); // Xóa điểm cũ
-        gameData.put("currentTurn", null); // Xóa lượt cũ
+        gameData.put("scores", null);
+        gameData.put("currentTurn", null);
         gameData.put("currentWord", null);
         gameData.put("drawingData", null);
         roomRef.updateChildren(gameData);
     }
 
     private void goToGame() {
-        isLeavingForGame = true; // Đánh dấu để không kích hoạt logic rời phòng
+        isLeavingForGame = true;
         removeAllListeners();
         Intent intent = new Intent(this, GarticActivity.class);
         intent.putExtra("roomId", coupleId);
@@ -263,11 +254,50 @@ public class WaitingRoomGarticActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         removeAllListeners();
-
-        // Nếu người dùng rời đi (không phải để vào game)
         if (!isLeavingForGame && userId != null) {
-            // Chỉ xóa người chơi này khỏi danh sách
-            roomRef.child("players").child(userId).removeValue();
+            removePlayerAndCleanUpTransaction();
         }
+    }
+    private void removePlayerAndCleanUpTransaction() {
+        roomRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                MutableData playersNode = currentData.child("players");
+                String hostId = currentData.child("hostId").getValue(String.class);
+
+                if (playersNode.hasChild(userId)) {
+                    playersNode.child(userId).setValue(null);
+                } else {
+                    return Transaction.success(currentData);
+                }
+
+                long remainingPlayers = playersNode.getChildrenCount();
+
+                if (remainingPlayers == 0) {
+                    currentData.setValue(null);
+                } else if (userId.equals(hostId)) {
+                    for (MutableData child : playersNode.getChildren()) {
+                        String newHostId = child.getKey();
+                        if (newHostId != null) {
+                            currentData.child("hostId").setValue(newHostId);
+                            break;
+                        }
+                    }
+                }
+                currentData.child("status").setValue("waiting");
+
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot snapshot) {
+                if (error != null) {
+                    Log.e(TAG, "Lỗi dọn dẹp phòng: " + error.getMessage());
+                } else if (committed && snapshot != null && !snapshot.exists()) {
+                    Log.d(TAG, "Phòng đã được dọn dẹp hoàn toàn.");
+                }
+            }
+        });
     }
 }

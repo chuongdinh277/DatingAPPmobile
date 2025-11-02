@@ -12,7 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
-
+import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class GarticActivity extends AppCompatActivity {
 
@@ -35,6 +36,7 @@ public class GarticActivity extends AppCompatActivity {
     private FrameLayout gameBoard;
     private EditText etMessage;
     private Button btnSend;
+    private ImageButton btnExit;
 
     private String userId, roomId;
     private DatabaseReference roomRef;
@@ -51,8 +53,21 @@ public class GarticActivity extends AppCompatActivity {
 
     private DrawingView drawingView;
 
-    private String[] wordList = {"Tree"};
+    private String[] wordList = {
 
+            "Tree", "Sun", "Cloud", "Flower", "House", "Car", "Bicycle",
+
+            "Chair", "Table", "Book", "Pencil", "Phone", "Clock", "Mountain",
+
+            "Cat", "Dog", "Fish", "Bird", "Snake", "Elephant", "Lion", "Rabbit",
+
+            "Apple", "Banana", "Pizza", "Cake", "Bread", "Ice Cream", "Coffee",
+
+            "Run", "Swim", "Jump", "Sing", "Dance", "Soccer", "Basketball",
+
+            "Hat", "Shoes", "Dress", "Glasses", "Star", "Heart", "Rain", "Balloon"
+
+    };
     private boolean isGuessingPhase = false;
 
     private ValueEventListener drawingDataListener;
@@ -70,7 +85,7 @@ public class GarticActivity extends AppCompatActivity {
         gameBoard = findViewById(R.id.gameBoard);
         etMessage = findViewById(R.id.etMessage);
         btnSend = findViewById(R.id.btnSend);
-
+        btnExit = findViewById(R.id.btnExit);
         userId = LoginPreferences.getUserId(this);
         roomId = getIntent().getStringExtra("roomId");
         tvRoomId.setText("Phòng: #" + roomId);
@@ -80,11 +95,14 @@ public class GarticActivity extends AppCompatActivity {
 
         drawingView = new DrawingView(this);
         gameBoard.addView(drawingView);
+        // Wire drawig to room for realtime strokes display
+        drawingView.setRoomId(roomId);
 
         btnSend.setOnClickListener(v -> sendGuess());
-
+        btnExit.setOnClickListener(v -> exitGame());
         initGame();
     }
+
 
     private void initGame() {
         roomRef.child("players").addListenerForSingleValueEvent(new SimpleValueListener() {
@@ -160,7 +178,7 @@ public class GarticActivity extends AppCompatActivity {
 
         if(isMyTurn){
             tvCurrentWord.setText("Đang chọn từ...");
-            tvTimer.setText("15s");
+            tvTimer.setText("30s");
 
             // Chọn từ mới
             roomRef.child("currentWord").addListenerForSingleValueEvent(new SimpleValueListener() {
@@ -355,5 +373,15 @@ public class GarticActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void exitGame() {
+        removePlayerFromRoom();
+
+        if (turnTimer != null) {
+            turnTimer.cancel();
+        }
+        finish();
+        Toast.makeText(this, "Đã rời khỏi phòng chơi.", Toast.LENGTH_SHORT).show();
     }
 }

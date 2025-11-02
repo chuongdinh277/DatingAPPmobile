@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -19,7 +20,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,12 +28,14 @@ import java.util.Map;
 public class DrawingView extends View {
 
     private Paint paint;
+    private boolean isDrawingEnabled = true;
+
     private final List<float[]> points = new ArrayList<>();
     private DatabaseReference drawRef;
-    private boolean enabled = true;
+    private boolean isLocalUserDrawing = true;
     private boolean listenerAttached = false;
 
-    // để giảm ghi Firebase liên tục
+    // ... (Handler và Runnable giữ nguyên)
     private final List<Map<String, Object>> buffer = new ArrayList<>();
     private final Handler handler = new Handler();
     private final Runnable flushRunnable = new Runnable() {
@@ -60,10 +62,17 @@ public class DrawingView extends View {
         paint.setStrokeWidth(8);
         paint.setStyle(Paint.Style.STROKE);
         paint.setAntiAlias(true);
+        // Bắt đầu flush buffer
         handler.postDelayed(flushRunnable, 100);
     }
-
-    /** Gán roomId để đồng bộ dữ liệu vẽ */
+    public void setDrawingEnabled(boolean enabled) {
+        this.isDrawingEnabled = enabled;
+        // Nếu không được vẽ, không cần thiết lập là người vẽ local nữa
+        if (!enabled) {
+            this.isLocalUserDrawing = false;
+        }
+        Log.d("DrawingView", "Drawing enabled set to: " + enabled);
+    }
     public void setRoomId(String roomId) {
         drawRef = FirebaseDatabase.getInstance()
                 .getReference("rooms")
@@ -77,7 +86,8 @@ public class DrawingView extends View {
                 public void onChildAdded(@NonNull DataSnapshot snapshot, String previousChildName) {
                     Float x = snapshot.child("x").getValue(Float.class);
                     Float y = snapshot.child("y").getValue(Float.class);
-                    if (x != null && y != null && !enabled) { // chỉ người xem mới nhận
+                    // ✅ CHỈ NGƯỜI KHÔNG VẼ MỚI NHẬN DỮ LIỆU TỪ FIREBASE
+                    if (x != null && y != null && !isDrawingEnabled) {
                         points.add(new float[]{x, y});
                         invalidate();
                     }
@@ -86,14 +96,11 @@ public class DrawingView extends View {
                 @Override public void onChildChanged(@NonNull DataSnapshot snapshot, String previousChildName) {}
                 @Override public void onChildRemoved(@NonNull DataSnapshot snapshot) {}
                 @Override public void onChildMoved(@NonNull DataSnapshot snapshot, String previousChildName) {}
-                @Override public void onCancelled(@NonNull DatabaseError error) {}
+                @Override public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e("DrawingView", "Firebase draw listener cancelled: " + error.getMessage());
+                }
             });
         }
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     @Override
@@ -106,7 +113,8 @@ public class DrawingView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!enabled) return false;
+        // ✅ KIỂM TRA isDrawingEnabled TRƯỚC HẾT
+        if (!isDrawingEnabled) return false;
 
         if (event.getAction() == MotionEvent.ACTION_MOVE) {
             float x = event.getX();
@@ -114,6 +122,7 @@ public class DrawingView extends View {
             points.add(new float[]{x, y});
             invalidate();
 
+            // Ghi vào buffer để gửi lên Firebase
             Map<String, Object> point = new HashMap<>();
             point.put("x", x);
             point.put("y", y);
@@ -123,10 +132,9 @@ public class DrawingView extends View {
         }
         return true;
     }
-
-    /** Gửi batch điểm vẽ lên Firebase */
     private void flushBuffer() {
-        if (drawRef == null || !enabled) return;
+        if (drawRef == null || !isDrawingEnabled) return;
+
         List<Map<String, Object>> batch;
         synchronized (buffer) {
             if (buffer.isEmpty()) return;
@@ -137,27 +145,29 @@ public class DrawingView extends View {
             drawRef.push().setValue(point);
         }
     }
-
-    /** Xuất ảnh vẽ */
     public Bitmap exportBitmap() {
+        if (getWidth() <= 0 || getHeight() <= 0) {
+            return null;
+        }
         Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+        if (getBackground() != null) {
+            getBackground().draw(canvas);
+        }
         draw(canvas);
         return bitmap;
     }
 
-    /** Hiển thị ảnh từ người khác */
     public void showImage(Bitmap bitmap) {
         setBackground(new BitmapDrawable(getResources(), bitmap));
         points.clear();
         invalidate();
     }
 
-    /** Xóa toàn bộ canvas (chỉ người vẽ mới dùng) */
     public void clearCanvas() {
         points.clear();
         invalidate();
-        if (drawRef != null && enabled) {
+        if (drawRef != null && isDrawingEnabled) {
             drawRef.removeValue();
         }
     }
