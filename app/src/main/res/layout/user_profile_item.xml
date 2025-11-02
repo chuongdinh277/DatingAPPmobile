@@ -4,46 +4,62 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="20dp"
-    android:gravity="center"
-    android:orientation="horizontal"
-    android:padding="16dp">
 
-    <LinearLayout
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="33dp"
+    android:paddingBottom="35dp"
+    android:paddingHorizontal="10dp"
+    android:background="@drawable/wavy_profile_background"
+    android:baselineAligned="false">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/userProfileLeft"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="5dp"
         android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
+        >
 
         <ImageView
             android:id="@+id/avtLeft"
             android:layout_width="100dp"
             android:layout_height="100dp"
-
-            android:scaleType="centerCrop"
+            android:layout_marginTop="8dp"
             android:background="@drawable/circle_mask"
             android:clipToOutline="true"
-            android:outlineProvider="background" />
+            android:outlineProvider="background"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/txtNameLeft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Kim ji won"
             android:fontFamily="@font/pacifico"
+            android:text="Kim ji won"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/avtLeft" />
 
         <LinearLayout
+            android:id="@+id/infoLeftLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtNameLeft">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -72,60 +88,67 @@
 
             <TextView
                 android:id="@+id/tvZodiacLeft"
-                android:layout_width="70dp"
-                android:layout_height="20dp"
+                android:layout_width="75dp"
+                android:layout_height="25dp"
                 android:layout_marginStart="10dp"
                 android:background="@drawable/bg_zodiac_pink"
                 android:gravity="center"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
+                android:fontFamily="@font/pacifico"
                 android:text="Nhân mã"
                 android:textColor="@android:color/white"
                 android:textSize="11sp" />
         </LinearLayout>
-    </LinearLayout>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-        android:layout_marginHorizontal="20dp"/>
-
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/userProfileRight"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="10dp">
 
         <ImageView
             android:id="@+id/avtRight"
             android:layout_width="100dp"
             android:layout_height="100dp"
-
+            android:layout_marginTop="8dp"
             android:background="@drawable/circle_mask"
-            android:scaleType="centerCrop"
             android:clipToOutline="true"
-            android:outlineProvider="background" />
+            android:outlineProvider="background"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/txtNameRight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Kim Hau Hau"
             android:fontFamily="@font/pacifico"
+            android:text="Kim Hau Hau"
             android:textColor="#000000"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/avtRight"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <LinearLayout
+            android:id="@+id/infoRightLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/txtNameRight"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -135,14 +158,12 @@
                 android:orientation="horizontal"
                 android:paddingStart="6dp"
                 android:paddingEnd="6dp">
-
                 <ImageView
                     android:id="@+id/imgGenderRight"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginEnd="2dp"
                     android:src="@drawable/girl" />
-
                 <TextView
                     android:id="@+id/tvAgeRight"
                     android:layout_width="wrap_content"
@@ -151,19 +172,20 @@
                     android:textColor="@android:color/white"
                     android:textSize="11sp" />
             </LinearLayout>
-
             <TextView
                 android:id="@+id/tvZodiacRight"
-                android:layout_width="70dp"
-                android:layout_height="20dp"
+                android:layout_width="75dp"
+                android:layout_height="25dp"
                 android:layout_marginStart="10dp"
                 android:background="@drawable/bg_zodiac_pink"
                 android:gravity="center"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:text="Sư Tử"
+                android:fontFamily="@font/pacifico"
                 android:textColor="@android:color/white"
                 android:textSize="11sp" />
         </LinearLayout>
-    </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

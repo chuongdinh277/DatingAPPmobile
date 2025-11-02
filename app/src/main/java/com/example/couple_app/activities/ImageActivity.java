@@ -93,6 +93,7 @@ public class ImageActivity extends BaseActivity {
             intent.putExtra("timestamp", image.getTimestamp());
             intent.putExtra("coupleId", coupleId);
             startActivity(intent);
+            overridePendingTransition(0, 0);
         });
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, 4);

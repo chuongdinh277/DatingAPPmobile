@@ -10,6 +10,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.auth.AdditionalUserInfo;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -530,23 +531,72 @@ public class AuthManager {
         mAuth.signInWithCredential(phoneCredential)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
+                    boolean isNew = false;
+                    try {
+                        if (task.getResult() != null) {
+                            AdditionalUserInfo info = task.getResult().getAdditionalUserInfo();
+                            if (info != null) isNew = info.isNewUser();
+                        }
+                    } catch (Exception ignored) {}
+
                     FirebaseUser user = mAuth.getCurrentUser();
-                    if (user != null) {
-                        // Update password
-                        user.updatePassword(newPassword)
-                            .addOnCompleteListener(updateTask -> {
-                                if (updateTask.isSuccessful()) {
-                                    Log.d(TAG, "Password reset successfully");
-                                    callback.onSuccess();
-                                } else {
-                                    String errorMessage = updateTask.getException() != null ?
-                                        updateTask.getException().getMessage() : "Password reset failed";
-                                    callback.onError(errorMessage);
-                                }
-                            });
-                    } else {
+                    if (user == null) {
                         callback.onError("User not found");
+                        return;
                     }
+
+                    if (isNew) {
+                        // Phone number not registered; avoid creating new account in forgot password flow
+                        user.delete().addOnCompleteListener(deleteTask -> {
+                            mAuth.signOut();
+                            callback.onError("Số điện thoại chưa được đăng ký");
+                        });
+                        return;
+                    }
+
+                    // Determine fake email from phone number
+                    String fakeEmail = generateFakeEmail(phoneNumber);
+                    mAuth.fetchSignInMethodsForEmail(fakeEmail)
+                        .addOnCompleteListener(fetchTask -> {
+                            if (fetchTask.isSuccessful()) {
+                                List<String> methods = fetchTask.getResult().getSignInMethods();
+                                boolean hasPassword = methods != null && methods.contains(EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD);
+
+                                if (hasPassword) {
+                                    // Update password directly
+                                    user.updatePassword(newPassword)
+                                        .addOnCompleteListener(updateTask -> {
+                                            if (updateTask.isSuccessful()) {
+                                                Log.d(TAG, "Password reset successfully for existing email-linked account");
+                                                callback.onSuccess();
+                                            } else {
+                                                String errorMessage = updateTask.getException() != null ?
+                                                    updateTask.getException().getMessage() : "Password reset failed";
+                                                callback.onError(errorMessage);
+                                            }
+                                        });
+                                } else {
+                                    // Link fake email/password first, then succeed
+                                    AuthCredential emailCred = EmailAuthProvider.getCredential(fakeEmail, newPassword);
+                                    user.linkWithCredential(emailCred)
+                                        .addOnCompleteListener(linkTask -> {
+                                            if (linkTask.isSuccessful()) {
+                                                Log.d(TAG, "Linked fake email to phone account and set new password");
+                                                callback.onSuccess();
+                                            } else {
+                                                String errorMessage = linkTask.getException() != null ?
+                                                    linkTask.getException().getMessage() : "Failed to link email/password";
+                                                Log.e(TAG, "Failed linking fake email on reset: " + errorMessage, linkTask.getException());
+                                                callback.onError(errorMessage);
+                                            }
+                                        });
+                                }
+                            } else {
+                                String errorMessage = fetchTask.getException() != null ?
+                                    fetchTask.getException().getMessage() : "Failed to check sign-in methods";
+                                callback.onError(errorMessage);
+                            }
+                        });
                 } else {
                     String errorMessage = task.getException() != null ?
                         task.getException().getMessage() : "Phone authentication failed";

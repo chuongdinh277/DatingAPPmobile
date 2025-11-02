@@ -1,21 +1,62 @@
 package com.example.couple_app.activities;
 
+// Import Android core libraries
+import android.app.AlertDialog;
+import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+// Import androidx libraries
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+// Import Glide library
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+
+// Import Google Material library
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+// Import Firebase libraries
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+// Import project-specific classes
 import com.example.couple_app.R;
 import com.example.couple_app.managers.DatabaseManager;
 import com.example.couple_app.models.User;
@@ -24,44 +65,101 @@ import com.example.couple_app.utils.NameCache;
 import com.example.couple_app.utils.DateUtils;
 import com.example.couple_app.utils.FragmentUtils;
 import com.example.couple_app.viewmodels.UserProfileData;
-import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
+// Import Java utilities
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class HomeMain1Fragment extends Fragment {
+
+
+
+public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionListener{
+
+    // === THAY ĐỔI 1: Thêm biến ImageView ===
+    private ImageView imgBackgroundDisplay;
+    // ======================================
+
+    private static final String TAG = "HomeMain1Fragment"; // Thêm TAG để debug
+    private static final String PREFS_NAME = "AppSettings"; // Tên file SharedPreferences
+    private static final String PREF_BACKGROUND_URL = "saved_background_url"; // Key lưu URL nền
+
     private static final ExecutorService IMAGE_EXECUTOR = Executors.newFixedThreadPool(2);
     private UserProfileData profileData;
 
+    // Love Counter Variables
     private Runnable loveCounterRunnable;
     private Timestamp startLoveDate = null;
     private final Handler loveCounterHandler = new Handler(Looper.getMainLooper());
-
-
     private TextView txtYears, txtMonths, txtWeeks, txtDays, txtTimer, txtStartDate;
 
+    // Background Change Variables
+    private ActivityResultLauncher<String[]> requestPermissionLauncher;
+    private ActivityResultLauncher<PickVisualMediaRequest> pickImageLauncher;
+    private ConstraintLayout rootLayout;
+    private FloatingActionButton fabChangeBackground;
+    private FirebaseStorage storage;
+    private ProgressDialog progressDialog;
+    private SharedPreferences sharedPreferences;
 
-    public HomeMain1Fragment() {}
+
+    private static final String PREF_BACKGROUND_SOURCE_TYPE = "background_source_type";
+    private static final String SOURCE_TYPE_RESOURCE = "resource";
+    private static final String SOURCE_TYPE_URL = "url";
+
+    private static final int[] DEFAULT_BACKGROUND_IDS = {
+            R.drawable.background_home,
+            R.drawable.background_default_1,
+            R.drawable.background_default_2,
+            R.drawable.background_default_3,
+            R.drawable.background_default_4
+    };
+    public HomeMain1Fragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate called");
+        storage = FirebaseStorage.getInstance();
+        sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        setupActivityLaunchers();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout
+        Log.d(TAG, "onCreateView called");
         View root = inflater.inflate(R.layout.homemain1, container, false);
-        // Get shared profile data instance
-        profileData = UserProfileData.getInstance();
 
-        // Initialize TextViews for love counter
+        // Find Views
+        rootLayout = root.findViewById(R.id.root_homemain1);
+
+        // === THAY ĐỔI 2: Tìm ImageView và xóa nền của rootLayout ===
+        imgBackgroundDisplay = root.findViewById(R.id.img_background);
+        if (rootLayout != null) {
+            rootLayout.setBackground(null); // Xóa nền mặc định của XML
+        }
+        // Đảm bảo ImageView không bao giờ kéo giãn ảnh
+        if (imgBackgroundDisplay != null) {
+            imgBackgroundDisplay.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        }
+        // ========================================================
+
+        fabChangeBackground = root.findViewById(R.id.fab_change_background);
         txtYears = root.findViewById(R.id.txtYears);
         txtMonths = root.findViewById(R.id.txtMonths);
         txtWeeks = root.findViewById(R.id.txtWeeks);
@@ -69,317 +167,732 @@ public class HomeMain1Fragment extends Fragment {
         txtTimer = root.findViewById(R.id.txtTimer);
         txtStartDate = root.findViewById(R.id.txtStartDate);
 
-        // After inflating, bind user info into included layout
+        // Initialize ViewModel and ProgressDialog
+        profileData = UserProfileData.getInstance();
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle("Đang tải lên");
+        progressDialog.setMessage("Vui lòng đợi trong giây lát...");
+        progressDialog.setCancelable(false);
+
+        // Load saved background immediately if available
+        loadSavedBackground();
+
+        // Bind user profile data (this will also load background from DB if needed)
         bindUserProfile(root);
 
+        fabChangeBackground.setOnClickListener(v -> {
+            BackgroundSelectionBottomSheet sheet = BackgroundSelectionBottomSheet.newInstance(DEFAULT_BACKGROUND_IDS);
+            // Truyền listener để sheet có thể gọi lại hàm trong fragment này
+            sheet.setTargetFragment(this, 0);
+            sheet.show(getParentFragmentManager(), "BackgroundSheet");
+        });
         return root;
     }
 
+    @Override
+    public void onDefaultBackgroundSelected(int resourceId) {
+        // Khi nhận được Resource ID từ Bottom Sheet
+        applyDefaultBackground(resourceId);
+    }
+
+    @Override
+    public void onCustomSelectionRequested() {
+        // Khi người dùng yêu cầu chọn ảnh từ thư viện
+        checkPermissionAndPickImage();
+    }
+    // --- Permission and Image Picking Logic ---
+
+    private void setupActivityLaunchers() {
+        Log.d(TAG, "setupActivityLaunchers");
+        // 1. Launcher for picking image using Photo Picker
+        pickImageLauncher = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(),
+                (Uri uri) -> {
+                    if (uri != null && isAdded()) {
+                        Log.d(TAG, "Image selected: " + uri.toString());
+                        uploadImageToFirebaseStorage(uri);
+                    } else {
+                        Log.d(TAG, "No media selected from picker.");
+                    }
+                });
+
+        // 2. Launcher for requesting permissions
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                permissions -> {
+                    String readImagePermission = getReadImagePermissionString(); // Helper to get correct permission name
+
+                    boolean imagesGranted = permissions.getOrDefault(readImagePermission, false);
+                    boolean selectedAccessGranted = false;
+
+                    // Only check selected access on Android 14+ IF full access was denied
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !imagesGranted) {
+                        selectedAccessGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+                                == PackageManager.PERMISSION_GRANTED;
+                    }
+
+                    if (imagesGranted) {
+                        Log.d(TAG, "Permission Result: Full media access granted.");
+                        launchImagePicker();
+                    } else if (selectedAccessGranted) {
+                        Log.d(TAG, "Permission Result: Selected Photos Access granted.");
+                        launchImagePicker();
+                        Toast.makeText(getContext(), "Bạn chỉ cấp quyền cho ảnh đã chọn.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Log.d(TAG, "Permission Result: Media permissions denied.");
+                        Toast.makeText(getContext(), "Bạn cần cấp quyền truy cập ảnh để đổi nền", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void launchImagePicker() {
+        Log.d(TAG, "Launching image picker.");
+        pickImageLauncher.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
+    }
+
+    private void checkPermissionAndPickImage() {
+        Log.d(TAG, "checkPermissionAndPickImage called");
+        if (!isAdded()) {
+            Log.w(TAG, "Fragment not added, cannot pick image.");
+            return;
+        }
+
+        String readImagePermission = getReadImagePermissionString();
+        boolean hasReadImages = ContextCompat.checkSelfPermission(requireContext(), readImagePermission) == PackageManager.PERMISSION_GRANTED;
+        boolean hasSelectedAccess = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            hasSelectedAccess = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED;
+        }
+
+        if (hasReadImages || hasSelectedAccess) {
+            Log.d(TAG, "Permission available (full or selected). Launching picker.");
+            launchImagePicker();
+        } else {
+            Log.d(TAG, "Requesting read image permission.");
+            requestPermissionLauncher.launch(new String[]{readImagePermission});
+        }
+    }
+
+    // Helper to get the correct permission string based on Android version
+    private String getReadImagePermissionString() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
+            return Manifest.permission.READ_MEDIA_IMAGES;
+        } else { // Android 12-
+            return Manifest.permission.READ_EXTERNAL_STORAGE;
+        }
+    }
+
+    // --- Firebase Storage and Firestore Logic ---
+
+    private void uploadImageToFirebaseStorage(Uri imageUri) {
+        FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (fbUser == null) {
+            Toast.makeText(getContext(), "Bạn chưa đăng nhập", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressDialog.show();
+        Log.d(TAG, "Starting image upload to Storage.");
+
+        StorageReference storageRef = storage.getReference();
+        String fileName = "background_" + System.currentTimeMillis() + ".jpg";
+        StorageReference backgroundRef = storageRef.child("backgrounds/" + fbUser.getUid() + "/" + fileName);
+        Uri compressedUri = null;
+        try {
+            compressedUri = compressImageBeforeUpload(requireContext(), imageUri);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(requireContext(), "Lỗi khi nén ảnh!", Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
+            return;
+        }
+
+        backgroundRef.putFile(compressedUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    Log.d(TAG, "Image upload successful. Getting download URL.");
+
+                    backgroundRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                                String urlString = downloadUrl.toString();
+                                Log.d(TAG, "Download URL obtained: " + urlString);
+
+                                // 1. Lưu URL vào Firestore
+                                saveBackgroundUrlToDatabase(urlString);
+
+                                // 2. Load background lên UI
+                                loadBackgroundFromUrl(urlString);
+
+                                // 3. Lưu vào SharedPreferences (lưu URL và loại nguồn)
+                                saveBackgroundUrlLocally(urlString);
+                                sharedPreferences.edit()
+                                        .putString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_URL) // Lưu loại nguồn là URL
+                                        .apply();
+
+                                // 4. Cập nhật ViewModel
+                                if (profileData != null) {
+                                    profileData.setCurrentUserBackgroundImageUrl(urlString);
+                                    Log.d(TAG, "Updated ViewModel with new background URL.");
+                                }
+                                progressDialog.dismiss();
+                                Toast.makeText(getContext(), "Đổi nền thành công!", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                progressDialog.dismiss();
+                                Log.e(TAG, "Failed to get download URL.", e);
+                                Toast.makeText(getContext(), "Lỗi lấy URL ảnh", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Log.e(TAG, "Image upload failed.", e);
+                    Toast.makeText(getContext(), "Tải ảnh lên thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void saveBackgroundUrlToDatabase(String downloadUrl) {
+        FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (fbUser == null) return;
+        String uid = fbUser.getUid();
+
+        Log.d(TAG, "Saving background URL to Firestore for user: " + uid);
+        FirebaseFirestore.getInstance().collection("users").document(uid)
+                .update("backgroundImageUrl", downloadUrl)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Firestore update successful."))
+                .addOnFailureListener(e -> Log.e(TAG, "Firestore update failed.", e));
+    }
+
+    // --- Local Storage (SharedPreferences) Logic ---
+
+    private void saveBackgroundUrlLocally(String url) {
+        if (sharedPreferences != null) {
+            sharedPreferences.edit().putString(PREF_BACKGROUND_URL, url).apply();
+            Log.d(TAG, "Saved background URL to SharedPreferences.");
+        }
+    }
+
+    private void loadSavedBackground() {
+        if (sharedPreferences != null) {
+            String savedUrlOrId = sharedPreferences.getString(PREF_BACKGROUND_URL, null);
+            String sourceType = sharedPreferences.getString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_URL);
+
+            if (savedUrlOrId != null && !savedUrlOrId.isEmpty()) {
+                if (sourceType.equals(SOURCE_TYPE_RESOURCE)) {
+                    // Tải từ Resource ID (Nền mặc định)
+                    try {
+                        int resourceId = Integer.parseInt(savedUrlOrId);
+                        if (imgBackgroundDisplay != null) { // Sửa từ rootLayout
+                            imgBackgroundDisplay.setImageResource(resourceId); // Sửa từ setBackgroundResource
+                            Log.d(TAG, "Loading background from saved Resource ID: " + resourceId);
+                        }
+                    } catch (NumberFormatException e) {
+                        Log.e(TAG, "Invalid Resource ID saved in SharedPreferences.");
+                        loadBackgroundFromUrl(savedUrlOrId); // Thử tải như URL nếu lỗi
+                    }
+                } else {
+                    // Tải từ URL (Ảnh tùy chỉnh)
+                    Log.d(TAG, "Loading background from SharedPreferences URL: " + savedUrlOrId);
+                    loadBackgroundFromUrl(savedUrlOrId);
+                }
+            } else {
+                Log.d(TAG, "No background data found in SharedPreferences.");
+                // Đặt nền mặc định nếu không có gì
+                if (imgBackgroundDisplay != null) {
+                    imgBackgroundDisplay.setImageResource(R.drawable.background_home);
+                }
+            }
+        }
+    }
+    // ===============================================
 
 
+
+    // --- Glide Background Loading ---
+
+    // === THAY ĐỔI 4: Sửa hàm loadBackgroundFromUrl ===
+    private void loadBackgroundFromUrl(String url) {
+        // Sửa: || imgBackgroundDisplay == null
+        if (url == null || url.isEmpty() || !isAdded() || imgBackgroundDisplay == null) {
+            Log.w(TAG, "Cannot load background: URL is null/empty, or fragment/layout not ready.");
+            // Ensure default is set if URL is invalid and nothing else was loaded
+            // Sửa: imgBackgroundDisplay != null && imgBackgroundDisplay.getDrawable() == null
+            if (imgBackgroundDisplay != null && imgBackgroundDisplay.getDrawable() == null) {
+                Log.d(TAG, "Setting default background because URL was invalid.");
+                // Sửa: imgBackgroundDisplay.setImageResource
+                imgBackgroundDisplay.setImageResource(R.drawable.background_home);
+            }
+            return;
+        }
+
+        Log.d(TAG, "Loading background from URL using Glide: " + url);
+        Glide.with(this)
+                .load(url)
+                .centerCrop()                         // đảm bảo không kéo giãn, chỉ crop để phủ kín
+                .error(R.drawable.background_home)    // ảnh fallback nếu lỗi
+                .diskCacheStrategy(DiskCacheStrategy.ALL)   // cache cả ảnh gốc & nén
+                .skipMemoryCache(false)               // dùng cache trong RAM
+                .into(imgBackgroundDisplay);
+    }
+    // ===============================================
+
+
+    // --- User Profile and Love Counter Logic (Mostly unchanged, added logging and minor fixes) ---
 
     private void bindUserProfile(View root) {
+        Log.d(TAG, "bindUserProfile called");
         View userInfo = root.findViewById(R.id.layoutUserInfo);
-        if (userInfo == null) return;
+        if (userInfo == null) {
+            Log.w(TAG, "layoutUserInfo not found.");
+            return;
+        }
 
-        // Views for left user (current user)
         ImageView avtLeft = userInfo.findViewById(R.id.avtLeft);
         TextView txtNameLeft = userInfo.findViewById(R.id.txtNameLeft);
         TextView tvAgeLeft = userInfo.findViewById(R.id.tvAgeLeft);
         TextView tvZodiacLeft = userInfo.findViewById(R.id.tvZodiacLeft);
-
-        // Views for right user (partner)
         ImageView avtRight = userInfo.findViewById(R.id.avtRight);
         TextView txtNameRight = userInfo.findViewById(R.id.txtNameRight);
         TextView tvAgeRight = userInfo.findViewById(R.id.tvAgeRight);
         TextView tvZodiacRight = userInfo.findViewById(R.id.tvZodiacRight);
 
-        // Check if data is already loaded
+        // --- Check ViewModel cache first ---
         if (profileData.isLoaded() && profileData.hasCurrentUserData()) {
-            // Use cached data - no need to reload
+            Log.d(TAG, "Using cached data from ViewModel.");
             displayCachedData(avtLeft, txtNameLeft, tvAgeLeft, tvZodiacLeft,
-                            avtRight, txtNameRight, tvAgeRight, tvZodiacRight);
-            return;
+                    avtRight, txtNameRight, tvAgeRight, tvZodiacRight); // displayCachedData now handles background too
+
+            // Load love date from ViewModel cache
+            startLoveDate = profileData.getCurrentUserStartLoveDate();
+            startLoveCounter(); // Will handle null date inside
+
+            return; // Stop here, used cache
         }
 
-        // Set default values using FragmentUtils
-        FragmentUtils.safeSetText(this, txtNameLeft, "");
+        // --- If ViewModel cache is empty, load from Database ---
+        Log.d(TAG, "ViewModel cache empty, loading from Database.");
+        // Set defaults while loading
+        FragmentUtils.safeSetText(this, txtNameLeft, "Loading...");
         FragmentUtils.safeSetText(this, txtNameRight, "");
         FragmentUtils.safeSetText(this, tvAgeLeft, "");
         FragmentUtils.safeSetText(this, tvZodiacLeft, "");
         FragmentUtils.safeSetText(this, tvAgeRight, "");
         FragmentUtils.safeSetText(this, tvZodiacRight, "");
+        if(avtLeft != null) avtLeft.setImageResource(R.drawable.ic_default_avatar);
+        if(avtRight != null) avtRight.setImageResource(R.drawable.ic_default_avatar);
+        // Đã xóa dòng setBackground mặc định bị "nháy" ở đây
+
 
         FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (fbUser == null) return;
-
+        if (fbUser == null) {
+            Log.w(TAG, "Firebase user is null, cannot load data.");
+            handleUserLoadError(fbUser); // Show fallback UI
+            return;
+        }
         String uid = fbUser.getUid();
 
-        // Try to load from cache first
-        Bitmap cachedAvatar = AvatarCache.getCachedBitmap(requireContext());
-        if (cachedAvatar != null && avtLeft != null) {
-            avtLeft.setImageBitmap(cachedAvatar);
-            profileData.setCurrentUserAvatar(cachedAvatar);
-        }
-
-        Bitmap cachedPartnerAvatar = AvatarCache.getPartnerCachedBitmap(requireContext());
-        if (cachedPartnerAvatar != null && avtRight != null) {
-            avtRight.setImageBitmap(cachedPartnerAvatar);
-            profileData.setPartnerAvatar(cachedPartnerAvatar);
-        }
-
-        // Load current user data from database
+        // Load user data from Database
         DatabaseManager.getInstance().getUser(uid, new DatabaseManager.DatabaseCallback<User>() {
             @Override
             public void onSuccess(User user) {
-                if (!isAdded()) return;
-
-                // Display current user's name
-                String displayName = null;
-                if (user != null && !TextUtils.isEmpty(user.getName())) {
-                    displayName = user.getName();
-                } else if (!TextUtils.isEmpty(fbUser.getDisplayName())) {
-                    displayName = fbUser.getDisplayName();
-                } else if (!TextUtils.isEmpty(fbUser.getEmail())) {
-                    displayName = fbUser.getEmail();
+                if (!isAdded()) {
+                    Log.w(TAG, "Fragment detached during DB callback.");
+                    return;
                 }
+                if (user == null) {
+                    Log.e(TAG, "User data from DB is null for UID: " + uid);
+                    handleUserLoadError(fbUser);
+                    profileData.setLoaded(true); // Mark as loaded even on error
+                    return;
+                }
+
+                Log.d(TAG, "User data loaded successfully from DB.");
+
+                // === THAY ĐỔI 5: Sửa logic tải nền trong bindUserProfile ===
+                // 1. Load Background Image (Prioritize SharedPreferences -> DB -> Default)
+                String backgroundUrlFromDb = user.getBackgroundImageUrl();
+                String savedUrlOrIdFromPrefs = sharedPreferences.getString(PREF_BACKGROUND_URL, null);
+                String sourceTypeFromPrefs = sharedPreferences.getString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_URL);
+
+                // Ưu tiên 1: Tải từ SharedPreferences (nếu có)
+                if (!TextUtils.isEmpty(savedUrlOrIdFromPrefs)) {
+                    Log.d(TAG, "bindUserProfile: Loading background from SharedPreferences.");
+                    if (sourceTypeFromPrefs.equals(SOURCE_TYPE_RESOURCE)) {
+                        // Nguồn là Resource ID (Nền mặc định)
+                        try {
+                            int resourceId = Integer.parseInt(savedUrlOrIdFromPrefs);
+                            if (imgBackgroundDisplay != null) { // Sửa
+                                imgBackgroundDisplay.setImageResource(resourceId); // Sửa
+                            }
+                        } catch (NumberFormatException e) {
+                            Log.e(TAG, "bindUserProfile: Invalid Resource ID in Prefs, falling back.");
+                            if (imgBackgroundDisplay != null) { // Sửa
+                                imgBackgroundDisplay.setImageResource(R.drawable.background_home); // Sửa
+                            }
+                        }
+                    } else {
+                        // Nguồn là URL (Ảnh tùy chỉnh)
+                        loadBackgroundFromUrl(savedUrlOrIdFromPrefs);
+                    }
+                    // Cập nhật ViewModel
+                    if (profileData != null) {
+                        profileData.setCurrentUserBackgroundImageUrl(savedUrlOrIdFromPrefs);
+                    }
+                }
+                // Ưu tiên 2: Tải từ Database (nếu Prefs rỗng)
+                else if (!TextUtils.isEmpty(backgroundUrlFromDb)) {
+                    Log.d(TAG, "bindUserProfile: Loading background from DB.");
+                    loadBackgroundFromUrl(backgroundUrlFromDb);
+                    // Lưu URL từ DB vào Prefs cho lần sau
+                    saveBackgroundUrlLocally(backgroundUrlFromDb);
+                    sharedPreferences.edit().putString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_URL).apply();
+                    // Cập nhật ViewModel
+                    if (profileData != null) {
+                        profileData.setCurrentUserBackgroundImageUrl(backgroundUrlFromDb);
+                    }
+                }
+                // Ưu tiên 3: Dùng nền mặc định (nếu cả 2 đều rỗng)
+                else {
+                    Log.d(TAG, "bindUserProfile: No background URL found in Prefs or DB. Using default.");
+                    if (imgBackgroundDisplay != null) { // Sửa
+                        imgBackgroundDisplay.setImageResource(R.drawable.background_home); // Sửa
+                    }
+                    if (profileData != null) {
+                        profileData.setCurrentUserBackgroundImageUrl(null);
+                    }
+                }
+                // ==========================================================
+
+
+                // --- 2. Load User Info (Name, Age, Zodiac, Avatar) ---
+                // Name (Prioritize DB -> Auth DisplayName -> Auth Email)
+                String displayName = user.getName();
+                if (TextUtils.isEmpty(displayName)) displayName = fbUser.getDisplayName();
+                if (TextUtils.isEmpty(displayName)) displayName = fbUser.getEmail();
                 if (!TextUtils.isEmpty(displayName)) {
                     FragmentUtils.safeSetText(HomeMain1Fragment.this, txtNameLeft, displayName);
                     profileData.setCurrentUserName(displayName);
                     profileData.setCurrentUserId(uid);
-                    NameCache.setCurrentName(requireContext(), displayName);
+                    NameCache.setCurrentName(requireContext(), displayName); // Keep if needed elsewhere
+                } else {
+                    FragmentUtils.safeSetText(HomeMain1Fragment.this, txtNameLeft, "User"); // Fallback name
                 }
 
-                // Display current user's age and zodiac using DateUtils
-                if (user != null && user.getDateOfBirth() != null) {
+                // Age & Zodiac
+                if (user.getDateOfBirth() != null) {
                     int age = DateUtils.calculateAge(user.getDateOfBirth());
                     String zodiac = DateUtils.getZodiacSign(user.getDateOfBirth());
-
                     profileData.setCurrentUserAge(age);
                     profileData.setCurrentUserZodiac(zodiac);
                     profileData.setCurrentUserDateOfBirth(user.getDateOfBirth());
-
-                    if (age > 0) {
-                        FragmentUtils.safeSetText(HomeMain1Fragment.this, tvAgeLeft, String.valueOf(age));
-                    }
-                    if (!TextUtils.isEmpty(zodiac)) {
-                        FragmentUtils.safeSetText(HomeMain1Fragment.this, tvZodiacLeft, zodiac);
-                    }
-                }
-
-                // Load current user's avatar
-                if (cachedAvatar == null && user != null && !TextUtils.isEmpty(user.getProfilePicUrl())) {
-                    loadImageAsync(user.getProfilePicUrl(), bmp -> {
-                        if (bmp != null && avtLeft != null) {
-                            avtLeft.setImageBitmap(bmp);
-                            profileData.setCurrentUserAvatar(bmp);
-                            AvatarCache.saveBitmapToCache(requireContext(), bmp);
-                        }
-                    });
-                } else if (cachedAvatar == null && fbUser.getPhotoUrl() != null) {
-                    loadImageAsync(fbUser.getPhotoUrl().toString(), bmp -> {
-                        if (bmp != null && avtLeft != null) {
-                            avtLeft.setImageBitmap(bmp);
-                            profileData.setCurrentUserAvatar(bmp);
-                            AvatarCache.saveBitmapToCache(requireContext(), bmp);
-                        }
-                    });
-                }
-
-                // Load partner information
-                if (user != null && !TextUtils.isEmpty(user.getPartnerId())) {
-                    String partnerId = user.getPartnerId();
-                    profileData.setPartnerId(partnerId);
-                    NameCache.setPartnerId(requireContext(), partnerId);
-
-                    // Fetch partner data
-                    DatabaseManager.getInstance().getUser(partnerId, new DatabaseManager.DatabaseCallback<User>() {
-                        @Override
-                        public void onSuccess(User partner) {
-                            if (!isAdded()) return;
-
-                            // Display partner's name
-                            String partnerName = partner != null && !TextUtils.isEmpty(partner.getName())
-                                    ? partner.getName() : "";
-                            FragmentUtils.safeSetText(HomeMain1Fragment.this, txtNameRight, partnerName);
-                            profileData.setPartnerName(partnerName);
-                            NameCache.setPartnerName(requireContext(), partnerName);
-
-                            // Display partner's age and zodiac using DateUtils
-                            if (partner != null && partner.getDateOfBirth() != null) {
-                                int partnerAge = DateUtils.calculateAge(partner.getDateOfBirth());
-                                String partnerZodiac = DateUtils.getZodiacSign(partner.getDateOfBirth());
-
-                                profileData.setPartnerAge(partnerAge);
-                                profileData.setPartnerZodiac(partnerZodiac);
-                                profileData.setPartnerDateOfBirth(partner.getDateOfBirth());
-
-                                if (partnerAge > 0) {
-                                    FragmentUtils.safeSetText(HomeMain1Fragment.this, tvAgeRight, String.valueOf(partnerAge));
-                                }
-                                if (!TextUtils.isEmpty(partnerZodiac)) {
-                                    FragmentUtils.safeSetText(HomeMain1Fragment.this, tvZodiacRight, partnerZodiac);
-                                }
-                            }
-
-                            // Load partner's avatar
-                            if (cachedPartnerAvatar == null && partner != null && !TextUtils.isEmpty(partner.getProfilePicUrl())) {
-                                loadImageAsync(partner.getProfilePicUrl(), bmp -> {
-                                    if (bmp != null && avtRight != null) {
-                                        avtRight.setImageBitmap(bmp);
-                                        profileData.setPartnerAvatar(bmp);
-                                        AvatarCache.savePartnerBitmapToCache(requireContext(), bmp);
-                                    }
-                                });
-                            }
-
-                            // Mark data as loaded
-                            profileData.setLoaded(true);
-                        }
-
-                        @Override
-                        public void onError(String error) {
-                            if (!isAdded()) return;
-                            profileData.setLoaded(true);
-                        }
-                    });
+                    FragmentUtils.safeSetText(HomeMain1Fragment.this, tvAgeLeft, age > 0 ? String.valueOf(age) : "");
+                    FragmentUtils.safeSetText(HomeMain1Fragment.this, tvZodiacLeft, zodiac);
                 } else {
-                    // No partner
-                    NameCache.clearPartner(requireContext());
-                    FragmentUtils.safeSetText(HomeMain1Fragment.this, txtNameRight, "");
+                    profileData.setCurrentUserAge(0);
+                    profileData.setCurrentUserZodiac(null);
+                    profileData.setCurrentUserDateOfBirth(null);
+                    FragmentUtils.safeSetText(HomeMain1Fragment.this, tvAgeLeft, "");
+                    FragmentUtils.safeSetText(HomeMain1Fragment.this, tvZodiacLeft, "");
+                }
+
+                // Avatar (Load from cache -> DB URL -> Auth URL -> Default)
+                Bitmap cachedAvatar = AvatarCache.getCachedBitmap(requireContext());
+                if (cachedAvatar != null && avtLeft != null) {
+                    avtLeft.setImageBitmap(cachedAvatar);
+                    profileData.setCurrentUserAvatar(cachedAvatar);
+                    Log.d(TAG, "Loaded current user avatar from cache.");
+                } else if (!TextUtils.isEmpty(user.getProfilePicUrl())) {
+                    Log.d(TAG, "Loading current user avatar from DB URL.");
+                    loadImageAsync(user.getProfilePicUrl(), bmp -> {
+                        if (bmp != null && avtLeft != null && isAdded()) {
+                            avtLeft.setImageBitmap(bmp);
+                            profileData.setCurrentUserAvatar(bmp);
+                            AvatarCache.saveBitmapToCache(requireContext(), bmp);
+                            Log.d(TAG, "Loaded/cached current user avatar from DB URL.");
+                        } else if (avtLeft != null && isAdded()) {
+                            avtLeft.setImageResource(R.drawable.ic_default_avatar); // Default on load fail
+                        }
+                    });
+                } else if (fbUser.getPhotoUrl() != null) {
+                    Log.d(TAG, "Loading current user avatar from Auth URL.");
+                    loadImageAsync(fbUser.getPhotoUrl().toString(), bmp -> {
+                        if (bmp != null && avtLeft != null && isAdded()) {
+                            avtLeft.setImageBitmap(bmp);
+                            profileData.setCurrentUserAvatar(bmp);
+                            AvatarCache.saveBitmapToCache(requireContext(), bmp);
+                            Log.d(TAG, "Loaded/cached current user avatar from Auth URL.");
+                        } else if (avtLeft != null && isAdded()) {
+                            avtLeft.setImageResource(R.drawable.ic_default_avatar); // Default on load fail
+                        }
+                    });
+                } else if (avtLeft != null) {
+                    Log.d(TAG, "No avatar source found, setting default.");
+                    avtLeft.setImageResource(R.drawable.ic_default_avatar); // Default if no URL/Cache
+                    profileData.setCurrentUserAvatar(null); // Clear ViewModel cache
+                }
+
+
+                // --- 3. Load Partner Info ---
+                String partnerId = user.getPartnerId();
+                if (!TextUtils.isEmpty(partnerId)) {
+                    Log.d(TAG, "Partner ID found: " + partnerId + ". Loading partner data.");
+                    profileData.setPartnerId(partnerId);
+                    NameCache.setPartnerId(requireContext(), partnerId); // Keep if needed elsewhere
+                    loadPartnerData(partnerId, avtRight, txtNameRight, tvAgeRight, tvZodiacRight);
+                } else {
+                    Log.d(TAG, "No partner ID found.");
+                    clearPartnerUI(avtRight, txtNameRight, tvAgeRight, tvZodiacRight);
+                    NameCache.clearPartner(requireContext()); // Keep if needed elsewhere
+                    profileData.clearPartnerData(); // Clear ViewModel partner cache
+                    profileData.setLoaded(true); // Mark data loading as complete (no partner to wait for)
+                }
+
+                // --- 4. Load Start Love Date ---
+                startLoveDate = user.getStartLoveDate();
+                profileData.setCurrentUserStartLoveDate(startLoveDate); // Update ViewModel
+                startLoveCounter(); // Start or stop counter based on the loaded date
+
+                // Mark loading complete ONLY IF there's no partner to wait for
+                if (TextUtils.isEmpty(partnerId)) {
+                    profileData.setLoaded(true);
+                    Log.d(TAG, "ViewModel marked as loaded (no partner).");
+                } // Otherwise loadPartnerData will mark it when done
+
+            } // End onSuccess (User)
+
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "Failed to load user data from DB: " + error);
+                handleUserLoadError(fbUser); // Use fallback logic
+                profileData.setLoaded(true); // Mark as loaded even on error
+            }
+        }); // End getUser callback
+    } // End bindUserProfile
+    // ✅ HÀM MỚI: Tải dữ liệu Partner (tách ra cho gọn)
+    private void loadPartnerData(String partnerId, ImageView avtRight, TextView txtNameRight, TextView tvAgeRight, TextView tvZodiacRight) {
+        // Load from cache first
+        Bitmap cachedPartnerAvatar = AvatarCache.getPartnerCachedBitmap(requireContext());
+        if (cachedPartnerAvatar != null && avtRight != null) {
+            avtRight.setImageBitmap(cachedPartnerAvatar);
+            profileData.setPartnerAvatar(cachedPartnerAvatar);
+            Log.d(TAG, "Loaded partner avatar from cache.");
+        }
+
+        // Fetch partner data from DB
+        DatabaseManager.getInstance().getUser(partnerId, new DatabaseManager.DatabaseCallback<User>() {
+            @Override
+            public void onSuccess(User partner) {
+                if (!isAdded() || partner == null) {
+                    Log.w(TAG, "Fragment detached or partner data is null during partner load.");
+                    if (partner == null) { // If partner deleted/not found
+                        clearPartnerUI(avtRight, txtNameRight, tvAgeRight, tvZodiacRight);
+                        profileData.clearPartnerData();
+                    }
+                    profileData.setLoaded(true); // Mark loading complete
+                    return;
+                }
+                Log.d(TAG, "Partner data loaded from DB for ID: " + partnerId);
+
+                // Partner Name
+                String partnerName = partner.getName();
+                if (TextUtils.isEmpty(partnerName)) partnerName = "Partner"; // Default if name missing
+                FragmentUtils.safeSetText(HomeMain1Fragment.this, txtNameRight, partnerName);
+                profileData.setPartnerName(partnerName);
+                NameCache.setPartnerName(requireContext(), partnerName); // Keep if needed
+
+                // Partner Age & Zodiac
+                if (partner.getDateOfBirth() != null) {
+                    int partnerAge = DateUtils.calculateAge(partner.getDateOfBirth());
+                    String partnerZodiac = DateUtils.getZodiacSign(partner.getDateOfBirth());
+                    profileData.setPartnerAge(partnerAge);
+                    profileData.setPartnerZodiac(partnerZodiac);
+                    profileData.setPartnerDateOfBirth(partner.getDateOfBirth());
+                    FragmentUtils.safeSetText(HomeMain1Fragment.this, tvAgeRight, partnerAge > 0 ? String.valueOf(partnerAge) : "");
+                    FragmentUtils.safeSetText(HomeMain1Fragment.this, tvZodiacRight, partnerZodiac);
+                } else {
                     FragmentUtils.safeSetText(HomeMain1Fragment.this, tvAgeRight, "");
                     FragmentUtils.safeSetText(HomeMain1Fragment.this, tvZodiacRight, "");
-                    profileData.setLoaded(true);
                 }
 
-                // Load startLoveDate for love counter
-                if (user != null && user.getStartLoveDate() != null) {
-                    startLoveDate = user.getStartLoveDate();
-                    startLoveCounter();
-                }
-            }
-            private void startLoveCounter() {
-                loveCounterRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (startLoveDate == null || !isAdded()) return;
-
-                        Date startDate = startLoveDate.toDate();
-                        Date currentDate = new Date();
-                        long diffInMillis = currentDate.getTime() - startDate.getTime();
-
-                        // --- Accurate Breakdown Calculation ---
-                        Calendar startCal = Calendar.getInstance();
-                        startCal.setTime(startDate);
-                        Calendar currentCal = Calendar.getInstance();
-                        currentCal.setTime(currentDate);
-
-                        int years = currentCal.get(Calendar.YEAR) - startCal.get(Calendar.YEAR);
-                        int months = currentCal.get(Calendar.MONTH) - startCal.get(Calendar.MONTH);
-                        int days = currentCal.get(Calendar.DAY_OF_MONTH) - startCal.get(Calendar.DAY_OF_MONTH);
-
-                        if (days < 0) {
-                            months--;
-                            // To get the days of the previous month, we need to adjust the current calendar
-                            Calendar tempCal = (Calendar) currentCal.clone();
-                            tempCal.add(Calendar.MONTH, -1);
-                            days += tempCal.getActualMaximum(Calendar.DAY_OF_MONTH);
+                // Partner Avatar (Load only if not already loaded from cache)
+                if (cachedPartnerAvatar == null && !TextUtils.isEmpty(partner.getProfilePicUrl())) {
+                    Log.d(TAG, "Loading partner avatar from DB URL.");
+                    loadImageAsync(partner.getProfilePicUrl(), bmp -> {
+                        if (bmp != null && avtRight != null && isAdded()) {
+                            avtRight.setImageBitmap(bmp);
+                            profileData.setPartnerAvatar(bmp);
+                            AvatarCache.savePartnerBitmapToCache(requireContext(), bmp);
+                            Log.d(TAG, "Loaded and cached partner avatar from DB URL.");
+                        } else if (avtRight != null && isAdded()) {
+                            avtRight.setImageResource(R.drawable.ic_default_avatar); // Default on load fail
                         }
-
-                        if (months < 0) {
-                            years--;
-                            months += 12;
-                        }
-
-                        // Now, from the remaining days, calculate weeks
-                        int weeks = days / 7;
-                        int remainingDays = days % 7;
-
-                        // Update UI with the breakdown
-                        safeSetText(txtYears, String.valueOf(years));
-                        safeSetText(txtMonths, String.valueOf(months));
-                        safeSetText(txtWeeks, String.valueOf(weeks));
-                        safeSetText(txtDays, String.valueOf(remainingDays));
-
-                        // Calculate HH:MM:SS timer for the current day
-                        long hours = TimeUnit.MILLISECONDS.toHours(diffInMillis) % 24;
-                        long minutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis) % 60;
-                        long seconds = TimeUnit.MILLISECONDS.toSeconds(diffInMillis) % 60;
-                        safeSetText(txtTimer, String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds));
-
-                        // Format and display the start date
-                        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
-                        String formattedDate = sdf.format(startDate);
-                        safeSetText(txtStartDate, formattedDate);
-
-                        // Schedule next update
-                        loveCounterHandler.postDelayed(this, 1000);
-                    }
-                };
-                loveCounterHandler.post(loveCounterRunnable);
-            }
-
-            private void safeSetText(@Nullable TextView tv, @Nullable String text) {
-                if (tv != null && isAdded()) {
-                    requireActivity().runOnUiThread(() -> tv.setText(text != null ? text : ""));
+                    });
+                } else if (cachedPartnerAvatar == null && avtRight != null) {
+                    Log.d(TAG, "No partner avatar URL found, setting default.");
+                    avtRight.setImageResource(R.drawable.ic_default_avatar); // Default if no URL
                 }
+                profileData.setLoaded(true); // Mark loading complete
             }
 
             @Override
             public void onError(String error) {
+                Log.e(TAG, "Failed to load partner data from DB: " + error);
                 if (!isAdded()) return;
-                // Use fallback from Firebase Auth
-                String fallbackName = fbUser.getDisplayName();
-                if (TextUtils.isEmpty(fallbackName)) fallbackName = fbUser.getEmail();
-                if (!TextUtils.isEmpty(fallbackName)) {
-                    FragmentUtils.safeSetText(HomeMain1Fragment.this, txtNameLeft, fallbackName);
-                    profileData.setCurrentUserName(fallbackName);
-                }
-                profileData.setLoaded(true);
+                // Clear partner UI on error
+                clearPartnerUI(avtRight, txtNameRight, tvAgeRight, tvZodiacRight);
+                profileData.clearPartnerData();
+                profileData.setLoaded(true); // Mark loading complete
             }
         });
+    }
+    private void clearPartnerUI(ImageView avtRight, TextView txtNameRight, TextView tvAgeRight, TextView tvZodiacRight) {
+        if (!isAdded()) return;
+        FragmentUtils.safeSetText(this, txtNameRight, "");
+        FragmentUtils.safeSetText(this, tvAgeRight, "");
+        FragmentUtils.safeSetText(this, tvZodiacRight, "");
+        if (avtRight != null) avtRight.setImageResource(R.drawable.ic_default_avatar);
+    }
+
+    private void startLoveCounter() {
+        if (startLoveDate == null) {
+            Log.d(TAG, "startLoveDate is null, counter not starting.");
+            stopLoveCounter(); // Ensure counter is stopped
+            clearLoveCounterUI(); // Clear old values
+            return;
+        }
+
+        stopLoveCounter(); // Stop any existing counter before starting new one
+        Log.d(TAG, "Starting love counter.");
+
+        loveCounterRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (startLoveDate == null || !isAdded()) {
+                    stopLoveCounter(); // Stop if date becomes null or fragment detached
+                    return;
+                }
+
+                Date startDate = startLoveDate.toDate();
+                Date currentDate = new Date();
+                long diffInMillis = currentDate.getTime() - startDate.getTime();
+
+                // Check for negative difference (start date in future?)
+                if (diffInMillis < 0) {
+                    Log.w(TAG, "Start date is in the future, stopping counter.");
+                    stopLoveCounter();
+                    clearLoveCounterUI();
+                    safeSetText(txtStartDate, "Ngày bắt đầu không hợp lệ");
+                    return;
+                }
+
+                // Breakdown Calculation (Keep your original logic)
+                Calendar startCal = Calendar.getInstance(); startCal.setTime(startDate);
+                Calendar currentCal = Calendar.getInstance(); currentCal.setTime(currentDate);
+                int years = currentCal.get(Calendar.YEAR) - startCal.get(Calendar.YEAR);
+                int months = currentCal.get(Calendar.MONTH) - startCal.get(Calendar.MONTH);
+                int days = currentCal.get(Calendar.DAY_OF_MONTH) - startCal.get(Calendar.DAY_OF_MONTH);
+                if (days < 0) { months--; Calendar temp = (Calendar) currentCal.clone(); temp.add(Calendar.MONTH, -1); days += temp.getActualMaximum(Calendar.DAY_OF_MONTH); }
+                if (months < 0) { years--; months += 12; }
+                int weeks = days / 7;
+                int remainingDays = days % 7;
+
+                // Update UI
+                safeSetText(txtYears, String.valueOf(years));
+                safeSetText(txtMonths, String.valueOf(months));
+                safeSetText(txtWeeks, String.valueOf(weeks));
+                safeSetText(txtDays, String.valueOf(remainingDays));
+                long hours = TimeUnit.MILLISECONDS.toHours(diffInMillis) % 24;
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis) % 60;
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(diffInMillis) % 60;
+                safeSetText(txtTimer, String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds));
+                SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
+                String formattedDate = sdf.format(startDate);
+                safeSetText(txtStartDate, formattedDate);
+
+                // Schedule next run
+                loveCounterHandler.postDelayed(this, 1000);
+            }
+        };
+        loveCounterHandler.post(loveCounterRunnable); // Start the first run
+    }
+
+    private void stopLoveCounter() {
+        if (loveCounterRunnable != null) {
+            loveCounterHandler.removeCallbacks(loveCounterRunnable);
+            loveCounterRunnable = null;
+            Log.d(TAG, "Love counter stopped.");
+        }
+    }
+
+    private void clearLoveCounterUI() {
+        Log.d(TAG, "Clearing love counter UI.");
+        safeSetText(txtYears, "-");
+        safeSetText(txtMonths, "-");
+        safeSetText(txtWeeks, "-");
+        safeSetText(txtDays, "-");
+        safeSetText(txtTimer, "--:--:--");
+        safeSetText(txtStartDate, "..."); // Placeholder
+    }
+
+
+    // --- Helper Methods ---
+
+    private void safeSetText(@Nullable TextView tv, @Nullable String text) {
+        if (tv != null && isAdded()) {
+            // Ensure running on UI thread
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                tv.setText(text != null ? text : "");
+            } else {
+                requireActivity().runOnUiThread(() -> tv.setText(text != null ? text : ""));
+            }
+        }
     }
 
     private void displayCachedData(ImageView avtLeft, TextView txtNameLeft, TextView tvAgeLeft, TextView tvZodiacLeft,
                                    ImageView avtRight, TextView txtNameRight, TextView tvAgeRight, TextView tvZodiacRight) {
-        // Display current user data from cache
-        if (profileData.getCurrentUserAvatar() != null) {
+        Log.d(TAG, "displayCachedData called");
+        // Current User
+        if (profileData.getCurrentUserAvatar() != null && avtLeft != null) {
             avtLeft.setImageBitmap(profileData.getCurrentUserAvatar());
+        } else if (avtLeft != null) {
+            avtLeft.setImageResource(R.drawable.ic_default_avatar);
         }
         FragmentUtils.safeSetText(this, txtNameLeft, profileData.getCurrentUserName());
-        if (profileData.getCurrentUserAge() > 0) {
-            FragmentUtils.safeSetText(this, tvAgeLeft, String.valueOf(profileData.getCurrentUserAge()));
-        }
-        if (!TextUtils.isEmpty(profileData.getCurrentUserZodiac())) {
-            FragmentUtils.safeSetText(this, tvZodiacLeft, profileData.getCurrentUserZodiac());
-        }
+        FragmentUtils.safeSetText(this, tvAgeLeft, profileData.getCurrentUserAge() > 0 ? String.valueOf(profileData.getCurrentUserAge()) : "");
+        FragmentUtils.safeSetText(this, tvZodiacLeft, profileData.getCurrentUserZodiac());
 
-        // Display partner data from cache
-        if (profileData.getPartnerAvatar() != null) {
+        // Partner
+        if (profileData.getPartnerAvatar() != null && avtRight != null) {
             avtRight.setImageBitmap(profileData.getPartnerAvatar());
+        } else if (avtRight != null) {
+            avtRight.setImageResource(R.drawable.ic_default_avatar);
         }
-        if (!TextUtils.isEmpty(profileData.getPartnerName())) {
-            FragmentUtils.safeSetText(this, txtNameRight, profileData.getPartnerName());
-        }
-        if (profileData.getPartnerAge() > 0) {
-            FragmentUtils.safeSetText(this, tvAgeRight, String.valueOf(profileData.getPartnerAge()));
-        }
-        if (!TextUtils.isEmpty(profileData.getPartnerZodiac())) {
-            FragmentUtils.safeSetText(this, tvZodiacRight, profileData.getPartnerZodiac());
-        }
+        FragmentUtils.safeSetText(this, txtNameRight, profileData.getPartnerName());
+        FragmentUtils.safeSetText(this, tvAgeRight, profileData.getPartnerAge() > 0 ? String.valueOf(profileData.getPartnerAge()) : "");
+        FragmentUtils.safeSetText(this, tvZodiacRight, profileData.getPartnerZodiac());
     }
 
     private interface BitmapCallback { void onBitmap(Bitmap bmp); }
 
+    // --- Lifecycle Methods ---
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Stop the love counter to prevent memory leaks
-        if (loveCounterRunnable != null) {
-            loveCounterHandler.removeCallbacks(loveCounterRunnable);
+        Log.d(TAG, "onDestroyView called");
+        stopLoveCounter(); // Stop counter
+        // Release views to prevent leaks
+        rootLayout = null;
+        // === THAY ĐỔI 6: Thêm imgBackgroundDisplay = null ===
+        imgBackgroundDisplay = null;
+        // ================================================
+        fabChangeBackground = null;
+        txtYears = txtMonths = txtWeeks = txtDays = txtTimer = txtStartDate = null;
+        // Dismiss dialog if showing
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
         }
+        progressDialog = null;
     }
 
+    // --- Image Loading (Keep using your existing method) ---
     private void loadImageAsync(String urlStr, BitmapCallback callback) {
         if (TextUtils.isEmpty(urlStr)) { if (callback != null) callback.onBitmap(null); return; }
         IMAGE_EXECUTOR.execute(() -> {
@@ -388,25 +901,242 @@ public class HomeMain1Fragment extends Fragment {
             try {
                 URL url = new URL(urlStr);
                 conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(15000);
-                conn.setReadTimeout(20000);
+                conn.setConnectTimeout(15000); // 15 seconds
+                conn.setReadTimeout(20000);    // 20 seconds
                 conn.setInstanceFollowRedirects(true);
                 conn.connect();
                 int code = conn.getResponseCode();
-                if (code >= 200 && code < 300) {
+                if (code >= 200 && code < 300) { // Check for successful response
                     try (InputStream is = conn.getInputStream()) {
-                        bmp = BitmapFactory.decodeStream(is);
+                        // Use BitmapFactory.Options for better memory management (optional but good practice)
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        // options.inSampleSize = 2; // Example: reduce size by factor of 2 if needed
+                        bmp = BitmapFactory.decodeStream(is, null, options);
                     }
+                } else {
+                    Log.w(TAG, "loadImageAsync HTTP error code: " + code + " for URL: " + urlStr);
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                Log.e(TAG, "loadImageAsync error for URL: " + urlStr, e);
             } finally {
                 if (conn != null) conn.disconnect();
             }
-            if (!isAdded()) return;
-            final Bitmap result = bmp;
-            requireActivity().runOnUiThread(() -> {
-                if (callback != null) callback.onBitmap(result);
+
+            // Ensure fragment is still attached before posting to UI thread
+            if (!isAdded()) {
+                Log.w(TAG, "Fragment detached after image load, discarding bitmap.");
+                return;
+            }
+            final Bitmap result = bmp; // Final variable for lambda
+            // Use Handler associated with the main looper for UI updates
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (callback != null) {
+                    callback.onBitmap(result); // Pass bitmap (or null) back
+                }
             });
         });
     }
-}
+
+    // ✅ HÀM MỚI: Xử lý khi không tải được User từ DB
+    // === THAY ĐỔI 7: Sửa hàm handleUserLoadError ===
+    private void handleUserLoadError(FirebaseUser fbUser) {
+        Log.e(TAG, "Error loading User from DB, using fallback from Auth.");
+        if (!isAdded() || getView() == null) { // Check if fragment view is available
+            Log.w(TAG, "Fragment detached or view is null in handleUserLoadError.");
+            return;
+        }
+
+        // Find views again safely within this method
+        TextView txtNameLeft = getView().findViewById(R.id.txtNameLeft);
+        TextView tvAgeLeft = getView().findViewById(R.id.tvAgeLeft);
+        TextView tvZodiacLeft = getView().findViewById(R.id.tvZodiacLeft);
+        ImageView avtLeft = getView().findViewById(R.id.avtLeft);
+        ImageView avtRight = getView().findViewById(R.id.avtRight);
+        TextView txtNameRight = getView().findViewById(R.id.txtNameRight);
+        TextView tvAgeRight = getView().findViewById(R.id.tvAgeRight);
+        TextView tvZodiacRight = getView().findViewById(R.id.tvZodiacRight);
+
+        // Use fallback name from Firebase Auth if fbUser is not null
+        String fallbackName = "User"; // Default fallback
+        if (fbUser != null) {
+            fallbackName = fbUser.getDisplayName();
+            if (TextUtils.isEmpty(fallbackName)) fallbackName = fbUser.getEmail();
+            if (TextUtils.isEmpty(fallbackName)) fallbackName = "User"; // Final fallback
+        }
+
+        FragmentUtils.safeSetText(this, txtNameLeft, fallbackName);
+        if (profileData != null) { // Update ViewModel too
+            profileData.setCurrentUserName(fallbackName);
+        }
+
+        // Clear other current user fields
+        FragmentUtils.safeSetText(this, tvAgeLeft, "");
+        FragmentUtils.safeSetText(this, tvZodiacLeft, "");
+        if (avtLeft != null) avtLeft.setImageResource(R.drawable.ic_default_avatar);
+        if (profileData != null) {
+            profileData.setCurrentUserAge(0);
+            profileData.setCurrentUserZodiac(null);
+            profileData.setCurrentUserAvatar(null);
+            profileData.setCurrentUserDateOfBirth(null);
+        }
+
+
+        // Clear partner fields as well
+        clearPartnerUI(avtRight, txtNameRight, tvAgeRight, tvZodiacRight);
+        if (profileData != null) {
+            profileData.clearPartnerData();
+        }
+        stopLoveCounter();
+        clearLoveCounterUI();
+        if (sharedPreferences != null && sharedPreferences.getString(PREF_BACKGROUND_URL, null) == null && imgBackgroundDisplay != null) { // Sửa
+            Log.d(TAG, "Setting default background in handleUserLoadError.");
+            imgBackgroundDisplay.setImageResource(R.drawable.background_home); // Sửa
+        }
+        // Ensure ViewModel background is also cleared if applicable
+        if (profileData != null) {
+            profileData.setCurrentUserBackgroundImageUrl(null);
+        }
+    }
+    // ===============================================
+
+    private Uri compressImageBeforeUpload(Context context, Uri imageUri) throws IOException {
+        InputStream inputStream = null;
+        try {
+            inputStream = context.getContentResolver().openInputStream(imageUri);
+            if (inputStream == null) {
+                throw new IOException("Unable to open input stream for Uri: " + imageUri);
+            }
+            // First, decode with inJustDecodeBounds=true to check dimensions
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(inputStream, null, options);
+            inputStream.close(); // Close the stream
+
+            // Get screen dimensions
+            DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+            int reqWidth = metrics.widthPixels;
+            int reqHeight = metrics.heightPixels;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+            // Decode bitmap with inSampleSize set
+            options.inJustDecodeBounds = false;
+            inputStream = context.getContentResolver().openInputStream(imageUri); // Reopen the stream
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+            if (bitmap == null) {
+                 throw new IOException("Failed to decode bitmap from Uri: " + imageUri);
+            }
+
+
+            // Create a scaled bitmap that preserves the aspect ratio
+            int originalWidth = bitmap.getWidth();
+            int originalHeight = bitmap.getHeight();
+            float scaleFactor = Math.max((float) reqWidth / originalWidth, (float) reqHeight / originalHeight);
+            int scaledWidth = Math.round(originalWidth * scaleFactor);
+            int scaledHeight = Math.round(originalHeight * scaleFactor);
+
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, scaledWidth, scaledHeight, true);
+            if (resizedBitmap != bitmap){
+                bitmap.recycle(); // free up memory
+            }
+
+            // Write the compressed bitmap to a temporary file
+            File outputDir = context.getCacheDir();
+            File outputFile = new File(outputDir, "compressed_" + System.currentTimeMillis() + ".jpg");
+            try (FileOutputStream out = new FileOutputStream(outputFile)) {
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 85, out);
+            }
+            resizedBitmap.recycle(); // free up memory
+
+            return Uri.fromFile(outputFile);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+        }
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
+    }
+
+
+    private void showBackgroundSelectionDialog() {
+        if (!isAdded()) return;
+
+        final String[] options = new String[DEFAULT_BACKGROUND_IDS.length + 1];
+        options[0] = "Chọn ảnh từ thư viện (Tùy chỉnh)";
+        for (int i = 0; i < DEFAULT_BACKGROUND_IDS.length; i++) {
+            options[i + 1] = "Nền mặc định " + (i + 1);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Chọn nền hiển thị");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                // Lựa chọn 1: Chọn ảnh từ thư viện (logic cũ)
+                checkPermissionAndPickImage();
+            } else {
+                // Lựa chọn 2 trở đi: Chọn nền mặc định
+                int resourceId = DEFAULT_BACKGROUND_IDS[which - 1];
+                applyDefaultBackground(resourceId);
+            }
+        });
+        builder.show();
+    }
+
+    private void applyDefaultBackground(int resourceId) {
+        if (imgBackgroundDisplay != null && isAdded()) { // Sửa
+            // 1. Set background ngay lập tức
+            imgBackgroundDisplay.setImageResource(resourceId); // Sửa
+
+            // 2. Lưu trạng thái nền mặc định vào SharedPreferences
+            sharedPreferences.edit()
+                    .putString(PREF_BACKGROUND_URL, String.valueOf(resourceId)) // Lưu Resource ID dưới dạng String
+                    .putString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_RESOURCE)
+                    .apply();
+
+            // 3. Cập nhật ViewModel
+            if (profileData != null) {
+                profileData.setCurrentUserBackgroundImageUrl(String.valueOf(resourceId));
+            }
+
+            Toast.makeText(getContext(), "Đã đặt nền mặc định.", Toast.LENGTH_SHORT).show();
+
+            removeBackgroundUrlFromDatabase();
+        }
+    }
+    private void removeBackgroundUrlFromDatabase() {
+        FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (fbUser == null) return;
+        String uid = fbUser.getUid();
+
+        Log.d(TAG, "Removing background URL from Firestore for user: " + uid);
+        FirebaseFirestore.getInstance().collection("users").document(uid)
+                .update("backgroundImageUrl", null) // Hoặc xóa trường field: FieldValue.delete()
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Firestore background URL removed."))
+                .addOnFailureListener(e -> Log.e(TAG, "Firestore background URL removal failed.", e));
+    }
+
+} // End of HomeMain1Fragment class

@@ -1,6 +1,9 @@
 package com.example.couple_app.viewmodels;
 
 import android.graphics.Bitmap;
+import android.util.Log;
+
+import com.google.firebase.Timestamp;
 
 /**
  * Shared data holder for user profile information
@@ -24,7 +27,16 @@ public class UserProfileData {
     private int partnerAge;
     private String partnerZodiac;
     private String partnerDateOfBirth;
+    private String currentUserBackgroundImageUrl;
+    private Timestamp currentUserStartLoveDate;
 
+    private String currentUserProfilePicUrl; // <-- THÊM DÒNG NÀY
+    private String partnerProfilePicUrl;
+    // Trong lớp UserProfileData.java
+
+    // ... (các biến cũ) ...
+    private String currentUserGender; // <-- THÊM DÒNG NÀY
+    private String partnerGender;     // <-- THÊM DÒNG NÀY
     // Loading state
     private boolean isLoaded = false;
 
@@ -53,11 +65,6 @@ public class UserProfileData {
         partnerDateOfBirth = null;
 
         isLoaded = false;
-    }
-
-    // Alias for clear() to match naming convention
-    public void clearAll() {
-        clear();
     }
 
     // Getters and Setters for current user
@@ -109,5 +116,77 @@ public class UserProfileData {
     public boolean hasPartnerData() {
         return partnerName != null && !partnerName.isEmpty();
     }
-}
 
+    public String getCurrentUserBackgroundImageUrl() {
+        return currentUserBackgroundImageUrl;
+    }
+
+    public void setCurrentUserBackgroundImageUrl(String currentUserBackgroundImageUrl) {
+        this.currentUserBackgroundImageUrl = currentUserBackgroundImageUrl;
+    }
+    public Timestamp getCurrentUserStartLoveDate() {
+        return currentUserStartLoveDate;
+    }
+
+    public void setCurrentUserStartLoveDate(Timestamp currentUserStartLoveDate) {
+        this.currentUserStartLoveDate = currentUserStartLoveDate;
+    }
+
+    // Vẫn trong lớp UserProfileData
+
+    // --- THÊM CÁC HÀM NÀY ---
+    public String getCurrentUserProfilePicUrl() {
+        return currentUserProfilePicUrl;
+    }
+
+    public void setCurrentUserProfilePicUrl(String currentUserProfilePicUrl) {
+        this.currentUserProfilePicUrl = currentUserProfilePicUrl;
+    }
+
+    public String getPartnerProfilePicUrl() {
+        return partnerProfilePicUrl;
+    }
+
+    public void setPartnerProfilePicUrl(String partnerProfilePicUrl) {
+        this.partnerProfilePicUrl = partnerProfilePicUrl;
+    }
+    // Vẫn trong lớp UserProfileData.java
+
+// --- THÊM CÁC HÀM NÀY ---
+
+    // Getter/Setter cho Giới tính User hiện tại
+    public String getCurrentUserGender() {
+        return currentUserGender;
+    }
+
+    public void setCurrentUserGender(String currentUserGender) {
+        this.currentUserGender = currentUserGender;
+    }
+
+    // Getter/Setter cho Giới tính Partner
+    public String getPartnerGender() {
+        return partnerGender;
+    }
+
+    public void setPartnerGender(String partnerGender) {
+        this.partnerGender = partnerGender;
+    }
+
+
+    public void clearPartnerData() {
+        this.partnerId = null;
+        this.partnerName = null;
+        this.partnerAge = 0;
+        this.partnerZodiac = null;
+        this.partnerAvatar = null;
+        this.partnerDateOfBirth = null;
+        // Xóa các biến partner khác nếu có
+        Log.d("UserProfileData", "Partner data cleared."); // Thêm log để dễ debug
+    }
+
+    public void clearAll() {
+        clear();
+        clearPartnerData();
+        Log.d("UserProfileData", "All user profile data cleared."); // Thêm log để dễ debug
+    }
+}

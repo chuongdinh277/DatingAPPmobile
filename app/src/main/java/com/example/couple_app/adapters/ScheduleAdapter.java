@@ -70,7 +70,39 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
         Plan plan = schedules.get(position);
-        holder.tvContent.setText(plan.getContent());
+
+        // Set title
+        if (plan.getTitle() != null && !plan.getTitle().isEmpty()) {
+            holder.tvTitle.setText(plan.getTitle());
+            holder.tvTitle.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvTitle.setText("Kế hoạch");
+            holder.tvTitle.setVisibility(View.VISIBLE);
+        }
+
+        // Set time
+        if (plan.getTime() != null && !plan.getTime().isEmpty()) {
+            holder.tvTime.setText(plan.getTime());
+            holder.tvTime.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvTime.setVisibility(View.GONE);
+        }
+
+        // Set date
+        if (plan.getDate() != null && !plan.getDate().isEmpty()) {
+            holder.tvDate.setText(plan.getDate());
+            holder.tvDate.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvDate.setVisibility(View.GONE);
+        }
+
+        // Set details
+        if (plan.getDetails() != null && !plan.getDetails().isEmpty()) {
+            holder.tvDetails.setText(plan.getDetails());
+            holder.tvDetails.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvDetails.setVisibility(View.GONE);
+        }
 
         // Xử lý click vào item để chỉnh sửa
         holder.itemView.setOnClickListener(v -> {
@@ -97,12 +129,18 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
      * ViewHolder chứa các view trong mỗi item
      */
     static class ScheduleViewHolder extends RecyclerView.ViewHolder {
-        TextView tvContent;
+        TextView tvTitle;
+        TextView tvTime;
+        TextView tvDate;
+        TextView tvDetails;
         ImageButton btnDelete;
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvContent = itemView.findViewById(R.id.tvContent);
+            tvTitle = itemView.findViewById(R.id.tvContent);
+            tvTime = itemView.findViewById(R.id.tvTime);
+            tvDate = itemView.findViewById(R.id.tvDate);
+            tvDetails = itemView.findViewById(R.id.tvDetails);
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }

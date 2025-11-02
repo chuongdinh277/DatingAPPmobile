@@ -29,12 +29,17 @@ public class PlanRepository {
     }
 
     /**
-     * Cập nhật nội dung kế hoạch
+     * Cập nhật kế hoạch
      */
-    public Task<Void> updatePlanContent(String planId, String newContent) {
+    public Task<Void> updatePlan(String planId, String title, String time, String details) {
         return db.collection(COLLECTION_COUPLE_PLANS)
                 .document(planId)
-                .update("content", newContent);
+                .update(
+                    "title", title,
+                    "time", time,
+                    "details", details,
+                    "timestamp", System.currentTimeMillis()
+                );
     }
 
     /**

@@ -2,34 +2,45 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_homemain2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.HomeMain2Fragment"
-    android:background="@drawable/background_home"
-    android:paddingBottom="70dp">
+    tools:context=".activities.HomeMain2Fragment">
 
+    <!-- Background image that fills the screen without stretching -->
+    <ImageView
+        android:id="@+id/img_background2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null"
+        android:src="@drawable/background_home"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <FrameLayout
         android:id="@+id/heartContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="50dp"
         android:background="@drawable/bg_transparent_panel"
         android:elevation="6dp"
+        app:layout_constraintBottom_toTopOf="@id/layoutUserInfo"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/layoutUserInfo">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/heartImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
+            android:contentDescription="@null"
             android:src="@drawable/heart_with_border" />
 
         <LinearLayout
@@ -38,7 +49,6 @@
             android:gravity="center"
             android:orientation="vertical"
             android:padding="20dp"
-
             android:translationY="-25dp">
 
             <TextView
@@ -78,7 +88,7 @@
         layout="@layout/user_profile_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

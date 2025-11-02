@@ -8,22 +8,15 @@
 
     <!-- Camera permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
-    <!-- Phone permission for phone login -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-    <!-- SMS permissions for automatic code retrieval -->
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
-    <uses-permission android:name="com.google.android.gms.permission.READ_PHONE_STATE" />
 
     <!-- Notification permission -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Hardware features -->
-    <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
     <application
         android:name=".CoupleApplication"
@@ -110,8 +103,13 @@
         <activity
             android:name=".activities.HomeMainActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.CoupleApp" />
 
+        <activity
+            android:name=".activities.ChatbotActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp" />
 
         <!-- BaseActivity - parent for other activities -->
         <activity
@@ -148,6 +146,25 @@
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustNothing" />
+
+        <!-- Chat History Activities -->
+        <activity
+            android:name=".activities.ChatHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp"
+            android:label="Lịch sử Chat" />
+
+        <activity
+            android:name=".activities.ChatSessionViewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp"
+            android:label="Chi tiết Chat" />
+
+        <!-- Notification Activity -->
+        <activity
+            android:name=".activities.NotificationActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CoupleApp" />
 
         <!-- Firebase Cloud Messaging Service -->
         <service

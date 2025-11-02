@@ -2,6 +2,7 @@ package com.example.couple_app.models;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.IgnoreExtraProperties;
+import com.google.firebase.firestore.PropertyName;
 import androidx.annotation.Keep;
 
 @Keep
@@ -14,11 +15,19 @@ public class User {
     private String phoneNumber; // New field for phone number
     private String profilePicUrl;
     private String pinCode;
+
+    @PropertyName("partnerId")
     private String partnerId;
+
+
     private Timestamp startLoveDate;
     private String gender;
 
+    private String backgroundImageUrl;
     private String fcmToken; // Firebase Cloud Messaging token for push notifications
+
+    private boolean isOnline; // Online/Offline status
+    private long lastSeen; // Timestamp of last activity
 
     // Default constructor required for Firebase
     public User() {}
@@ -28,7 +37,7 @@ public class User {
         this.userId = userId;
         this.name = name;
         this.email = email;
-        this.phoneNumber = null; // null when registering with email
+        this.phoneNumber = null;
         this.profilePicUrl = "";
         this.pinCode = null;
         this.partnerId = null;
@@ -37,10 +46,10 @@ public class User {
     }
 
     // Constructor for phone registration
-    public User(String userId, String name, String phoneNumber, boolean isPhoneRegistration) {
+    public User(String userId, String name, String email, String phoneNumber) {
         this.userId = userId;
         this.name = name;
-        this.email = null; // null when registering with phone
+        this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePicUrl = "";
         this.pinCode = null;
@@ -84,8 +93,12 @@ public class User {
     public String getPinCode() { return pinCode; }
     public void setPinCode(String pinCode) { this.pinCode = pinCode; }
 
+    @PropertyName("partnerId")
     public String getPartnerId() { return partnerId; }
+
+    @PropertyName("partnerId")
     public void setPartnerId(String partnerId) { this.partnerId = partnerId; }
+
 
     public Timestamp getStartLoveDate() { return startLoveDate; }
     public void setStartLoveDate(Timestamp startLoveDate) { this.startLoveDate = startLoveDate; }
@@ -95,4 +108,18 @@ public class User {
 
     public String getGender() { return gender;}
     public void setGender(String gender) { this.gender = gender;}
+
+    public String getBackgroundImageUrl() {
+        return backgroundImageUrl;
+    }
+
+    public void setBackgroundImageUrl(String backgroundImageUrl) {
+        this.backgroundImageUrl = backgroundImageUrl;
+    }
+
+    public boolean isOnline() { return isOnline; }
+    public void setOnline(boolean online) { isOnline = online; }
+
+    public long getLastSeen() { return lastSeen; }
+    public void setLastSeen(long lastSeen) { this.lastSeen = lastSeen; }
 }

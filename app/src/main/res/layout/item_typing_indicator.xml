@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="4dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <!-- Bot avatar -->
+    <ImageView
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/circle_bot_avatar"
+        android:contentDescription="Bot avatar" />
+
+    <!-- Typing indicator container -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="#F3E5F5"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="0dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="0dp">
+
+            <!-- Dot 1 -->
+            <View
+                android:id="@+id/dot1"
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/circle_typing_dot" />
+
+            <!-- Dot 2 -->
+            <View
+                android:id="@+id/dot2"
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/circle_typing_dot" />
+
+            <!-- Dot 3 -->
+            <View
+                android:id="@+id/dot3"
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:background="@drawable/circle_typing_dot" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>
+

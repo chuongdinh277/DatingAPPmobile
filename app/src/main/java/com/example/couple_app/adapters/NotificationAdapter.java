@@ -9,24 +9,26 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
-import com.example.couple_app.managers.AuthManager;
-import com.example.couple_app.managers.DatabaseManager;
 
 import com.example.couple_app.R;
 import com.example.couple_app.models.Notification;
-import com.example.couple_app.models.User;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Instant;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
     private List<Notification> notifications;
 
-    private DatabaseManager databaseManager;
+
+    private OnNotificationClickListener clickListener;
+
+    public interface OnNotificationClickListener {
+        void onNotificationClick(Notification notification);
+    }
 
     public NotificationAdapter(List<Notification> notifications) {
         this.notifications = notifications;
@@ -35,6 +37,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void setNotifications(List<Notification> notificationList) {
         this.notifications = notificationList;
         notifyDataSetChanged();
+    }
+
+    public void setOnNotificationClickListener(OnNotificationClickListener listener) {
+        this.clickListener = listener;
     }
 
     static class NotificationViewHolder extends RecyclerView.ViewHolder {
@@ -64,32 +70,47 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         Notification notification = notifications.get(position);
 
         holder.contextNotification.setText(notification.getMessage());
-        holder.timeNotification.setText(notification.getTimestamp());
 
-        loadSenderImage(notification.getSenderId(), holder);
+        // Format timestamp
+        String formattedTime = formatTimestamp(notification.getTimestamp());
+        holder.timeNotification.setText(formattedTime);
+
+        // No need to load avatar - we're using icon instead
     }
 
+    private String formatTimestamp(long timestamp) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+            Date date = new Date(timestamp);
+            return sdf.format(date);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // No longer needed - we don't show avatar anymore
+    /*
     public void loadSenderImage(String senderId, NotificationViewHolder holder) {
-        final String[] imageSenderUrl = new String[1];
         databaseManager = DatabaseManager.getInstance();
         databaseManager.getUser(senderId, new DatabaseManager.DatabaseCallback<>() {
             @Override
             public void onSuccess(com.example.couple_app.models.User user) {
-                imageSenderUrl[0] = user.getProfilePicUrl() != null ? user.getProfilePicUrl() : null;
+                String imageSenderUrl = user.getProfilePicUrl() != null ? user.getProfilePicUrl() : null;
+                Glide.with(holder.ivSenderImage.getContext())
+                        .load(imageSenderUrl)
+                        .placeholder(R.drawable.user_icon)
+                        .error(R.drawable.user_icon)
+                        .into(holder.ivSenderImage);
             }
             @Override
             public void onError(String error) {
-                imageSenderUrl[0] = null;
+                Glide.with(holder.ivSenderImage.getContext())
+                        .load(R.drawable.user_icon)
+                        .into(holder.ivSenderImage);
             }
         });
-
-        Glide.with(holder.ivSenderImage.getContext())
-                .load(imageSenderUrl)
-                .placeholder(R.drawable.user_icon)
-                .error(R.drawable.user_icon)
-                .into(holder.ivSenderImage);
     }
-
+    */
 
 
     @Override

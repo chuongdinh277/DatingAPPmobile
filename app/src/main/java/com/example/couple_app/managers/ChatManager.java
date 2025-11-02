@@ -27,8 +27,8 @@ public class ChatManager {
 
     private ChatManager() {
         try {
-            // Use specific database URL for better connection
-            String databaseUrl = "https://couples-app-b83be-default-rtdb.firebaseio.com/";
+            // ✅ FIXED: Use correct database URL for Asia Southeast 1 region
+            String databaseUrl = "https://couples-app-b83be-default-rtdb.asia-southeast1.firebasedatabase.app";
             database = FirebaseDatabase.getInstance(databaseUrl).getReference();
 
             // Enable logging for debugging
@@ -174,6 +174,55 @@ public class ChatManager {
             @Override
             public void onCancelled(DatabaseError error) {
                 Log.w(TAG, "Error getting chat history", error.toException());
+                callback.onError("Failed to get chat history: " + error.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Get chat history before a specific timestamp (for pagination)
+     * @param coupleId The couple ID
+     * @param beforeTimestamp Load messages before this timestamp
+     * @param limit Number of messages to load
+     * @param callback Callback with results
+     */
+    public void getChatHistoryBefore(String coupleId, long beforeTimestamp, int limit, ChatCallback callback) {
+        if (coupleId == null) {
+            callback.onError("Invalid couple ID");
+            return;
+        }
+
+        DatabaseReference chatRef = database.child(CHATS_PATH).child(coupleId);
+        Query query = chatRef.orderByChild("timestamp")
+                            .endBefore(beforeTimestamp)
+                            .limitToLast(limit);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<ChatMessage> messages = new ArrayList<>();
+                for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                    ChatMessage message = messageSnapshot.getValue(ChatMessage.class);
+                    if (message != null) {
+                        message.setMessageId(messageSnapshot.getKey());
+                        messages.add(message);
+                    }
+                }
+                // Sort by timestamp ascending to ensure correct order
+                Collections.sort(messages, new Comparator<ChatMessage>() {
+                    @Override
+                    public int compare(ChatMessage a, ChatMessage b) {
+                        long ta = coerceToMillis(a != null ? a.getTimestamp() : null);
+                        long tb = coerceToMillis(b != null ? b.getTimestamp() : null);
+                        return Long.compare(ta, tb);
+                    }
+                });
+                callback.onMessagesReceived(messages);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.w(TAG, "Error getting chat history before timestamp", error.toException());
                 callback.onError("Failed to get chat history: " + error.getMessage());
             }
         });

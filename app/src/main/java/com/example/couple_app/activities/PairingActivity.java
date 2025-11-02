@@ -1,5 +1,6 @@
 package com.example.couple_app.activities;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,6 +19,10 @@ import com.example.couple_app.managers.AuthManager;
 import com.example.couple_app.managers.DatabaseManager;
 import com.example.couple_app.models.Couple;
 import com.example.couple_app.models.User;
+import com.google.firebase.Timestamp;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class PairingActivity extends BaseActivity {
     private static final String TAG = "PairingActivity";
@@ -32,12 +37,19 @@ public class PairingActivity extends BaseActivity {
     private DatabaseManager databaseManager;
     private String currentUserId;
     private String userPin;
+    private com.google.firebase.firestore.ListenerRegistration pairingListener;
 
     // Ẩn thanh menu trên màn hình ghép cặp
     @Override
     protected boolean shouldShowBottomBar() {
         return false;
     }
+
+    @Override
+    protected boolean shouldShowHeader() {
+        return false;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +170,8 @@ public class PairingActivity extends BaseActivity {
                 showLoading(false);
                 userPin = pin;
                 displayPin(pin);
+                // Start listening for pairing from partner
+                startListeningForPairing();
             }
 
             @Override
@@ -178,6 +192,92 @@ public class PairingActivity extends BaseActivity {
         btnPair.setVisibility(View.VISIBLE);
     }
 
+    private void startListeningForPairing() {
+        // Listen for changes in the current user's document
+        // When partner enters our PIN, our partnerId field will be updated
+        pairingListener = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(currentUserId)
+            .addSnapshotListener((documentSnapshot, error) -> {
+                if (error != null) {
+                    Log.e(TAG, "Error listening for pairing: " + error.getMessage());
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    String partnerId = documentSnapshot.getString("partnerId");
+
+                    // If partnerId is set, we've been paired by our partner
+                    if (partnerId != null && !partnerId.isEmpty()) {
+                        Log.d(TAG, "Detected pairing by partner! PartnerId: " + partnerId);
+
+                        // Stop listening
+                        if (pairingListener != null) {
+                            pairingListener.remove();
+                            pairingListener = null;
+                        }
+
+                        // Get coupleId and navigate
+                        handleAutomaticPairing();
+                    }
+                }
+            });
+    }
+
+    private void handleAutomaticPairing() {
+        showLoading(true);
+        Toast.makeText(this, "Đối phương đã ghép đôi với bạn!", Toast.LENGTH_SHORT).show();
+
+        // Fetch couple info and navigate
+        databaseManager.getCoupleByUserId(currentUserId, new DatabaseManager.DatabaseCallback<Couple>() {
+            @Override
+            public void onSuccess(Couple couple) {
+                if (couple == null) {
+                    showLoading(false);
+                    Log.e(TAG, "Couple object is null in handleAutomaticPairing");
+                    return;
+                }
+
+                String coupleId = couple.getCoupleId();
+                String user1Id = couple.getUser1Id();
+                String user2Id = couple.getUser2Id();
+
+                if (user1Id == null || user2Id == null || coupleId == null) {
+                    showLoading(false);
+                    Log.e(TAG, "Couple data incomplete in handleAutomaticPairing");
+                    return;
+                }
+
+                String partnerId = user1Id.equals(currentUserId) ? user2Id : user1Id;
+
+                // Fetch partner name
+                databaseManager.getUser(partnerId, new DatabaseManager.DatabaseCallback<User>() {
+                    @Override
+                    public void onSuccess(User partner) {
+                        showLoading(false);
+                        String partnerName = (partner != null && partner.getName() != null)
+                            ? partner.getName()
+                            : "Đối phương";
+                        navigateToChat(coupleId, partnerName);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        showLoading(false);
+                        Log.e(TAG, "Error fetching partner in handleAutomaticPairing: " + error);
+                        navigateToChat(coupleId, "Đối phương");
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                showLoading(false);
+                Log.e(TAG, "Error fetching couple in handleAutomaticPairing: " + error);
+            }
+        });
+    }
+
     private void pairWithPartner() {
         String partnerPin = etPartnerPin.getText().toString().trim();
 
@@ -196,6 +296,12 @@ public class PairingActivity extends BaseActivity {
             return;
         }
 
+        // Stop listening since we're actively pairing
+        if (pairingListener != null) {
+            pairingListener.remove();
+            pairingListener = null;
+        }
+
         showLoading(true);
         btnPair.setEnabled(false);
 
@@ -204,7 +310,8 @@ public class PairingActivity extends BaseActivity {
             public void onSuccess(String coupleId) {
                 // Add a small delay to ensure Firestore has saved the data
                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                    fetchPartnerInfoAndNavigate(coupleId);
+                    // Instead of navigating immediately, fetch partner info then prompt for start date
+                    fetchPartnerInfoAndPromptDate(coupleId);
                 }, 500); // 500ms delay
             }
 
@@ -217,6 +324,107 @@ public class PairingActivity extends BaseActivity {
             }
         });
     }
+
+    private void fetchPartnerInfoAndPromptDate(String coupleId) {
+        // Fetch the fresh couple doc to determine partner id and name
+        databaseManager.getCoupleByUserId(currentUserId, new DatabaseManager.DatabaseCallback<Couple>() {
+            @Override
+            public void onSuccess(Couple couple) {
+                if (couple == null) {
+                    Log.e(TAG, "Couple object is null when fetching partner info after pairing");
+                    showLoading(false);
+                    // fallback navigate
+                    navigateToChat(coupleId, "Đối phương");
+                    return;
+                }
+
+                String user1Id = couple.getUser1Id();
+                String user2Id = couple.getUser2Id();
+                if (user1Id == null || user2Id == null) {
+                    Log.e(TAG, "User IDs are null in couple object (after pairing)");
+                    showLoading(false);
+                    navigateToChat(coupleId, "Đối phương");
+                    return;
+                }
+
+                String partnerId = user1Id.equals(currentUserId) ? user2Id : user1Id;
+
+                databaseManager.getUser(partnerId, new DatabaseManager.DatabaseCallback<User>() {
+                    @Override
+                    public void onSuccess(User partner) {
+                        showLoading(false);
+                        String partnerName = (partner != null && partner.getName() != null) ? partner.getName() : "Đối phương";
+                        // Prompt the initiating user to pick a start date before navigating
+                        showStartDatePickerAndSave(coupleId, partnerName);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        showLoading(false);
+                        Log.e(TAG, "Error fetching partner after pairing: " + error);
+                        showStartDatePickerAndSave(coupleId, "Đối phương");
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                showLoading(false);
+                Log.e(TAG, "Error fetching couple after pairing: " + error);
+                // fallback navigate
+                navigateToChat(coupleId, "Đối phương");
+            }
+        });
+    }
+
+    private void showStartDatePickerAndSave(String coupleId, String partnerName) {
+        // Show a DatePickerDialog; default to today
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dpd = new DatePickerDialog(this, (view, y, m, d) -> {
+            // User selected date y, m (0-based), d
+            Calendar selected = new GregorianCalendar(y, m, d);
+            java.util.Date date = selected.getTime();
+            Timestamp ts = new Timestamp(date);
+
+            showLoading(true);
+            databaseManager.setStartDateForCoupleAndUsers(coupleId, ts, new DatabaseManager.DatabaseActionCallback() {
+                @Override
+                public void onSuccess() {
+                    showLoading(false);
+                    // After saving, navigate to chat/main
+                    navigateToChat(coupleId, partnerName);
+                }
+
+                @Override
+                public void onError(String error) {
+                    showLoading(false);
+                    Log.e(TAG, "Failed to save start date: " + error);
+                    Toast.makeText(PairingActivity.this, "Lỗi lưu ngày bắt đầu: " + error, Toast.LENGTH_LONG).show();
+                    // Still navigate to chat even if saving failed, to avoid blocking user
+                    navigateToChat(coupleId, partnerName);
+                }
+            });
+
+        }, year, month, day);
+
+        dpd.setTitle("Chọn ngày bắt đầu yêu");
+        dpd.setCancelable(false);
+        // Provide a Cancel handling: if user cancels, we'll navigate anyway
+        dpd.setButton(DatePickerDialog.BUTTON_NEGATIVE, "Bỏ qua", (dialog, which) -> {
+            if (which == DatePickerDialog.BUTTON_NEGATIVE) {
+                dialog.dismiss();
+                // Navigate without saving custom date (server's start date remains)
+                navigateToChat(coupleId, partnerName);
+            }
+        });
+
+        dpd.show();
+    }
+
 
     private void fetchPartnerInfoAndNavigate(String coupleId) {
         databaseManager.getCoupleByUserId(currentUserId, new DatabaseManager.DatabaseCallback<Couple>() {
@@ -315,6 +523,13 @@ public class PairingActivity extends BaseActivity {
         // Clear login state from SharedPreferences
         com.example.couple_app.utils.LoginPreferences.clearLoginState(this);
 
+        // Clear background image data from AppSettings SharedPreferences
+        android.content.SharedPreferences appSettingsPrefs = getSharedPreferences("AppSettings", MODE_PRIVATE);
+        appSettingsPrefs.edit()
+            .remove("saved_background_url")
+            .remove("background_source_type")
+            .commit();
+
         // Sign out from Firebase
         authManager.signOut();
 
@@ -332,5 +547,15 @@ public class PairingActivity extends BaseActivity {
     private void showLoading(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         btnPair.setEnabled(!show);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clean up listener to prevent memory leaks
+        if (pairingListener != null) {
+            pairingListener.remove();
+            pairingListener = null;
+        }
     }
 }

@@ -1,42 +1,101 @@
 package com.example.couple_app.models;
 
-import com.google.firebase.database.ServerValue;
-import java.util.Map;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.google.firebase.database.Exclude;
+
+/**
+ * Model for chat messages in Messenger (Firebase Realtime Database)
+ * Used for couple messaging feature
+ */
+@Keep
 public class ChatMessage {
     private String messageId;
     private String senderId;
     private String message;
-    private Object timestamp; // Use Object to handle ServerValue.TIMESTAMP
-    private boolean read; // ✅ Thêm trường read
-    private Object readAt; // ✅ Thêm trường readAt
+    private Object timestamp; // Can be ServerValue.TIMESTAMP or Long
+    private boolean isRead;
+    private Object readAt;
 
-    public ChatMessage() {}
+    // Default constructor required for Firebase
+    public ChatMessage() {
+    }
 
-    public ChatMessage(String senderId, String message) {
+    public ChatMessage(@NonNull String senderId, @NonNull String message) {
         this.senderId = senderId;
         this.message = message;
-        this.timestamp = ServerValue.TIMESTAMP;
-        this.read = false; // Mặc định chưa đọc
+        this.timestamp = com.google.firebase.database.ServerValue.TIMESTAMP;
+        this.isRead = false;
         this.readAt = null;
     }
 
-    // Getters and Setters
-    public String getMessageId() { return messageId; }
-    public void setMessageId(String messageId) { this.messageId = messageId; }
+    // Getters and setters
+    @Nullable
+    public String getMessageId() {
+        return messageId;
+    }
 
-    public String getSenderId() { return senderId; }
-    public void setSenderId(String senderId) { this.senderId = senderId; }
+    public void setMessageId(@Nullable String messageId) {
+        this.messageId = messageId;
+    }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    @NonNull
+    public String getSenderId() {
+        return senderId != null ? senderId : "";
+    }
 
-    public Object getTimestamp() { return timestamp; }
-    public void setTimestamp(Object timestamp) { this.timestamp = timestamp; }
+    public void setSenderId(@NonNull String senderId) {
+        this.senderId = senderId;
+    }
 
-    public boolean isRead() { return read; }
-    public void setRead(boolean read) { this.read = read; }
+    @NonNull
+    public String getMessage() {
+        return message != null ? message : "";
+    }
 
-    public Object getReadAt() { return readAt; }
-    public void setReadAt(Object readAt) { this.readAt = readAt; }
+    public void setMessage(@NonNull String message) {
+        this.message = message;
+    }
+
+    @NonNull
+    public Object getTimestamp() {
+        return timestamp != null ? timestamp : 0L;
+    }
+
+    public void setTimestamp(@NonNull Object timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
+    }
+
+    @Nullable
+    public Object getReadAt() {
+        return readAt;
+    }
+
+    public void setReadAt(@Nullable Object readAt) {
+        this.readAt = readAt;
+    }
+
+    /**
+     * Get timestamp as long value (for sorting)
+     */
+    @Exclude
+    public long getTimestampLong() {
+        if (timestamp instanceof Long) {
+            return (Long) timestamp;
+        } else if (timestamp instanceof Double) {
+            return ((Double) timestamp).longValue();
+        }
+        return 0L;
+    }
 }
+

@@ -30,7 +30,6 @@ import com.example.couple_app.utils.NotificationAPI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -88,8 +87,6 @@ public class MessengerActivity extends BaseActivity {
         setupRecyclerView();
         setupClickListeners();
 
-        // Lấy và lưu FCM token
-        registerFCMToken();
 
         // Hiển thị overlay và đảm bảo lấy couple/partner trước khi load messages
         showLoading(true);
@@ -582,8 +579,14 @@ public class MessengerActivity extends BaseActivity {
                 @Override
                 public void onError(String error) {
                     Log.e("MessengerActivity", "⚠️ Failed to send notification: " + error);
-                    // Không hiển thị lỗi cho user vì tin nhắn đã được gửi thành công
-                    // Notification chỉ là bonus feature
+
+                    // ✅ Kiểm tra nếu lỗi là do partner chưa có FCM token
+                    if (error.contains("does not have FCM token") || error.contains("400")) {
+                        Log.w("MessengerActivity", "💡 Partner needs to login on their device to receive push notifications");
+                        // Không hiển thị lỗi cho user vì tin nhắn đã được gửi thành công
+                        // Partner sẽ nhận được tin nhắn khi họ mở app
+                    }
+                    // Notification chỉ là bonus feature, không ảnh hưởng đến việc gửi tin nhắn
                 }
             }
         );
@@ -595,37 +598,6 @@ public class MessengerActivity extends BaseActivity {
         }
     }
 
-    /**
-     * Đăng ký FCM token cho thiết bị hiện tại
-     */
-    private void registerFCMToken() {
-        FirebaseMessaging.getInstance().getToken()
-            .addOnCompleteListener(task -> {
-                if (!task.isSuccessful()) {
-                    Log.w("MessengerActivity", "Fetching FCM registration token failed", task.getException());
-                    return;
-                }
-
-                // Get new FCM registration token
-                String token = task.getResult();
-                Log.d("MessengerActivity", "FCM Token: " + token);
-
-                // Save token to Firestore
-                if (currentUserId != null) {
-                    databaseManager.updateUserFcmToken(currentUserId, token, new DatabaseManager.DatabaseActionCallback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d("MessengerActivity", "FCM token saved successfully");
-                        }
-
-                        @Override
-                        public void onError(String error) {
-                            Log.e("MessengerActivity", "Failed to save FCM token: " + error);
-                        }
-                    });
-                }
-            });
-    }
 
     @Override
     protected void onResume() {
@@ -633,6 +605,9 @@ public class MessengerActivity extends BaseActivity {
         // ✅ Đánh dấu MessengerActivity đang active
         isMessengerActive = true;
         activeMessengerCoupleId = coupleId;
+
+        // ✅ Ensure FCM token is registered (in case it wasn't registered before)
+        ensureFCMTokenRegistered();
 
         // ✅ Cập nhật trạng thái "đang xem chat" lên Firestore
         updateChatViewingStatus(true);
@@ -721,6 +696,44 @@ public class MessengerActivity extends BaseActivity {
      */
     public static boolean isViewingChat(String coupleId) {
         return isMessengerActive && coupleId != null && coupleId.equals(activeMessengerCoupleId);
+    }
+
+    /**
+     * ✅ Ensure FCM token is registered for the current user
+     */
+    private void ensureFCMTokenRegistered() {
+        if (currentUserId == null || currentUserId.isEmpty()) {
+            Log.w("MessengerActivity", "Cannot register FCM token: userId is null");
+            return;
+        }
+
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
+            .addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    Log.w("MessengerActivity", "❌ Failed to get FCM token", task.getException());
+                    return;
+                }
+
+                String token = task.getResult();
+                if (token != null && !token.isEmpty()) {
+                    Log.d("MessengerActivity", "✅ FCM Token retrieved: " + token.substring(0, Math.min(20, token.length())) + "...");
+
+                    // Save token to Firestore
+                    databaseManager.updateUserFcmToken(currentUserId, token, new DatabaseManager.DatabaseActionCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d("MessengerActivity", "✅ FCM token registered successfully");
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            Log.e("MessengerActivity", "❌ Failed to register FCM token: " + error);
+                        }
+                    });
+                } else {
+                    Log.w("MessengerActivity", "⚠️ FCM token is null or empty");
+                }
+            });
     }
 
     @Override

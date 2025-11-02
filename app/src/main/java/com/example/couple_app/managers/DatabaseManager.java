@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FieldValue;
 import com.example.couple_app.models.User;
 import com.example.couple_app.models.Couple;
 import com.example.couple_app.models.AISuggestion;
@@ -77,7 +78,7 @@ public class DatabaseManager {
     // Create user document in Firestore (for phone registration)
     public void createUserDocumentWithPhone(FirebaseUser firebaseUser, String name, String phoneNumber, AuthManager.AuthCallback callback) {
         String userId = firebaseUser.getUid();
-        User user = new User(userId, name, phoneNumber, true); // true indicates phone registration
+        User user = new User(userId, name, null, phoneNumber); // email=null for phone registration
 
         db.collection(USERS_COLLECTION)
             .document(userId)
@@ -95,7 +96,7 @@ public class DatabaseManager {
     // Create user document in Firestore (for phone registration with date of birth)
     public void createUserDocumentWithPhoneAndDOB(FirebaseUser firebaseUser, String name, String phoneNumber, java.time.LocalDate dateOfBirth, AuthManager.AuthCallback callback) {
         String userId = firebaseUser.getUid();
-        User user = new User(userId, name, phoneNumber, true); // true indicates phone registration
+        User user = new User(userId, name, null, phoneNumber); // email=null for phone registration
 
         // Set date of birth - convert LocalDate to String
         if (dateOfBirth != null) {
@@ -198,6 +199,25 @@ public class DatabaseManager {
             });
     }
 
+    // Clear user FCM token in Firestore (remove the field)
+    public void clearUserFcmToken(String userId, DatabaseActionCallback callback) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("fcmToken", FieldValue.delete());
+        updates.put("updatedAt", Timestamp.now());
+
+        db.collection(USERS_COLLECTION)
+            .document(userId)
+            .update(updates)
+            .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "FCM token cleared successfully for user: " + userId);
+                if (callback != null) callback.onSuccess();
+            })
+            .addOnFailureListener(e -> {
+                Log.w(TAG, "Error clearing FCM token", e);
+                if (callback != null) callback.onError("Failed to clear FCM token: " + e.getMessage());
+            });
+    }
+
     /**
      * ✅ Cập nhật trạng thái đang xem chat của user
      * @param userId ID của user
@@ -293,7 +313,8 @@ public class DatabaseManager {
                                         // Phone user
                                         newUser = new User(userId,
                                             currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User",
-                                            currentUser.getPhoneNumber(), true);
+                                            currentUser.getEmail(),
+                                            currentUser.getPhoneNumber());
                                     }
                                     newUser.setPinCode(newPin);
 
@@ -370,22 +391,27 @@ public class DatabaseManager {
 
     // Create couple document and update both users
     private void createCoupleDocument(String user1Id, String user2Id, DatabaseCallback<String> callback) {
-        // Create couple document with a specific ID
+        // Create couple document with auto-generated ID
         String coupleId = db.collection(COUPLES_COLLECTION).document().getId();
 
         Timestamp now = Timestamp.now();
 
+        // Create Couple object with coupleId in content (important!)
         Couple couple = new Couple(coupleId, user1Id, user2Id, now);
-        couple.setUser1Id(user1Id);
-        couple.setUser2Id(user2Id);
-        couple.setStartDate(now);
-        couple.setSharedStories(new ArrayList<>());
 
-        // Use .document(coupleId).set() instead of .add() to ensure we use the correct ID
+        // Log để debug
+        Log.d(TAG, "Creating couple document:");
+        Log.d(TAG, "  Document ID: " + coupleId);
+        Log.d(TAG, "  coupleId field: " + couple.getCoupleId());
+        Log.d(TAG, "  user1Id: " + user1Id);
+        Log.d(TAG, "  user2Id: " + user2Id);
+
+        // Save to Firestore - coupleId will be saved as a field inside the document
         db.collection(COUPLES_COLLECTION)
             .document(coupleId)
             .set(couple)
             .addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "Couple document created successfully with coupleId: " + coupleId);
                 // Update both users with partner info
                 updateUsersWithPartnerInfo(user1Id, user2Id, coupleId, now, callback);
             })
@@ -414,7 +440,7 @@ public class DatabaseManager {
             .addOnSuccessListener(aVoid -> {
                 db.collection(USERS_COLLECTION).document(user2Id).update(user2Updates)
                     .addOnSuccessListener(aVoid2 -> {
-                        Log.d(TAG, "Couple connected successfully");
+                        Log.d(TAG, "Couple connected successfully with coupleId: " + coupleId);
                         callback.onSuccess(coupleId);
                     })
                     .addOnFailureListener(e -> callback.onError("Failed to update partner: " + e.getMessage()));
@@ -682,4 +708,62 @@ public class DatabaseManager {
                     }
                 });
     }
+
+    // New: set start date for a couple and update both users' startLoveDate
+    public void setStartDateForCoupleAndUsers(String coupleId, Timestamp startDate, DatabaseActionCallback callback) {
+        if (coupleId == null || coupleId.isEmpty()) {
+            callback.onError("Invalid coupleId");
+            return;
+        }
+        // Read couple doc to find user IDs
+        db.collection(COUPLES_COLLECTION).document(coupleId).get()
+            .addOnSuccessListener(doc -> {
+                if (!doc.exists()) {
+                    callback.onError("Couple document not found");
+                    return;
+                }
+                String user1Id = doc.contains("user1Id") ? doc.getString("user1Id") : null;
+                String user2Id = doc.contains("user2Id") ? doc.getString("user2Id") : null;
+
+                Map<String, Object> coupleUpdates = new HashMap<>();
+                coupleUpdates.put("startDate", startDate);
+
+                // Update couple startDate
+                db.collection(COUPLES_COLLECTION).document(coupleId).update(coupleUpdates)
+                    .addOnSuccessListener(aVoid -> {
+                        // Update both users
+                        Map<String, Object> userUpdates = new HashMap<>();
+                        userUpdates.put("startLoveDate", startDate);
+
+                        if (user1Id != null && !user1Id.isEmpty()) {
+                            db.collection(USERS_COLLECTION).document(user1Id).update(userUpdates)
+                                .addOnSuccessListener(aVoid2 -> {
+                                    // update user2
+                                    if (user2Id != null && !user2Id.isEmpty()) {
+                                        db.collection(USERS_COLLECTION).document(user2Id).update(userUpdates)
+                                            .addOnSuccessListener(aVoid3 -> callback.onSuccess())
+                                            .addOnFailureListener(e -> callback.onError("Failed to update user2: " + e.getMessage()));
+                                    } else {
+                                        // only one user present
+                                        callback.onSuccess();
+                                    }
+                                })
+                                .addOnFailureListener(e -> callback.onError("Failed to update user1: " + e.getMessage()));
+                        } else if (user2Id != null && !user2Id.isEmpty()) {
+                            // user1Id missing but user2Id present
+                            db.collection(USERS_COLLECTION).document(user2Id).update(userUpdates)
+                                .addOnSuccessListener(aVoid2 -> callback.onSuccess())
+                                .addOnFailureListener(e -> callback.onError("Failed to update user2: " + e.getMessage()));
+                        } else {
+                            // no users found on couple doc
+                            callback.onError("No users found in couple document");
+                        }
+
+                    })
+                    .addOnFailureListener(e -> callback.onError("Failed to update couple: " + e.getMessage()));
+
+            })
+            .addOnFailureListener(e -> callback.onError("Failed to read couple: " + e.getMessage()));
+    }
+
 }

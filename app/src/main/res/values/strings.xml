@@ -25,6 +25,20 @@
     <string name="pair">Pair</string>
     <string name="logout_vi">Đăng xuất</string>
 
+    <!-- Chatbot strings -->
+    <string name="chatbot_label">Chatbot</string>
+    <string name="chatbot_placeholder">Đây là màn hình Chatbot (placeholder)</string>
+    <string name="ai_chatbot">AI Chatbot</string>
+    <string name="online_label">Online</string>
+    <string name="send_message_cd">Send message</string>
+    <string name="input_hint">Nhắn tin</string>
+    <string name="chatbot_welcome_message">Xin chào! Tôi là AI Chatbot của bạn. Tôi có thể giúp gì cho bạn?</string>
+    <string name="chatbot_typing">Đang trả lời...</string>
+    <string name="chatbot_no_response">Xin lỗi, tôi không thể trả lời lúc này.</string>
+    <string name="chatbot_error">Lỗi</string>
+    <string name="error_empty_message">Vui lòng nhập tin nhắn</string>
+    <string name="error_no_internet">Không có kết nối internet</string>
+
     <!-- Plan screen strings -->
     <string name="schedule_today_title">Lịch trình hôm nay</string>
     <string name="schedule_today_title_full">Lịch trình ngày hôm nay %1$d/%2$d/%3$d</string>
@@ -43,6 +57,22 @@
     <string name="cd_game">Game</string>
     <string name="cd_settings">Setting</string>
     <string name="gallery">Gallery</string>
+    <string name="back">Back</string>
     <string name="photo_library">Thư viện ảnh</string>
     <string name="zero_photos">0 ảnh</string>
+    <string name="new_conversation">Cuộc trò chuyện mới</string>
+
+    <!-- Chat history string -->
+    <string name="chat_history">Lịch sử chat</string>
+
+    <!-- Plan detail strings -->
+    <string name="close">Đóng</string>
+
+    <!-- Chat bottom sheet strings -->
+    <string name="chat_online_status">Đang hoạt động</string>
+    <string name="chat_offline_status">Không hoạt động</string>
+
+    <!-- Loading messages strings -->
+    <string name="loading_messages">Đang tải tin nhắn...</string>
+    <string name="loading_more_messages">Đang tải thêm tin nhắn...</string>
 </resources>

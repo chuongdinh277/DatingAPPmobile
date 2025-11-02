@@ -3,18 +3,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_homemain1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_home">
+    android:background="@drawable/background_home"
+    >
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="185dp"
-        android:layout_height="59dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginBottom="376dp"
-        android:text="💞            💗"
+    <ImageView
+        android:id="@+id/img_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:contentDescription="Background Image"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
@@ -26,7 +29,6 @@
         android:text="💖"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="44dp"
@@ -43,9 +45,9 @@
         android:layout_width="0dp"
         android:layout_height="259dp"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="60dp"
         android:background="@drawable/bg_transparent_panel"
         android:elevation="6dp"
+        android:layout_marginTop="80dp"
         android:paddingHorizontal="20dp"
         android:paddingTop="8dp"
         android:paddingBottom="0dp"
@@ -78,17 +80,17 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_heart_outline"
                         android:contentDescription="@string/app_name"
-                        app:tint="#FFFFFF" />
+                        android:src="@drawable/ic_heart_outline"
+                        app:tint="@color/text_home" />
 
                     <TextView
                         android:id="@+id/txtYears"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="1"
-                        android:textColor="#FFFFFF"
+                        android:text="-"
+                        android:textColor="@color/text_home"
                         android:textSize="20sp"
                         android:textStyle="bold" />
                 </FrameLayout>
@@ -99,7 +101,7 @@
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/pacifico"
                     android:text="năm"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_home"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -118,17 +120,17 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_heart_outline"
                         android:contentDescription="@string/app_name"
-                        app:tint="#FFFFFF" />
+                        android:src="@drawable/ic_heart_outline"
+                        app:tint="@color/text_home" />
 
                     <TextView
                         android:id="@+id/txtMonths"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="3"
-                        android:textColor="#FFFFFF"
+                        android:text="-"
+                        android:textColor="@color/text_home"
                         android:textSize="20sp"
                         android:textStyle="bold" />
                 </FrameLayout>
@@ -139,7 +141,7 @@
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/pacifico"
                     android:text="tháng"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_home"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -158,17 +160,17 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_heart_outline"
                         android:contentDescription="@string/app_name"
-                        app:tint="#FFFFFF" />
+                        android:src="@drawable/ic_heart_outline"
+                        app:tint="@color/text_home" />
 
                     <TextView
                         android:id="@+id/txtWeeks"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="2"
-                        android:textColor="#FFFFFF"
+                        android:text="-"
+                        android:textColor="@color/text_home"
                         android:textSize="20sp"
                         android:textStyle="bold" />
                 </FrameLayout>
@@ -179,7 +181,7 @@
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/pacifico"
                     android:text="tuần"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_home"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -198,17 +200,17 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_heart_outline"
                         android:contentDescription="@string/app_name"
-                        app:tint="#FFFFFF" />
+                        android:src="@drawable/ic_heart_outline"
+                        app:tint="@color/text_home" />
 
                     <TextView
                         android:id="@+id/txtDays"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="12"
-                        android:textColor="#FFFFFF"
+                        android:text="-"
+                        android:textColor="@color/text_home"
                         android:textSize="22sp"
                         android:textStyle="bold" />
                 </FrameLayout>
@@ -219,9 +221,10 @@
                     android:layout_marginTop="0dp"
                     android:fontFamily="@font/pacifico"
                     android:text="ngày"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_home"
                     android:textSize="20sp" />
             </LinearLayout>
+
         </LinearLayout>
 
         <TextView
@@ -231,8 +234,8 @@
             android:layout_marginEnd="15dp"
             android:layout_marginBottom="25dp"
             android:fontFamily="@font/pacifico"
-            android:text="00:37:50"
-            android:textColor="#FFFFFF"
+            android:text="--:--:--"
+            android:textColor="@color/text_home"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -245,9 +248,10 @@
             android:layout_marginStart="15dp"
             android:layout_marginBottom="25dp"
             android:gravity="start"
-            android:text="Ngày bắt đầu:\n01/01/2024"
+            android:text="..."
+            android:fontFamily="@font/pacifico"
             android:textAlignment="textStart"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_home"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -259,9 +263,25 @@
         layout="@layout/user_profile_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_change_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="280dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="448dp"
+        android:contentDescription="Đổi ảnh nền"
+        android:src="@android:drawable/ic_menu_gallery"
+        app:backgroundTint="#800D42"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/heartContainer"
+        app:tint="@android:color/white" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

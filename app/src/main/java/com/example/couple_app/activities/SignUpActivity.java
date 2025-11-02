@@ -2,22 +2,17 @@ package com.example.couple_app.activities;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.couple_app.R;
 import com.example.couple_app.managers.DatabaseManager;
@@ -28,7 +23,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.auth.FirebaseAuthSettings;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -80,14 +74,11 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void initializeFirebaseAuth() {
         mAuth = FirebaseAuth.getInstance();
-
-        // FOR DEVELOPMENT: Enable test mode to bypass device blocking
-        // This allows using test phone numbers without SMS
-        // TODO: Remove or comment out before production release
-        FirebaseAuthSettings firebaseAuthSettings = mAuth.getFirebaseAuthSettings();
-        firebaseAuthSettings.setAppVerificationDisabledForTesting(true);
-
-        Log.d("SignUpActivity", "Firebase Auth initialized in TEST MODE - Use test phone numbers");
+        // Ensure app verification is enabled in non-debug builds
+        try {
+            mAuth.getFirebaseAuthSettings().setAppVerificationDisabledForTesting(false);
+        } catch (Exception ignored) {}
+        Log.d("SignUpActivity", "Firebase Auth initialized - CAPTCHA verification enabled");
     }
 
     private void initializePhoneAuthCallbacks() {
@@ -104,7 +95,8 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onVerificationFailed(FirebaseException e) {
                 hideProgressBar();
-                Toast.makeText(SignUpActivity.this, "Xác thực thất bại: " + e.getMessage(),
+                String message = e.getMessage() != null ? e.getMessage() : e.toString();
+                Toast.makeText(SignUpActivity.this, "Xác thực thất bại: " + message,
                     Toast.LENGTH_LONG).show();
             }
 
@@ -241,6 +233,7 @@ public class SignUpActivity extends AppCompatActivity {
                 .setCallbacks(mCallbacks)
                 .build();
         PhoneAuthProvider.verifyPhoneNumber(options);
+
     }
 
     private void verifyCode(String code) {

@@ -34,6 +34,8 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
     implementation(libs.firebase.messaging)
+    // Firebase Functions (HTTPS callable)
+    implementation(libs.firebase.functions)
 
     // Firebase App Check (IMPORTANT for fixing error 17093)
     implementation("com.google.firebase:firebase-appcheck-playintegrity:19.0.1")
@@ -46,6 +48,17 @@ dependencies {
     implementation("com.google.android.play:integrity:1.5.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Retrofit for API calls
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // Markwon for rendering Markdown in TextView
+    implementation("io.noties.markwon:core:4.6.2")
+    implementation("io.noties.markwon:ext-strikethrough:4.6.2")
+    implementation("io.noties.markwon:ext-tables:4.6.2")
 
     implementation(libs.appcompat)
     implementation(libs.material)

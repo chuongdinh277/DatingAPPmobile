@@ -1,8 +1,11 @@
 package com.example.couple_app.models;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.IgnoreExtraProperties;
 import androidx.annotation.Keep;
+
 import java.util.List;
 
 @Keep
@@ -12,10 +15,13 @@ public class Couple {
     private String user1Id;
     private String user2Id;
     private Timestamp startDate;
-    private List<Story> sharedStories;
+    private List<String> sharedStories;
 
-    public Couple() {}
+    // Default constructor required for Firestore
+    public Couple() {
+    }
 
+    // Constructor
     public Couple(String coupleId, String user1Id, String user2Id, Timestamp startDate) {
         this.coupleId = coupleId;
         this.user1Id = user1Id;
@@ -24,18 +30,57 @@ public class Couple {
     }
 
     // Getters and Setters
-    public String getCoupleId() { return coupleId; }
-    public void setCoupleId(String coupleId) { this.coupleId = coupleId; }
+    public String getCoupleId() {
+        return coupleId;
+    }
 
-    public String getUser1Id() { return user1Id; }
-    public void setUser1Id(String user1Id) { this.user1Id = user1Id; }
+    public void setCoupleId(String coupleId) {
+        this.coupleId = coupleId;
+    }
 
-    public String getUser2Id() { return user2Id; }
-    public void setUser2Id(String user2Id) { this.user2Id = user2Id; }
+    public String getUser1Id() {
+        return user1Id;
+    }
 
-    public Timestamp getStartDate() { return startDate; }
-    public void setStartDate(Timestamp startDate) { this.startDate = startDate; }
+    public void setUser1Id(String user1Id) {
+        this.user1Id = user1Id;
+    }
 
-    public List<Story> getSharedStories() { return sharedStories; }
-    public void setSharedStories(List<Story> sharedStories) { this.sharedStories = sharedStories; }
+    public String getUser2Id() {
+        return user2Id;
+    }
+
+    public void setUser2Id(String user2Id) {
+        this.user2Id = user2Id;
+    }
+
+    @Nullable
+    public Timestamp getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(@Nullable Timestamp startDate) {
+        this.startDate = startDate;
+    }
+
+    @Nullable
+    public List<String> getSharedStories() {
+        return sharedStories;
+    }
+
+    public void setSharedStories(@Nullable List<String> sharedStories) {
+        this.sharedStories = sharedStories;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Couple{" +
+                "coupleId='" + coupleId + '\'' +
+                ", user1Id='" + user1Id + '\'' +
+                ", user2Id='" + user2Id + '\'' +
+                ", startDate=" + startDate +
+                '}';
+    }
 }
+

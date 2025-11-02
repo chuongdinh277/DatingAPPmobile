@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FCE4EC"
-    android:padding="16dp">
+    android:padding="10dp">
 
     <LinearLayout
         android:id="@+id/headerContainer"
@@ -14,35 +14,23 @@
         android:background="@drawable/bg_header_game"
         android:elevation="8dp"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/tvRoomId"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="start"
-            android:text="Phòng: #XXXXXX"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/tvCurrentWord"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="70dp"
+            android:layout_height="68dp"
             android:layout_marginHorizontal="8dp"
-            android:layout_weight="1.5"
+            android:layout_weight="1.0"
             android:background="@drawable/bg_word_display"
             android:elevation="4dp"
             android:gravity="center"
             android:paddingHorizontal="10dp"
-            android:text="Từ bí mật:
-            CÁI GÌ ĐÓ"
+            android:text="Từ bí mật:\nCÁI GÌ ĐÓ"
             android:textColor="#800D42"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -55,16 +43,43 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="0.8"
             android:gravity="end"
+            android:paddingRight="10dp"
             android:shadowColor="#000000"
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="2"
-            android:text="30s"
+            android:text="hết giờ"
             android:textColor="#FFEB3B"
-            android:textSize="28sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnExit"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginHorizontal="8dp"
+            android:background="@drawable/bg_button_circle"
+            android:elevation="4dp"
+            android:contentDescription="Xóa bảng vẽ"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_close"
+            app:tint="#800D42" />
+
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvRoomId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Phòng: #..."
+        android:textColor="#800D42"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerContainer" />
     <LinearLayout
         android:id="@+id/scoreContainer"
         android:layout_width="match_parent"
@@ -75,7 +90,7 @@
         android:paddingHorizontal="16dp"
         android:gravity="center"
         android:elevation="4dp"
-        app:layout_constraintTop_toBottomOf="@id/headerContainer"
+        app:layout_constraintTop_toBottomOf="@id/tvRoomId"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -83,7 +98,7 @@
             android:id="@+id/tvScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Điểm: 0 - 0"
+            android:text="0 - 0"
             android:textSize="24sp"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
@@ -96,8 +111,10 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/bg_canvas"
         android:elevation="4dp"
-        app:layout_constraintTop_toBottomOf="@id/scoreContainer"
         app:layout_constraintBottom_toTopOf="@id/chatInputContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scoreContainer"
         app:layout_constraintVertical_weight="1" />
 
     <LinearLayout

@@ -1,7 +1,5 @@
 package com.example.couple_app.models;
 
-import com.google.firebase.Timestamp;
-
 public class Notification {
     private String notificationId;
 
@@ -11,17 +9,34 @@ public class Notification {
 
     private String message;
 
-    private boolean isRead;
+    private boolean read; // Changed from isRead to read for Firebase consistency
 
-    private Timestamp timestamp;
+    private long timestamp; // Changed from Timestamp to long for Realtime Database
+
+    private String type; // "image", "plan", "other"
+
+    // Default constructor required for Firebase
+    public Notification() {
+    }
 
     public Notification(String senderId, String receiverId, String message) {
         this.notificationId = null;
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.message = message;
-        this.isRead = false;
-        this.timestamp = Timestamp.now();
+        this.read = false;
+        this.timestamp = System.currentTimeMillis();
+        this.type = "other";
+    }
+
+    public Notification(String senderId, String receiverId, String message, String type) {
+        this.notificationId = null;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.message = message;
+        this.read = false;
+        this.timestamp = System.currentTimeMillis();
+        this.type = type;
     }
 
     public String getNotificationId() {
@@ -56,16 +71,29 @@ public class Notification {
         this.message = message;
     }
 
-    public boolean isRead() {
-        return isRead;
+
+    public boolean getRead() {
+        return read;
     }
 
     public void setRead(boolean read) {
-        isRead = read;
+        this.read = read;
     }
 
-    public String getTimestamp() {
-        return timestamp.toString();
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
 }

@@ -246,15 +246,14 @@ public class SettingProfileActivity extends BaseActivity {
                 ivUserImage.setImageBitmap(bitmap);
             }
         });
-
-        // Load avatar if not cached in ViewModel
-        avatarViewModel.loadAvatar(userId);
-
-        // Fallback to old cache if ViewModel doesn't have it yet
         Bitmap cachedAvatar = AvatarCache.getCachedBitmap(this);
         if (cachedAvatar != null) {
             ivUserImage.setImageBitmap(cachedAvatar);
+        }else {
+            // Load avatar if not cached in ViewModel
+            avatarViewModel.loadAvatar(userId);
         }
+
     }
 
     private void saveProfileChanges() {

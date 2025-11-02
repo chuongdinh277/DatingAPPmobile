@@ -9,6 +9,10 @@ import com.example.couple_app.R;
 import com.example.couple_app.utils.LoginPreferences;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import androidx.appcompat.app.AlertDialog;
 
 public class GameListActivity extends BaseActivity {
 
@@ -36,8 +40,28 @@ public class GameListActivity extends BaseActivity {
     private void openWaitingRoom(String gameType) {
         String userId = LoginPreferences.getUserId(this);
 
+        // Fallback to FirebaseAuth currentUser if LoginPreferences is empty
         if (userId == null || userId.isEmpty()) {
-            Toast.makeText(this, "Bạn chưa đăng nhập!", Toast.LENGTH_SHORT).show();
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (firebaseUser != null) {
+                userId = firebaseUser.getUid();
+                // Persist to LoginPreferences so future calls use it
+                LoginPreferences.saveLoginState(this, true, firebaseUser.getEmail(), firebaseUser.getDisplayName(), userId);
+            }
+        }
+
+        if (userId == null || userId.isEmpty()) {
+            // Show dialog offering to go to login
+            new AlertDialog.Builder(this)
+                .setTitle("Chưa đăng nhập")
+                .setMessage("Bạn cần đăng nhập để chơi trò chơi. Bạn có muốn chuyển tới màn hình đăng nhập không?")
+                .setPositiveButton("Đăng nhập", (dialog, which) -> {
+                    Intent intent = new Intent(GameListActivity.this, WelcomeActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Huỷ", (dialog, which) -> dialog.dismiss())
+                .show();
             return;
         }
 

@@ -1,12 +1,15 @@
 package com.example.couple_app.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.example.couple_app.R;
 import com.example.couple_app.managers.AuthManager;
 import com.example.couple_app.managers.DatabaseManager;
@@ -26,15 +29,20 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.List;
 import com.google.firebase.auth.FirebaseAuthSettings;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class SettingActivity extends BaseActivity {
     private static final String TAG = "SettingActivity";
     private static final int RC_GOOGLE_SIGN_IN = 9001;
+    private static final String PREFS_NAME = "ThemePrefs";
+    private static final String KEY_DARK_MODE = "dark_mode";
 
     private FirebaseAuth mAuth;
     private AuthManager authManager;
     private GoogleSignInClient googleSignInClient;
     private MaterialButton btLinkGoogle;
+    private SwitchMaterial switchTheme;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +62,16 @@ public class SettingActivity extends BaseActivity {
 
         // Ánh xạ các button
         MaterialButton btProfile = findViewById(R.id.bt_profile);
-        MaterialButton btNotification = findViewById(R.id.bt_notification);
-        MaterialButton btPrivacy = findViewById(R.id.bt_privacy);
         MaterialButton btAbout = findViewById(R.id.bt_about);
         btLinkGoogle = findViewById(R.id.bt_link_google);
         MaterialButton btLogout = findViewById(R.id.bt_logout);
+        switchTheme = findViewById(R.id.switch_theme);
+
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+        // Setup dark mode switch
+        setupDarkModeSwitch();
 
         // Update UI based on current linked providers
         updateLinkGoogleButton();
@@ -67,19 +80,10 @@ public class SettingActivity extends BaseActivity {
         btProfile.setOnClickListener(v -> {
             Intent intent = new Intent(SettingActivity.this, SettingProfileActivity.class);
             startActivity(intent);
+            overridePendingTransition(0, 0);
         });
 
-        // Notification
-        btNotification.setOnClickListener(v -> {
-            // TODO: Create SettingNotificationActivity later
-            Toast.makeText(this, "Notification settings coming soon", Toast.LENGTH_SHORT).show();
-        });
 
-        // Privacy
-        btPrivacy.setOnClickListener(v -> {
-            // TODO: Create SettingPrivacyActivity later
-            Toast.makeText(this, "Privacy settings coming soon", Toast.LENGTH_SHORT).show();
-        });
 
         // About
         btAbout.setOnClickListener(v -> {
@@ -104,6 +108,32 @@ public class SettingActivity extends BaseActivity {
                 .build();
 
         googleSignInClient = GoogleSignIn.getClient(this, gso);
+    }
+
+    private void setupDarkModeSwitch() {
+        // Get current theme preference
+        boolean isDarkMode = sharedPreferences.getBoolean(KEY_DARK_MODE, false);
+
+        // Set switch state without triggering listener
+        switchTheme.setChecked(isDarkMode);
+
+        // Set up listener for theme changes
+        switchTheme.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Save preference
+            sharedPreferences.edit().putBoolean(KEY_DARK_MODE, isChecked).apply();
+
+            // Apply theme
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+
+            // Show feedback
+            Toast.makeText(this,
+                isChecked ? "Đã bật chế độ tối" : "Đã tắt chế độ tối",
+                Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void updateLinkGoogleButton() {
@@ -403,6 +433,32 @@ public class SettingActivity extends BaseActivity {
     private void performLogout() {
         Log.d(TAG, "Performing logout - clearing all caches");
 
+        String uid = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null;
+
+        // Try to clear FCM on backend first (best-effort)
+        if (uid != null) {
+            com.example.couple_app.managers.DatabaseManager.getInstance()
+                .clearUserFcmToken(uid, new com.example.couple_app.managers.DatabaseManager.DatabaseActionCallback() {
+                    @Override public void onSuccess() { Log.d(TAG, "Cleared FCM token in Firestore"); }
+                    @Override public void onError(String error) { Log.w(TAG, "Failed to clear FCM token in Firestore: " + error); }
+                });
+        }
+
+        // Delete local FCM token so this device stops receiving old-topic messages
+        try {
+            FirebaseMessaging.getInstance().deleteToken()
+                .addOnCompleteListener(t -> Log.d(TAG, "Local FCM token deleted: " + t.isSuccessful()));
+        } catch (Exception e) {
+            Log.w(TAG, "Error deleting FCM token locally", e);
+        }
+
+        // Set user offline before signing out
+        if (mAuth.getCurrentUser() != null) {
+            String userId = mAuth.getCurrentUser().getUid();
+            com.example.couple_app.managers.UserPresenceManager.getInstance().setUserOffline(userId);
+            com.example.couple_app.managers.UserPresenceManager.getInstance().cleanup();
+        }
+
         // Sign out from Firebase Authentication FIRST
         mAuth.signOut();
         Log.d(TAG, "Firebase Auth signed out");
@@ -448,6 +504,14 @@ public class SettingActivity extends BaseActivity {
             .commit(); // ← Use commit() for immediate write
         Log.d(TAG, "Last user ID cleared from UserSession");
 
+        // ⭐ Clear background image data (saved in AppSettings)
+        android.content.SharedPreferences appSettingsPrefs = getSharedPreferences("AppSettings", MODE_PRIVATE);
+        appSettingsPrefs.edit()
+            .remove("saved_background_url")
+            .remove("background_source_type")
+            .commit(); // ← Use commit() for immediate write
+        Log.d(TAG, "Background image data cleared from AppSettings");
+
         // Clear all cached data (avatars)
         AvatarCache.clearAllCache(this);
         Log.d(TAG, "AvatarCache cleared");
@@ -456,6 +520,7 @@ public class SettingActivity extends BaseActivity {
         Intent intent = new Intent(this, WelcomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+        overridePendingTransition(0, 0);
         finish();
 
         Toast.makeText(this, "Đã đăng xuất thành công", Toast.LENGTH_SHORT).show();

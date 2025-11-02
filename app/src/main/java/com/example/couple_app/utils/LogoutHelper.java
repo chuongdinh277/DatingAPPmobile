@@ -24,6 +24,13 @@ public class LogoutHelper {
         // Clear login state from SharedPreferences
         LoginPreferences.clearLoginState(context);
 
+        // Clear background image data from AppSettings SharedPreferences
+        android.content.SharedPreferences appSettingsPrefs = context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE);
+        appSettingsPrefs.edit()
+            .remove("saved_background_url")
+            .remove("background_source_type")
+            .commit();
+
         // Show logout message
         Toast.makeText(context, "Đã đăng xuất thành công", Toast.LENGTH_SHORT).show();
 

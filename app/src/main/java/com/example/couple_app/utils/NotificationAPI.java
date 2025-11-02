@@ -95,9 +95,20 @@ public class NotificationAPI {
                     mainHandler.post(() -> callback.onError("JSON error: " + e.getMessage()));
                 }
             } catch (IOException e) {
-                Log.e(TAG, "❌ Network error: " + e.getMessage(), e);
+                String errorMsg = e.getMessage();
+                Log.e(TAG, "❌ Network error: " + errorMsg, e);
+
+                // ✅ Check if error is due to invalid/expired FCM token
+                if (errorMsg != null && (errorMsg.contains("registration-token-not-registered") ||
+                    errorMsg.contains("Invalid or expired FCM token"))) {
+                    Log.w(TAG, "⚠️ FCM token is invalid/expired for user: " + toUserId +
+                        ". The user needs to refresh their token.");
+                    // Note: The receiver's token is invalid, not the sender's
+                    // The receiver will get a new token when they open the app
+                }
+
                 if (callback != null) {
-                    mainHandler.post(() -> callback.onError("Network error: " + e.getMessage()));
+                    mainHandler.post(() -> callback.onError("Network error: " + errorMsg));
                 }
             }
         });
