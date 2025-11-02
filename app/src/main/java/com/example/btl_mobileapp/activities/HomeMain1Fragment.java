@@ -89,6 +89,10 @@ import java.util.concurrent.TimeUnit;
 
 public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionListener{
 
+    // === THAY ĐỔI 1: Thêm biến ImageView ===
+    private ImageView imgBackgroundDisplay;
+    // ======================================
+
     private static final String TAG = "HomeMain1Fragment"; // Thêm TAG để debug
     private static final String PREFS_NAME = "AppSettings"; // Tên file SharedPreferences
     private static final String PREF_BACKGROUND_URL = "saved_background_url"; // Key lưu URL nền
@@ -143,6 +147,14 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
 
         // Find Views
         rootLayout = root.findViewById(R.id.root_homemain1);
+
+        // === THAY ĐỔI 2: Tìm ImageView và xóa nền của rootLayout ===
+        imgBackgroundDisplay = root.findViewById(R.id.img_background_display);
+        if (rootLayout != null) {
+            rootLayout.setBackground(null); // Xóa nền mặc định của XML
+        }
+        // ========================================================
+
         fabChangeBackground = root.findViewById(R.id.fab_change_background);
         txtYears = root.findViewById(R.id.txtYears);
         txtMonths = root.findViewById(R.id.txtMonths);
@@ -295,7 +307,6 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
                 .addOnSuccessListener(taskSnapshot -> {
                     Log.d(TAG, "Image upload successful. Getting download URL.");
 
-                    // BẮT ĐẦU KHỐI LỆNH BỊ THIẾU DẤU NGOẶC HOẶC LOGIC ở lần trước
                     backgroundRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
                                 String urlString = downloadUrl.toString();
                                 Log.d(TAG, "Download URL obtained: " + urlString);
@@ -319,13 +330,13 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
                                 }
                                 progressDialog.dismiss();
                                 Toast.makeText(getContext(), "Đổi nền thành công!", Toast.LENGTH_SHORT).show();
-                            }) // KẾT THÚC KHỐI LỆNH Download URL
+                            })
                             .addOnFailureListener(e -> {
                                 progressDialog.dismiss();
                                 Log.e(TAG, "Failed to get download URL.", e);
                                 Toast.makeText(getContext(), "Lỗi lấy URL ảnh", Toast.LENGTH_SHORT).show();
                             });
-                }) // KẾT THÚC KHỐI LỆNH putFile
+                })
                 .addOnFailureListener(e -> {
                     progressDialog.dismiss();
                     Log.e(TAG, "Image upload failed.", e);
@@ -354,8 +365,6 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
         }
     }
 
-    // --- Local Storage (SharedPreferences) Logic ---
-
     private void loadSavedBackground() {
         if (sharedPreferences != null) {
             String savedUrlOrId = sharedPreferences.getString(PREF_BACKGROUND_URL, null);
@@ -366,8 +375,8 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
                     // Tải từ Resource ID (Nền mặc định)
                     try {
                         int resourceId = Integer.parseInt(savedUrlOrId);
-                        if (rootLayout != null) {
-                            rootLayout.setBackgroundResource(resourceId);
+                        if (imgBackgroundDisplay != null) { // Sửa từ rootLayout
+                            imgBackgroundDisplay.setImageResource(resourceId); // Sửa từ setBackgroundResource
                             Log.d(TAG, "Loading background from saved Resource ID: " + resourceId);
                         }
                     } catch (NumberFormatException e) {
@@ -381,21 +390,30 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
                 }
             } else {
                 Log.d(TAG, "No background data found in SharedPreferences.");
+                // Đặt nền mặc định nếu không có gì
+                if (imgBackgroundDisplay != null) {
+                    imgBackgroundDisplay.setImageResource(R.drawable.background_home);
+                }
             }
         }
     }
+    // ===============================================
 
 
 
     // --- Glide Background Loading ---
 
+    // === THAY ĐỔI 4: Sửa hàm loadBackgroundFromUrl ===
     private void loadBackgroundFromUrl(String url) {
-        if (url == null || url.isEmpty() || !isAdded() || rootLayout == null) {
+        // Sửa: || imgBackgroundDisplay == null
+        if (url == null || url.isEmpty() || !isAdded() || imgBackgroundDisplay == null) {
             Log.w(TAG, "Cannot load background: URL is null/empty, or fragment/layout not ready.");
             // Ensure default is set if URL is invalid and nothing else was loaded
-            if (rootLayout != null && rootLayout.getBackground() == null) {
+            // Sửa: imgBackgroundDisplay != null && imgBackgroundDisplay.getDrawable() == null
+            if (imgBackgroundDisplay != null && imgBackgroundDisplay.getDrawable() == null) {
                 Log.d(TAG, "Setting default background because URL was invalid.");
-                rootLayout.setBackgroundResource(R.drawable.background_home);
+                // Sửa: imgBackgroundDisplay.setImageResource
+                imgBackgroundDisplay.setImageResource(R.drawable.background_home);
             }
             return;
         }
@@ -409,8 +427,10 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
                 .into(new CustomTarget<Drawable>() {
                     @Override
                     public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                        if (rootLayout != null && isAdded()) {
-                            rootLayout.setBackground(resource);
+                        // Sửa: imgBackgroundDisplay != null
+                        if (imgBackgroundDisplay != null && isAdded()) {
+                            // Sửa: imgBackgroundDisplay.setImageDrawable(resource)
+                            imgBackgroundDisplay.setImageDrawable(resource);
                         }
                     }
                     @Override
@@ -420,14 +440,17 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
                     @Override
                     public void onLoadFailed(@Nullable Drawable errorDrawable) {
                         Log.e(TAG, "Glide failed to load background from URL: " + url);
-                        if (rootLayout != null && isAdded()) {
+                        // Sửa: imgBackgroundDisplay != null
+                        if (imgBackgroundDisplay != null && isAdded()) {
                             // Fallback to default background on failure
-                            rootLayout.setBackgroundResource(R.drawable.background_home);
+                            // Sửa: imgBackgroundDisplay.setImageResource
+                            imgBackgroundDisplay.setImageResource(R.drawable.background_home);
                             Log.d(TAG, "Set default background due to Glide load failure.");
                         }
                     }
                 });
     }
+    // ===============================================
 
 
     // --- User Profile and Love Counter Logic (Mostly unchanged, added logging and minor fixes) ---
@@ -473,8 +496,7 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
         FragmentUtils.safeSetText(this, tvZodiacRight, "");
         if(avtLeft != null) avtLeft.setImageResource(R.drawable.ic_default_avatar);
         if(avtRight != null) avtRight.setImageResource(R.drawable.ic_default_avatar);
-        // Ensure default background is shown initially if nothing else loaded yet
-
+        // Đã xóa dòng setBackground mặc định bị "nháy" ở đây
 
 
         FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -502,6 +524,7 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
 
                 Log.d(TAG, "User data loaded successfully from DB.");
 
+                // === THAY ĐỔI 5: Sửa logic tải nền trong bindUserProfile ===
                 // 1. Load Background Image (Prioritize SharedPreferences -> DB -> Default)
                 String backgroundUrlFromDb = user.getBackgroundImageUrl();
                 String savedUrlOrIdFromPrefs = sharedPreferences.getString(PREF_BACKGROUND_URL, null);
@@ -514,13 +537,13 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
                         // Nguồn là Resource ID (Nền mặc định)
                         try {
                             int resourceId = Integer.parseInt(savedUrlOrIdFromPrefs);
-                            if (rootLayout != null) {
-                                rootLayout.setBackgroundResource(resourceId);
+                            if (imgBackgroundDisplay != null) { // Sửa
+                                imgBackgroundDisplay.setImageResource(resourceId); // Sửa
                             }
                         } catch (NumberFormatException e) {
                             Log.e(TAG, "bindUserProfile: Invalid Resource ID in Prefs, falling back.");
-                            if (rootLayout != null) {
-                                rootLayout.setBackgroundResource(R.drawable.background_home);
+                            if (imgBackgroundDisplay != null) { // Sửa
+                                imgBackgroundDisplay.setImageResource(R.drawable.background_home); // Sửa
                             }
                         }
                     } else {
@@ -547,13 +570,15 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
                 // Ưu tiên 3: Dùng nền mặc định (nếu cả 2 đều rỗng)
                 else {
                     Log.d(TAG, "bindUserProfile: No background URL found in Prefs or DB. Using default.");
-                    if (rootLayout != null) {
-                        rootLayout.setBackgroundResource(R.drawable.background_home);
+                    if (imgBackgroundDisplay != null) { // Sửa
+                        imgBackgroundDisplay.setImageResource(R.drawable.background_home); // Sửa
                     }
                     if (profileData != null) {
                         profileData.setCurrentUserBackgroundImageUrl(null);
                     }
                 }
+                // ==========================================================
+
 
                 // --- 2. Load User Info (Name, Age, Zodiac, Avatar) ---
                 // Name (Prioritize DB -> Auth DisplayName -> Auth Email)
@@ -736,8 +761,6 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
             }
         });
     }
-
-    // ✅ HÀM MỚI: Xóa thông tin Partner trên UI
     private void clearPartnerUI(ImageView avtRight, TextView txtNameRight, TextView tvAgeRight, TextView tvZodiacRight) {
         if (!isAdded()) return;
         FragmentUtils.safeSetText(this, txtNameRight, "");
@@ -745,9 +768,6 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
         FragmentUtils.safeSetText(this, tvZodiacRight, "");
         if (avtRight != null) avtRight.setImageResource(R.drawable.ic_default_avatar);
     }
-
-
-    // --- Love Counter Methods ---
 
     private void startLoveCounter() {
         if (startLoveDate == null) {
@@ -879,6 +899,9 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
         stopLoveCounter(); // Stop counter
         // Release views to prevent leaks
         rootLayout = null;
+        // === THAY ĐỔI 6: Thêm imgBackgroundDisplay = null ===
+        imgBackgroundDisplay = null;
+        // ================================================
         fabChangeBackground = null;
         txtYears = txtMonths = txtWeeks = txtDays = txtTimer = txtStartDate = null;
         // Dismiss dialog if showing
@@ -934,6 +957,7 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
     }
 
     // ✅ HÀM MỚI: Xử lý khi không tải được User từ DB
+    // === THAY ĐỔI 7: Sửa hàm handleUserLoadError ===
     private void handleUserLoadError(FirebaseUser fbUser) {
         Log.e(TAG, "Error loading User from DB, using fallback from Auth.");
         if (!isAdded() || getView() == null) { // Check if fragment view is available
@@ -981,22 +1005,18 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
         if (profileData != null) {
             profileData.clearPartnerData();
         }
-
-
-        // Stop counter and clear UI
         stopLoveCounter();
         clearLoveCounterUI();
-
-        // Load default background if nothing saved in SharedPreferences
-        if (sharedPreferences != null && sharedPreferences.getString(PREF_BACKGROUND_URL, null) == null && rootLayout != null) {
+        if (sharedPreferences != null && sharedPreferences.getString(PREF_BACKGROUND_URL, null) == null && imgBackgroundDisplay != null) { // Sửa
             Log.d(TAG, "Setting default background in handleUserLoadError.");
-            rootLayout.setBackgroundResource(R.drawable.background_home);
+            imgBackgroundDisplay.setImageResource(R.drawable.background_home); // Sửa
         }
         // Ensure ViewModel background is also cleared if applicable
         if (profileData != null) {
             profileData.setCurrentUserBackgroundImageUrl(null);
         }
     }
+    // ===============================================
 
     private Uri compressImageBeforeUpload(Context context, Uri imageUri) throws IOException {
         Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
@@ -1021,17 +1041,11 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
         return Uri.fromFile(outputFile);
     }
 
-
-    // --- Background Change Logic ---
-// ... (các hàm liên quan đến permissions/uploadImageToFirebaseStorage)
-
     private void showBackgroundSelectionDialog() {
         if (!isAdded()) return;
 
         final String[] options = new String[DEFAULT_BACKGROUND_IDS.length + 1];
-        options[0] = "Chọn ảnh từ thư viện (Tùy chỉnh)"; // Lựa chọn đầu tiên
-
-        // Đặt tên cho các nền mặc định (ví dụ: "Nền 1", "Nền 2",...)
+        options[0] = "Chọn ảnh từ thư viện (Tùy chỉnh)";
         for (int i = 0; i < DEFAULT_BACKGROUND_IDS.length; i++) {
             options[i + 1] = "Nền mặc định " + (i + 1);
         }
@@ -1051,13 +1065,10 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
         builder.show();
     }
 
-    /**
-     * Áp dụng nền mặc định từ Resource ID
-     */
     private void applyDefaultBackground(int resourceId) {
-        if (rootLayout != null && isAdded()) {
+        if (imgBackgroundDisplay != null && isAdded()) { // Sửa
             // 1. Set background ngay lập tức
-            rootLayout.setBackgroundResource(resourceId);
+            imgBackgroundDisplay.setImageResource(resourceId); // Sửa
 
             // 2. Lưu trạng thái nền mặc định vào SharedPreferences
             sharedPreferences.edit()
@@ -1075,7 +1086,6 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
             removeBackgroundUrlFromDatabase();
         }
     }
-
     private void removeBackgroundUrlFromDatabase() {
         FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
         if (fbUser == null) return;
@@ -1087,7 +1097,5 @@ public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionL
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Firestore background URL removed."))
                 .addOnFailureListener(e -> Log.e(TAG, "Firestore background URL removal failed.", e));
     }
-
-
 
 } // End of HomeMain1Fragment class
