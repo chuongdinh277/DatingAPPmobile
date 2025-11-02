@@ -1,6 +1,7 @@
 package com.example.btl_mobileapp.activities;
 
 // Import Android core libraries
+import android.app.AlertDialog;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -83,7 +84,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class HomeMain1Fragment extends Fragment {
+
+
+
+public class HomeMain1Fragment extends Fragment  implements BackgroundSelectionListener{
 
     private static final String TAG = "HomeMain1Fragment"; // Thêm TAG để debug
     private static final String PREFS_NAME = "AppSettings"; // Tên file SharedPreferences
@@ -107,8 +111,19 @@ public class HomeMain1Fragment extends Fragment {
     private ProgressDialog progressDialog;
     private SharedPreferences sharedPreferences;
 
+
+    private static final String PREF_BACKGROUND_SOURCE_TYPE = "background_source_type";
+    private static final String SOURCE_TYPE_RESOURCE = "resource";
+    private static final String SOURCE_TYPE_URL = "url";
+
+    private static final int[] DEFAULT_BACKGROUND_IDS = {
+            R.drawable.background_home,
+            R.drawable.background_default_1,
+            R.drawable.background_default_2,
+            R.drawable.background_default_3,
+            R.drawable.background_default_4
+    };
     public HomeMain1Fragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -149,12 +164,26 @@ public class HomeMain1Fragment extends Fragment {
         // Bind user profile data (this will also load background from DB if needed)
         bindUserProfile(root);
 
-        // Set listener for background change button
-        fabChangeBackground.setOnClickListener(v -> checkPermissionAndPickImage());
-
+        fabChangeBackground.setOnClickListener(v -> {
+            BackgroundSelectionBottomSheet sheet = BackgroundSelectionBottomSheet.newInstance(DEFAULT_BACKGROUND_IDS);
+            // Truyền listener để sheet có thể gọi lại hàm trong fragment này
+            sheet.setTargetFragment(this, 0);
+            sheet.show(getParentFragmentManager(), "BackgroundSheet");
+        });
         return root;
     }
 
+    @Override
+    public void onDefaultBackgroundSelected(int resourceId) {
+        // Khi nhận được Resource ID từ Bottom Sheet
+        applyDefaultBackground(resourceId);
+    }
+
+    @Override
+    public void onCustomSelectionRequested() {
+        // Khi người dùng yêu cầu chọn ảnh từ thư viện
+        checkPermissionAndPickImage();
+    }
     // --- Permission and Image Picking Logic ---
 
     private void setupActivityLaunchers() {
@@ -265,24 +294,38 @@ public class HomeMain1Fragment extends Fragment {
         backgroundRef.putFile(compressedUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     Log.d(TAG, "Image upload successful. Getting download URL.");
+
+                    // BẮT ĐẦU KHỐI LỆNH BỊ THIẾU DẤU NGOẶC HOẶC LOGIC ở lần trước
                     backgroundRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
-                        String urlString = downloadUrl.toString();
-                        Log.d(TAG, "Download URL obtained: " + urlString);
-                        saveBackgroundUrlToDatabase(urlString); // Save to Firestore
-                        loadBackgroundFromUrl(urlString);      // Set as background
-                        saveBackgroundUrlLocally(urlString);   // Save to SharedPreferences
-                        if (profileData != null) {
-                            profileData.setCurrentUserBackgroundImageUrl(urlString);
-                            Log.d(TAG, "Updated ViewModel with new background URL.");
-                        }
-                        progressDialog.dismiss();
-                        Toast.makeText(getContext(), "Đổi nền thành công!", Toast.LENGTH_SHORT).show();
-                    }).addOnFailureListener(e -> {
-                        progressDialog.dismiss();
-                        Log.e(TAG, "Failed to get download URL.", e);
-                        Toast.makeText(getContext(), "Lỗi lấy URL ảnh", Toast.LENGTH_SHORT).show();
-                    });
-                })
+                                String urlString = downloadUrl.toString();
+                                Log.d(TAG, "Download URL obtained: " + urlString);
+
+                                // 1. Lưu URL vào Firestore
+                                saveBackgroundUrlToDatabase(urlString);
+
+                                // 2. Load background lên UI
+                                loadBackgroundFromUrl(urlString);
+
+                                // 3. Lưu vào SharedPreferences (lưu URL và loại nguồn)
+                                saveBackgroundUrlLocally(urlString);
+                                sharedPreferences.edit()
+                                        .putString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_URL) // Lưu loại nguồn là URL
+                                        .apply();
+
+                                // 4. Cập nhật ViewModel
+                                if (profileData != null) {
+                                    profileData.setCurrentUserBackgroundImageUrl(urlString);
+                                    Log.d(TAG, "Updated ViewModel with new background URL.");
+                                }
+                                progressDialog.dismiss();
+                                Toast.makeText(getContext(), "Đổi nền thành công!", Toast.LENGTH_SHORT).show();
+                            }) // KẾT THÚC KHỐI LỆNH Download URL
+                            .addOnFailureListener(e -> {
+                                progressDialog.dismiss();
+                                Log.e(TAG, "Failed to get download URL.", e);
+                                Toast.makeText(getContext(), "Lỗi lấy URL ảnh", Toast.LENGTH_SHORT).show();
+                            });
+                }) // KẾT THÚC KHỐI LỆNH putFile
                 .addOnFailureListener(e -> {
                     progressDialog.dismiss();
                     Log.e(TAG, "Image upload failed.", e);
@@ -311,19 +354,38 @@ public class HomeMain1Fragment extends Fragment {
         }
     }
 
+    // --- Local Storage (SharedPreferences) Logic ---
+
     private void loadSavedBackground() {
         if (sharedPreferences != null) {
-            String savedUrl = sharedPreferences.getString(PREF_BACKGROUND_URL, null);
-            if (savedUrl != null && !savedUrl.isEmpty()) {
-                Log.d(TAG, "Loading background from SharedPreferences: " + savedUrl);
-                loadBackgroundFromUrl(savedUrl);
+            String savedUrlOrId = sharedPreferences.getString(PREF_BACKGROUND_URL, null);
+            String sourceType = sharedPreferences.getString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_URL);
+
+            if (savedUrlOrId != null && !savedUrlOrId.isEmpty()) {
+                if (sourceType.equals(SOURCE_TYPE_RESOURCE)) {
+                    // Tải từ Resource ID (Nền mặc định)
+                    try {
+                        int resourceId = Integer.parseInt(savedUrlOrId);
+                        if (rootLayout != null) {
+                            rootLayout.setBackgroundResource(resourceId);
+                            Log.d(TAG, "Loading background from saved Resource ID: " + resourceId);
+                        }
+                    } catch (NumberFormatException e) {
+                        Log.e(TAG, "Invalid Resource ID saved in SharedPreferences.");
+                        loadBackgroundFromUrl(savedUrlOrId); // Thử tải như URL nếu lỗi
+                    }
+                } else {
+                    // Tải từ URL (Ảnh tùy chỉnh)
+                    Log.d(TAG, "Loading background from SharedPreferences URL: " + savedUrlOrId);
+                    loadBackgroundFromUrl(savedUrlOrId);
+                }
             } else {
-                Log.d(TAG, "No background URL found in SharedPreferences.");
-                // Optionally set default background here if needed immediately
-                // if (rootLayout != null) rootLayout.setBackgroundResource(R.drawable.background_home);
+                Log.d(TAG, "No background data found in SharedPreferences.");
             }
         }
     }
+
+
 
     // --- Glide Background Loading ---
 
@@ -412,9 +474,7 @@ public class HomeMain1Fragment extends Fragment {
         if(avtLeft != null) avtLeft.setImageResource(R.drawable.ic_default_avatar);
         if(avtRight != null) avtRight.setImageResource(R.drawable.ic_default_avatar);
         // Ensure default background is shown initially if nothing else loaded yet
-        if (rootLayout != null && sharedPreferences.getString(PREF_BACKGROUND_URL, null) == null) {
-            rootLayout.setBackgroundResource(R.drawable.background_home);
-        }
+
 
 
         FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -444,35 +504,52 @@ public class HomeMain1Fragment extends Fragment {
 
                 // 1. Load Background Image (Prioritize SharedPreferences -> DB -> Default)
                 String backgroundUrlFromDb = user.getBackgroundImageUrl();
-                String backgroundUrlFromPrefs = sharedPreferences.getString(PREF_BACKGROUND_URL, null);
-                String urlToLoad = null;
+                String savedUrlOrIdFromPrefs = sharedPreferences.getString(PREF_BACKGROUND_URL, null);
+                String sourceTypeFromPrefs = sharedPreferences.getString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_URL);
 
-                // Priority: Use Prefs if available (means user changed it recently)
-                if (!TextUtils.isEmpty(backgroundUrlFromPrefs)) {
-                    urlToLoad = backgroundUrlFromPrefs;
-                    Log.d(TAG, "Using background URL from SharedPreferences: " + urlToLoad);
-                }
-                // Otherwise, use DB URL if available
-                else if (!TextUtils.isEmpty(backgroundUrlFromDb)) {
-                    urlToLoad = backgroundUrlFromDb;
-                    Log.d(TAG, "Using background URL from DB: " + urlToLoad);
-                    // Save the DB URL to Prefs for next time
-                    saveBackgroundUrlLocally(urlToLoad);
-                }
-
-                // Load the determined URL (or default if null)
-                if (urlToLoad != null) {
-                    loadBackgroundFromUrl(urlToLoad);
-                    // Update ViewModel cache
-                    if (profileData != null) {
-                        profileData.setCurrentUserProfilePicUrl(urlToLoad);
+                // Ưu tiên 1: Tải từ SharedPreferences (nếu có)
+                if (!TextUtils.isEmpty(savedUrlOrIdFromPrefs)) {
+                    Log.d(TAG, "bindUserProfile: Loading background from SharedPreferences.");
+                    if (sourceTypeFromPrefs.equals(SOURCE_TYPE_RESOURCE)) {
+                        // Nguồn là Resource ID (Nền mặc định)
+                        try {
+                            int resourceId = Integer.parseInt(savedUrlOrIdFromPrefs);
+                            if (rootLayout != null) {
+                                rootLayout.setBackgroundResource(resourceId);
+                            }
+                        } catch (NumberFormatException e) {
+                            Log.e(TAG, "bindUserProfile: Invalid Resource ID in Prefs, falling back.");
+                            if (rootLayout != null) {
+                                rootLayout.setBackgroundResource(R.drawable.background_home);
+                            }
+                        }
+                    } else {
+                        // Nguồn là URL (Ảnh tùy chỉnh)
+                        loadBackgroundFromUrl(savedUrlOrIdFromPrefs);
                     }
-                } else {
-                    Log.d(TAG, "No background URL found in Prefs or DB. Using default background resource.");
+                    // Cập nhật ViewModel
+                    if (profileData != null) {
+                        profileData.setCurrentUserBackgroundImageUrl(savedUrlOrIdFromPrefs);
+                    }
+                }
+                // Ưu tiên 2: Tải từ Database (nếu Prefs rỗng)
+                else if (!TextUtils.isEmpty(backgroundUrlFromDb)) {
+                    Log.d(TAG, "bindUserProfile: Loading background from DB.");
+                    loadBackgroundFromUrl(backgroundUrlFromDb);
+                    // Lưu URL từ DB vào Prefs cho lần sau
+                    saveBackgroundUrlLocally(backgroundUrlFromDb);
+                    sharedPreferences.edit().putString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_URL).apply();
+                    // Cập nhật ViewModel
+                    if (profileData != null) {
+                        profileData.setCurrentUserBackgroundImageUrl(backgroundUrlFromDb);
+                    }
+                }
+                // Ưu tiên 3: Dùng nền mặc định (nếu cả 2 đều rỗng)
+                else {
+                    Log.d(TAG, "bindUserProfile: No background URL found in Prefs or DB. Using default.");
                     if (rootLayout != null) {
                         rootLayout.setBackgroundResource(R.drawable.background_home);
                     }
-                    // Ensure ViewModel cache reflects no URL
                     if (profileData != null) {
                         profileData.setCurrentUserBackgroundImageUrl(null);
                     }
@@ -943,6 +1020,74 @@ public class HomeMain1Fragment extends Fragment {
 
         return Uri.fromFile(outputFile);
     }
+
+
+    // --- Background Change Logic ---
+// ... (các hàm liên quan đến permissions/uploadImageToFirebaseStorage)
+
+    private void showBackgroundSelectionDialog() {
+        if (!isAdded()) return;
+
+        final String[] options = new String[DEFAULT_BACKGROUND_IDS.length + 1];
+        options[0] = "Chọn ảnh từ thư viện (Tùy chỉnh)"; // Lựa chọn đầu tiên
+
+        // Đặt tên cho các nền mặc định (ví dụ: "Nền 1", "Nền 2",...)
+        for (int i = 0; i < DEFAULT_BACKGROUND_IDS.length; i++) {
+            options[i + 1] = "Nền mặc định " + (i + 1);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Chọn nền hiển thị");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                // Lựa chọn 1: Chọn ảnh từ thư viện (logic cũ)
+                checkPermissionAndPickImage();
+            } else {
+                // Lựa chọn 2 trở đi: Chọn nền mặc định
+                int resourceId = DEFAULT_BACKGROUND_IDS[which - 1];
+                applyDefaultBackground(resourceId);
+            }
+        });
+        builder.show();
+    }
+
+    /**
+     * Áp dụng nền mặc định từ Resource ID
+     */
+    private void applyDefaultBackground(int resourceId) {
+        if (rootLayout != null && isAdded()) {
+            // 1. Set background ngay lập tức
+            rootLayout.setBackgroundResource(resourceId);
+
+            // 2. Lưu trạng thái nền mặc định vào SharedPreferences
+            sharedPreferences.edit()
+                    .putString(PREF_BACKGROUND_URL, String.valueOf(resourceId)) // Lưu Resource ID dưới dạng String
+                    .putString(PREF_BACKGROUND_SOURCE_TYPE, SOURCE_TYPE_RESOURCE)
+                    .apply();
+
+            // 3. Cập nhật ViewModel
+            if (profileData != null) {
+                profileData.setCurrentUserBackgroundImageUrl(String.valueOf(resourceId));
+            }
+
+            Toast.makeText(getContext(), "Đã đặt nền mặc định.", Toast.LENGTH_SHORT).show();
+
+            removeBackgroundUrlFromDatabase();
+        }
+    }
+
+    private void removeBackgroundUrlFromDatabase() {
+        FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (fbUser == null) return;
+        String uid = fbUser.getUid();
+
+        Log.d(TAG, "Removing background URL from Firestore for user: " + uid);
+        FirebaseFirestore.getInstance().collection("users").document(uid)
+                .update("backgroundImageUrl", null) // Hoặc xóa trường field: FieldValue.delete()
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Firestore background URL removed."))
+                .addOnFailureListener(e -> Log.e(TAG, "Firestore background URL removal failed.", e));
+    }
+
 
 
 } // End of HomeMain1Fragment class
