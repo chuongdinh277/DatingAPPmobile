@@ -77,6 +77,16 @@ public class AIChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
+    public void updateLastAIMessage(String newContent) {
+        if (!messages.isEmpty()) {
+            MessageChatBot lastMessage = messages.get(messages.size() - 1);
+            if (lastMessage.isFromAI()) {
+                lastMessage.setContent(newContent);
+                notifyItemChanged(messages.size() - 1);
+            }
+        }
+    }
+
     // --- ViewHolder cho User ---
     static class UserMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvMessage, tvTime;

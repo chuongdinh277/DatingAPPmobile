@@ -91,7 +91,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             if (isDebuggable) {
                 FirebaseAuthSettings settings = mAuth.getFirebaseAuthSettings();
                 // Enable disabling app verification for testing in debug builds
-                settings.setAppVerificationDisabledForTesting(false);
+                settings.setAppVerificationDisabledForTesting(true);
             }
         } catch (Exception ignored) {}
     }

@@ -99,6 +99,20 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     }
 
     /**
+     * Update the content of the last bot message (for streaming)
+     */
+    public void updateLastBotMessage(@NonNull String newContent) {
+        if (!messages.isEmpty()) {
+            ChatBotMessage lastMessage = messages.get(messages.size() - 1);
+            if (lastMessage.isBot()) {
+                ChatBotMessage updatedMessage = new ChatBotMessage(newContent, ChatBotMessage.TYPE_BOT, lastMessage.getTimestamp());
+                messages.set(messages.size() - 1, updatedMessage);
+                notifyItemChanged(messages.size() - 1);
+            }
+        }
+    }
+
+    /**
      * ViewHolder for chat messages
      */
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
@@ -122,4 +136,3 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         }
     }
 }
-

@@ -195,18 +195,7 @@
             android:layout_marginTop="16dp"
             android:visibility="gone" />
 
-        <!-- Login Link -->
-        <TextView
-            android:id="@+id/tvLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="32dp"
-            android:text="Đã có tài khoản? Đăng nhập"
-            android:textColor="#800D42"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+
 
     </LinearLayout>
 

@@ -3,6 +3,8 @@ package com.example.couple_app.fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,10 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.couple_app.R;
 import com.example.couple_app.adapters.ChatMessageAdapter;
 import com.example.couple_app.models.ChatBotMessage;
-import com.example.couple_app.models.ChatResponse;
 import com.example.couple_app.models.ChatSession;
 import com.example.couple_app.models.ChatSessionMessage;
-import com.example.couple_app.repositories.ChatBotRepository;
+import com.example.couple_app.managers.AIChatManager;
 import com.example.couple_app.repositories.ChatSessionRepository;
 import com.example.couple_app.utils.NetworkUtils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -59,12 +60,14 @@ public class ChatbotBottomSheetFragment extends BottomSheetDialogFragment {
     private com.example.couple_app.views.TypingIndicatorView typingIndicator;
 
     private ChatMessageAdapter adapter;
-    private ChatBotRepository repository;
     private ChatSessionRepository sessionRepository;
     private String sessionId;
     private String currentUserId;
     private boolean sessionCreatedInFirestore = false; // Track if session created
     private boolean resumeExistingSession = false; // New: whether to resume existing
+
+    private Handler updateHandler = new Handler(Looper.getMainLooper());
+    private Runnable updateRunnable;
 
     // Factory method to create fragment with a specific session
     public static ChatbotBottomSheetFragment newInstance(@NonNull String sessionId, @Nullable String title) {
@@ -192,7 +195,6 @@ public class ChatbotBottomSheetFragment extends BottomSheetDialogFragment {
      */
     private void setupRecyclerView() {
         adapter = new ChatMessageAdapter();
-        repository = new ChatBotRepository();
         sessionRepository = new ChatSessionRepository();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -286,33 +288,47 @@ public class ChatbotBottomSheetFragment extends BottomSheetDialogFragment {
         Log.d(TAG, "  User ID: " + (userId != null ? userId : "NULL - not logged in"));
         Log.d(TAG, "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-        // Send to backend with userId for personalized responses
-        if (userId != null) {
-            repository.sendMessageWithUserId(message, sessionId, userId, new ChatBotRepository.ChatBotCallback() {
+        // Add empty bot message for streaming
+        addBotMessage("");
+
+        // Send to AI backend with streaming
+        AIChatManager.sendMessageToAI(message, userId, sessionId, new AIChatManager.AICallback() {
+            private final StringBuilder content = new StringBuilder();
+
             @Override
-            public void onSuccess(@NonNull ChatResponse response) {
+            public void onToken(String token) {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
-                        // Log response details
-                        Log.d(TAG, "━━━━━━━━━━━━━━━━━━━━━━━���━━━━━━");
-                        Log.d(TAG, "Received response:");
-                        Log.d(TAG, "  Success: " + response.isSuccess());
-                        Log.d(TAG, "  Has Personal Context: " + response.hasPersonalContext());
-                        Log.d(TAG, "  Answer length: " + (response.getAnswer() != null ? response.getAnswer().length() : 0));
-                        Log.d(TAG, "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                        content.append(token);
+                        // Debounce UI update
+                        if (updateRunnable != null) {
+                            updateHandler.removeCallbacks(updateRunnable);
+                        }
+                        updateRunnable = () -> {
+                            adapter.updateLastBotMessage(content.toString());
+                            scrollToBottom();
+                        };
+                        updateHandler.postDelayed(updateRunnable, 100); // 100ms delay
+                    });
+                }
+            }
 
+            @Override
+            public void onDone(String fullAnswer) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        // Cancel any pending update
+                        if (updateRunnable != null) {
+                            updateHandler.removeCallbacks(updateRunnable);
+                        }
                         // Hide typing indicator
                         hideTypingIndicator();
 
-                        // Add bot response
-                        String answer = response.getAnswer();
-                        if (answer != null && !answer.isEmpty()) {
-                            addBotMessage(answer);
-                            // Save bot response to Firestore
-                            saveMessageToFirestore(answer, "bot");
-                        } else {
-                            addBotMessage(getString(R.string.chatbot_no_response));
-                        }
+                        // Update with final answer
+                        adapter.updateLastBotMessage(fullAnswer);
+
+                        // Save bot response to Firestore
+                        saveMessageToFirestore(fullAnswer, "bot");
 
                         // Re-enable send button
                         btnSend.setEnabled(true);
@@ -321,15 +337,19 @@ public class ChatbotBottomSheetFragment extends BottomSheetDialogFragment {
             }
 
             @Override
-            public void onError(@NonNull String error) {
+            public void onError(String error) {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
+                        // Cancel any pending update
+                        if (updateRunnable != null) {
+                            updateHandler.removeCallbacks(updateRunnable);
+                        }
                         // Hide typing indicator
                         hideTypingIndicator();
 
                         // Show error message
                         String errorMsg = getString(R.string.chatbot_error) + ": " + error;
-                        addBotMessage(errorMsg);
+                        adapter.updateLastBotMessage(errorMsg);
 
                         Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
 
@@ -338,43 +358,7 @@ public class ChatbotBottomSheetFragment extends BottomSheetDialogFragment {
                     });
                 }
             }
-            });
-        } else {
-            // Fallback: send without userId (no personalization)
-            android.util.Log.w("ChatbotBottomSheet", "⚠️ User not logged in, sending without userId");
-            repository.sendMessage(message, sessionId, new ChatBotRepository.ChatBotCallback() {
-                @Override
-                public void onSuccess(@NonNull ChatResponse response) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            hideTypingIndicator();
-                            String answer = response.getAnswer();
-                            if (answer != null && !answer.isEmpty()) {
-                                addBotMessage(answer);
-                                // Save bot response to Firestore
-                                saveMessageToFirestore(answer, "bot");
-                            } else {
-                                addBotMessage(getString(R.string.chatbot_no_response));
-                            }
-                            btnSend.setEnabled(true);
-                        });
-                    }
-                }
-
-                @Override
-                public void onError(@NonNull String error) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            hideTypingIndicator();
-                            String errorMsg = getString(R.string.chatbot_error) + ": " + error;
-                            addBotMessage(errorMsg);
-                            Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
-                            btnSend.setEnabled(true);
-                        });
-                    }
-                }
-            });
-        }
+        });
     }
 
     /**

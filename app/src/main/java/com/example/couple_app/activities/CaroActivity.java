@@ -156,7 +156,9 @@ public class CaroActivity extends AppCompatActivity {
                         btn.setBackgroundResource(R.drawable.ic_caro_o);
                     }
                 }
-                checkWinner();
+                if ("X".equals(mySymbol)) {
+                    checkWinner();
+                }
             }
 
             @Override

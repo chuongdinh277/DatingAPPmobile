@@ -26,4 +26,8 @@ public class MessageChatBot {
     public boolean isFromAI() {
         return "ai_assistant".equals(senderId);
     }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }
