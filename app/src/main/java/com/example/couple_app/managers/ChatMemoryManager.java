@@ -1,7 +1,7 @@
 package com.example.couple_app.managers;
 
-import com.example.couple_app.models.Message;
-import com.example.couple_app.models.MessageChatBot;
+import com.example.couple_app.data.model.Message;
+import com.example.couple_app.data.model.MessageChatBot;
 
 import java.util.ArrayList;
 import java.util.HashMap;

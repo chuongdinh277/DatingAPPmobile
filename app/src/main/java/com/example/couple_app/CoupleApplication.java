@@ -12,7 +12,7 @@ import com.example.couple_app.utils.AvatarCache;
 import com.google.firebase.appcheck.FirebaseAppCheck;
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.example.couple_app.managers.DatabaseManager;
+import com.example.couple_app.data.local.DatabaseManager;
 
 public class CoupleApplication extends Application {
     private static final String TAG = "CoupleApplication";

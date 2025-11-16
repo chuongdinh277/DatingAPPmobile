@@ -1,6 +1,8 @@
 package com.example.couple_app.managers;
 
 import android.util.Log;
+
+import com.example.couple_app.data.local.DatabaseManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthSettings;
 import com.google.firebase.auth.FirebaseUser;

@@ -6,7 +6,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.example.couple_app.models.GameSession;
+import com.example.couple_app.data.model.GameSession;
 import java.util.HashMap;
 import java.util.Map;
 

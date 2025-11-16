@@ -32,7 +32,7 @@
 
         <!-- Splash Screen - Main entry point -->
         <activity
-            android:name=".activities.SplashActivity"
+            android:name=".ui.activities.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.CoupleApp">
             <intent-filter>
@@ -43,126 +43,121 @@
 
         <!-- Welcome/Login Screen -->
         <activity
-            android:name=".activities.WelcomeActivity"
+            android:name=".ui.activities.WelcomeActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
 
         <!-- Game related activities -->
         <activity
-            android:name=".activities.GameListActivity"
+            android:name=".ui.activities.GameListActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
         <activity
-            android:name=".activities.WaitingRoomGarticActivity"
+            android:name=".ui.activities.WaitingRoomGarticActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
         <activity
-            android:name=".activities.GarticActivity"
+            android:name=".ui.activities.GarticActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
         <activity
-            android:name=".activities.WaitingRoomCaroActivity"
+            android:name=".ui.activities.WaitingRoomCaroActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
         <activity
-            android:name=".activities.CaroActivity"
+            android:name=".ui.activities.CaroActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
 
         <activity
-            android:name=".activities.LoginByPhoneActivity"
+            android:name=".ui.activities.LoginByPhoneActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".activities.SignUpActivity"
+            android:name=".ui.activities.SignUpActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activities.ImageActivity"
+            android:name=".ui.activities.ImageActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".activities.showImageActivity"
+            android:name=".ui.activities.showImageActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- Forgot Password Activity -->
         <activity
-            android:name=".activities.ForgotPasswordActivity"
+            android:name=".ui.activities.ForgotPasswordActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- Main Application Activities -->
         <activity
-            android:name=".activities.HomeMainActivity"
+            android:name=".ui.activities.HomeMainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.CoupleApp" />
 
-        <activity
-            android:name=".activities.ChatbotActivity"
-            android:exported="false"
-            android:theme="@style/Theme.CoupleApp" />
-
         <!-- BaseActivity - parent for other activities -->
         <activity
-            android:name=".activities.BaseActivity"
+            android:name=".ui.activities.BaseActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
 
 
         <activity
-            android:name=".activities.MessengerActivity"
+            android:name=".ui.activities.MessengerActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".activities.PairingActivity"
+            android:name=".ui.activities.PairingActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".activities.SettingActivity"
+            android:name=".ui.activities.SettingActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
 
         <!-- New: Profile settings screen -->
         <activity
-            android:name=".activities.SettingProfileActivity"
+            android:name=".ui.activities.SettingProfileActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
 
         <activity
-            android:name=".activities.PlanActivity"
+            android:name=".ui.activities.PlanActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:windowSoftInputMode="adjustNothing" />
 
         <!-- Chat History Activities -->
         <activity
-            android:name=".activities.ChatHistoryActivity"
+            android:name=".ui.activities.ChatHistoryActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:label="Lịch sử Chat" />
 
         <activity
-            android:name=".activities.ChatSessionViewActivity"
+            android:name=".ui.activities.ChatSessionViewActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp"
             android:label="Chi tiết Chat" />
 
         <!-- Notification Activity -->
         <activity
-            android:name=".activities.NotificationActivity"
+            android:name=".ui.activities.NotificationActivity"
             android:exported="false"
             android:theme="@style/Theme.CoupleApp" />
 

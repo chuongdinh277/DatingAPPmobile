@@ -4,7 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.couple_app.models.Notification;
+import com.example.couple_app.data.model.Notification;
 import com.google.firebase.database.*;
 
 import java.util.ArrayList;

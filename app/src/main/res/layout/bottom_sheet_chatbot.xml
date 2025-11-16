@@ -201,7 +201,7 @@
                 tools:listitem="@layout/item_chat_message" />
 
             <!-- Typing indicator -->
-            <com.example.couple_app.views.TypingIndicatorView
+            <com.example.couple_app.ui.views.TypingIndicatorView
                 android:id="@+id/typing_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

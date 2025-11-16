@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/app_background_soft"
-    tools:context=".activities.PlanActivity"
+    tools:context=".ui.activities.PlanActivity"
     android:paddingBottom="55dp"
     android:paddingTop="40dp">
 
