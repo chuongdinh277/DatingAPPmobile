@@ -1,0 +1,78 @@
+<resources>
+    <string name="app_name">Couple App</string>
+    <!-- Add Google Sign-In Web Client ID - Replace with your actual Web Client ID from Firebase Console -->
+    <string name="default_web_client_id">501013051271-mus50dnnjjdld03pdq9vng4qjfm0usae.apps.googleusercontent.com</string>
+    <string name="camera_button">Camera button</string>
+    <string name="about">About</string>
+    <string name="logout">Logout</string>
+    <string name="privacy">Privacy</string>
+    <string name="notification">Notification</string>
+    <string name="profile">Profile</string>
+    <string name="first_name">First Name :</string>
+    <string name="last_name">Last Name :</string>
+    <string name="username">Username :</string>
+    <string name="gmail">Gmail :</string>
+    <string name="phone">Phone Number :</string>
+    <string name="upload">Upload</string>
+    <string name="edit">Edit</string>
+    <string name="hint_message">Nhắn tin</string>
+    <string name="send">Gửi</string>
+
+
+    <string name="your_code_label">Your Code:</string>
+    <string name="default_pin_code">000000</string>
+    <string name="friend_code_hint">Friend Code</string>
+    <string name="pair">Pair</string>
+    <string name="logout_vi">Đăng xuất</string>
+
+    <!-- Chatbot strings -->
+    <string name="chatbot_label">Chatbot</string>
+    <string name="chatbot_placeholder">Đây là màn hình Chatbot (placeholder)</string>
+    <string name="ai_chatbot">AI Chatbot</string>
+    <string name="online_label">Online</string>
+    <string name="send_message_cd">Send message</string>
+    <string name="input_hint">Nhắn tin</string>
+    <string name="chatbot_welcome_message">Xin chào! Tôi là AI Chatbot của bạn. Tôi có thể giúp gì cho bạn?</string>
+    <string name="chatbot_typing">Đang trả lời...</string>
+    <string name="chatbot_no_response">Xin lỗi, tôi không thể trả lời lúc này.</string>
+    <string name="chatbot_error">Lỗi</string>
+    <string name="error_empty_message">Vui lòng nhập tin nhắn</string>
+    <string name="error_no_internet">Không có kết nối internet</string>
+
+    <!-- Plan screen strings -->
+    <string name="schedule_today_title">Lịch trình hôm nay</string>
+    <string name="schedule_today_title_full">Lịch trình ngày hôm nay %1$d/%2$d/%3$d</string>
+    <string name="schedule_day_title">Lịch trình ngày %1$d/%2$d/%3$d</string>
+    <string name="hint_new_plan">Nhập kế hoạch...</string>
+    <string name="save">Lưu</string>
+    <string name="add_plan_cd">Thêm kế hoạch</string>
+    <string name="schedule_item_default">Nội dung lịch</string>
+    <string name="delete_schedule_cd">Xóa lịch trình</string>
+    <string name="schedule_month_year">Tháng %1$d, %2$d</string>
+
+    <!-- Bottom bar content descriptions -->
+    <string name="cd_task">Task</string>
+    <string name="cd_message">Mess</string>
+    <string name="cd_home">Home</string>
+    <string name="cd_game">Game</string>
+    <string name="cd_settings">Setting</string>
+    <string name="gallery">Gallery</string>
+    <string name="back">Back</string>
+    <string name="photo_library">Thư viện ảnh</string>
+    <string name="zero_photos">0 ảnh</string>
+    <string name="new_conversation">Cuộc trò chuyện mới</string>
+
+    <!-- Chat history string -->
+    <string name="chat_history">Lịch sử chat</string>
+
+    <!-- Plan detail strings -->
+    <string name="close">Đóng</string>
+
+    <!-- Chat bottom sheet strings -->
+    <string name="chat_online_status">Đang hoạt động</string>
+    <string name="chat_offline_status">Không hoạt động</string>
+
+    <!-- Loading messages strings -->
+    <string name="loading_messages">Đang tải tin nhắn...</string>
+    <string name="loading_more_messages">Đang tải thêm tin nhắn...</string>
+</resources>

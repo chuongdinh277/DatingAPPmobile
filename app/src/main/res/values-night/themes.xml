@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Dark Theme -->
+    <style name="Base.Theme.CoupleApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#C2185B</item>
+        <item name="colorPrimaryVariant">#880E4F</item>
+        <item name="colorSecondary">#FF4081</item>
+        <item name="colorSecondaryVariant">#F50057</item>
+        <item name="android:colorBackground">@color/background_primary</item>
+        <item name="colorSurface">@color/surface_color</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+
+        <!-- Status Bar cho dark theme -->
+        <item name="android:statusBarColor">#121212</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Navigation Bar cho dark theme -->
+        <item name="android:navigationBarColor">#121212</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+
+        <!-- Edge-to-edge display -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:fitsSystemWindows">false</item>
+
+        <!-- Tránh màu đen khi keyboard xuất hiện -->
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="Theme.CoupleApp" parent="Base.Theme.CoupleApp" />
+
+    <!-- Theme cho các Activity fullscreen -->
+    <style name="Theme.CoupleApp.Fullscreen" parent="Theme.CoupleApp">
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+    </style>
+</resources>

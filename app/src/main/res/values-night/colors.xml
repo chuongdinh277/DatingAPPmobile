@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Theme Colors -->
+    <color name="background_dark">#FF121212</color>
+    <color name="surface_dark">#FF1E1E1E</color>
+    <color name="on_background_dark">#FFFFFFFF</color>
+    <color name="on_surface_dark">#FFFFFFFF</color>
+    <color name="text_secondary_dark">#FFBBBBBB</color>
+    <color name="divider_dark">#FF333333</color>
+
+    <!-- Dark theme specific colors -->
+    <color name="background_primary">#121212</color>
+    <color name="background_secondary">#1E1E1E</color>
+    <color name="surface_color">#1E1E1E</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#BBBBBB</color>
+    <color name="text_hint">#666666</color>
+    <color name="divider_color">#333333</color>
+    <color name="card_background">#1E1E1E</color>
+    <color name="button_text">#FFFFFF</color>
+    <color name="app_background_soft">#121212</color>
+    <color name="primary_text">#FFFFFF</color>
+    <color name="secondary_text">#BBBBBB</color>
+    <color name="delete_button_tint">#FFFFFF</color>
+
+    <!-- Dark pink background for dark theme -->
+    <color name="bg_app">#1A1A1A</color>
+
+    <!-- Chat colors for dark theme -->
+    <color name="chat_bubble_sent">#1A237E</color>
+    <color name="chat_bubble_received">#4A148C</color>
+    <color name="chat_text_sent">#90CAF9</color>
+    <color name="chat_text_received">#CE93D8</color>
+    <color name="chat_primary_text">#FFFFFF</color>
+    <color name="chat_secondary_text">#BBBBBB</color>
+    <color name="chat_divider">#333333</color>
+    <color name="chat_input_bar_bg">#1E1E1E</color>
+    <color name="chat_input_field_bg">#FFFFFF</color>
+
+    <!-- Button and accent colors for dark theme -->
+    <color name="google_button_text">#FFFFFF</color>
+    <color name="default_button_color">#424242</color>
+    <color name="accent_color">#FF4081</color>
+    <color name="primary_purple">#C2185B</color>
+    <color name="brandAccent">#C2185B</color>
+
+    <!-- Plan colors for dark theme -->
+    <color name="plan_item_bg_color">#1E1E1E</color>
+    <color name="plan_icon_background">#2A2A2A</color>
+    <color name="plan_icon_tint">#FFFFFF</color>
+    <color name="plan_title_text">#FFFFFF</color>
+    <color name="plan_detail_text">#BBBBBB</color>
+    <color name="plan_item_border_color">#FFFFFF</color>
+    <color name="edit_plan_text">#FFFFFF</color>
+
+    <!-- Pills and underlines for dark theme -->
+    <color name="pill_pink">#AD1457</color>
+    <color name="pill_maroon">#880E4F</color>
+    <color name="underline_dark">#FFFFFF</color>
+    <color name="underline_light">#666666</color>
+
+    <!-- Bottom sheet for dark theme -->
+    <color name="bottom_sheet_bg_color">#1E1E1E</color>
+
+    <!-- Common colors -->
+    <color name="couple_pink_bg">#2A2A2A</color>
+</resources>

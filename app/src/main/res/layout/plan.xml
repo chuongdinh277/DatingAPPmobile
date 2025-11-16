@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background_soft"
+    tools:context=".activities.PlanActivity"
+    android:paddingBottom="55dp"
+    android:paddingTop="40dp">
+
+    <TextView
+        android:id="@+id/tvMonthYear"
+        android:layout_width="221dp"
+        android:layout_height="66dp"
+        android:background="?attr/selectableItemBackground"
+        android:drawablePadding="8dp"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="Tháng 11, 2025"
+        android:textColor="@color/primary_text"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:drawableEndCompat="@drawable/ic_arrow_down"
+        app:drawableTint="@color/primary_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/calendarContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/bg_calendar_container"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:theme="@style/CustomCalendarTheme"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvMonthYear"
+        tools:visibility="visible">
+
+        <CalendarView
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:theme="@style/CustomCalendarTheme" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvTodayTitle"
+        android:layout_width="350dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="Lịch trình hôm nay"
+        android:textColor="@color/secondary_text"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.275"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calendarContainer" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSchedule"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTodayTitle" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddPlan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="Thêm kế hoạch"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/accent_color"
+        app:tint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/llAddPlan"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_input_area"
+        android:elevation="10dp"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/etNewPlan"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Nhập kế hoạch mới..."
+            android:inputType="textMultiLine"
+            android:background="@drawable/bg_edittext_rounded"
+            android:padding="12dp"
+            android:minHeight="48dp"
+            android:textColor="@color/primary_text"/>
+
+        <ImageButton
+            android:id="@+id/btnSavePlan"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/bg_button_accent_rounded"
+            android:src="@drawable/ic_send"
+            app:tint="@android:color/white"
+            android:contentDescription="Lưu" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
