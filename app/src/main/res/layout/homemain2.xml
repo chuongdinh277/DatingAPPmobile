@@ -5,7 +5,7 @@
     android:id="@+id/root_homemain2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.HomeMain2Fragment">
+    tools:context=".ui.activities.HomeMain2Fragment">
 
     <!-- Background image that fills the screen without stretching -->
     <ImageView

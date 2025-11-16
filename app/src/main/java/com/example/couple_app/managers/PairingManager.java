@@ -9,8 +9,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
-import com.example.couple_app.models.User;
-import com.example.couple_app.models.Couple;
+import com.example.couple_app.data.model.User;
+import com.example.couple_app.data.model.Couple;
 import java.util.Random;
 
 public class PairingManager {

@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
-import com.example.couple_app.managers.DatabaseManager;
-import com.example.couple_app.models.User;
+import com.example.couple_app.data.local.DatabaseManager;
+import com.example.couple_app.data.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 

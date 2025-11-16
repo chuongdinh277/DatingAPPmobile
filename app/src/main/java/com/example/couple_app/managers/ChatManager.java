@@ -9,7 +9,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
-import com.example.couple_app.models.ChatMessage;
+import com.example.couple_app.data.model.ChatMessage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

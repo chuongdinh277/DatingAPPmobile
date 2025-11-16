@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.example.couple_app.activities.WelcomeActivity;
+import com.example.couple_app.ui.activities.WelcomeActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 /**

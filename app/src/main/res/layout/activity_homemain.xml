@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/couple_pink_bg"
-    tools:context=".activities.HomeMainActivity">
+    tools:context=".ui.activities.HomeMainActivity">
 
     <!-- ViewPager2 để hi�����n thị các fragments -->
 
@@ -22,7 +22,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
 
-        <com.example.couple_app.views.DraggableImageView
+        <com.example.couple_app.ui.views.DraggableImageView
             android:id="@+id/ic_chatbot_fab"
             android:layout_width="90dp"
             android:layout_height="90dp"
